@@ -2,6 +2,31 @@
 
 Parental Guard is a comprehensive Android-based parental control solution designed to provide parents with robust monitoring and management tools for their children's digital safety. The system comprises two distinct applications: the **Parent Controller** and the **Child Agent**, seamlessly communicating to enforce safety boundaries.
 
+---
+
+## 📸 Screenshots
+
+### 🎮 Parent Controller
+<p align="center">
+  <img src="screenshots/parent_dashboard.jpg" width="30%" />
+  <img src="screenshots/device_overview.jpg" width="30%" />
+  <img src="screenshots/app_management.jpg" width="30%" />
+</p>
+<p align="center">
+  <img src="screenshots/category_limits.jpg" width="30%" />
+  <img src="screenshots/usage_reports.jpg" width="30%" />
+  <img src="screenshots/parent_settings.jpg" width="30%" />
+</p>
+
+### 🕵️ Child Agent
+<p align="center">
+  <img src="screenshots/child_welcome.jpg" width="30%" />
+  <img src="screenshots/child_permissions.jpg" width="30%" />
+  <img src="screenshots/child_qr_pairing.jpg" width="30%" />
+</p>
+
+---
+
 ## 🚀 Key Features
 
 ### 🎮 Parent Controller
