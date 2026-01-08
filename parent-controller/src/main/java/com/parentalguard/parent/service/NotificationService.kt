@@ -147,7 +147,7 @@ class NotificationService : Service() {
 
     private fun createNotification(): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Parental Guard Active")
+            .setContentTitle("Family Guard Active")
             .setContentText("Listening for child device events...")
             .setSmallIcon(R.drawable.ic_parent_logo) // Ensure this exists, or use default
             .setPriority(NotificationCompat.PRIORITY_LOW)

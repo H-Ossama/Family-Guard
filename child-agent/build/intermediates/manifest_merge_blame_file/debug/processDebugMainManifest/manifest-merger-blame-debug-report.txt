@@ -9,35 +9,35 @@
 9        android:targetSdkVersion="34" />
 10
 11    <uses-permission android:name="android.permission.INTERNET" />
-11-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:5:5-67
-11-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:5:22-64
+11-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:5:5-67
+11-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:5:22-64
 12    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-12-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:6:5-79
-12-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:6:22-76
+12-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:6:5-79
+12-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:6:22-76
 13    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-13-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:7:5-76
-13-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:7:22-73
+13-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:7:5-76
+13-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:7:22-73
 14    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-14-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:8:5-77
-14-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:8:22-74
+14-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:8:5-77
+14-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:8:22-74
 15    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
-15-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:9:5-87
-15-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:9:22-84
+15-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:9:5-87
+15-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:9:22-84
 16    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-16-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:10:5-81
-16-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:10:22-78
+16-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:10:5-81
+16-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:10:22-78
 17    <uses-permission android:name="android.permission.WAKE_LOCK" />
-17-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:11:5-68
-17-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:11:22-65
+17-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:11:5-68
+17-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:11:22-65
 18    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
-18-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:12:5-114
-18-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:12:22-75
+18-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:12:5-114
+18-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:12:22-75
 19    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-19-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:13:5-78
-19-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:13:22-75
+19-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:13:5-78
+19-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:13:22-75
 20    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
-20-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:14:5-119
-20-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:14:22-74
+20-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:14:5-119
+20-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:14:22-74
 21
 22    <permission
 22-->[androidx.core:core:1.12.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\3ba43a761911e6fdddd2cf16d70d94cb\transformed\core-1.12.0\AndroidManifest.xml:22:5-24:47
@@ -51,165 +51,165 @@
 26-->[androidx.core:core:1.12.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\3ba43a761911e6fdddd2cf16d70d94cb\transformed\core-1.12.0\AndroidManifest.xml:26:22-94
 27
 28    <application
-28-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:16:5-98:19
+28-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:16:5-98:19
 29        android:name="com.parentalguard.child.ChildApp"
-29-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:17:9-33
+29-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:17:9-33
 30        android:allowBackup="true"
-30-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:18:9-35
+30-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:18:9-35
 31        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
 31-->[androidx.core:core:1.12.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\3ba43a761911e6fdddd2cf16d70d94cb\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
 32        android:debuggable="true"
 33        android:extractNativeLibs="false"
 34        android:icon="@drawable/ic_system_service"
-34-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:19:9-51
+34-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:19:9-51
 35        android:label="Android System Services"
-35-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:20:9-48
+35-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:20:9-48
 36        android:supportsRtl="true"
-36-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:21:9-35
+36-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:21:9-35
 37        android:theme="@style/Theme.ChildApp" >
-37-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:22:9-46
+37-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:22:9-46
 38
 39        <!-- Main Activity for Setup -->
 40        <activity
-40-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:25:9-32:20
+40-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:25:9-32:20
 41            android:name="com.parentalguard.child.MainActivity"
-41-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:26:13-41
+41-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:26:13-41
 42            android:exported="true" >
-42-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:27:13-36
+42-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:27:13-36
 43            <intent-filter>
-43-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:28:13-31:29
+43-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:28:13-31:29
 44                <action android:name="android.intent.action.MAIN" />
-44-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:29:17-69
-44-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:29:25-66
+44-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:29:17-69
+44-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:29:25-66
 45
 46                <category android:name="android.intent.category.LAUNCHER" />
-46-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:30:17-77
-46-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:30:27-74
+46-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:30:17-77
+46-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:30:27-74
 47            </intent-filter>
 48        </activity>
 49        <activity
-49-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:34:9-83
+49-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:34:9-83
 50            android:name="com.parentalguard.child.ui.OnboardingActivity"
-50-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:34:19-56
+50-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:34:19-56
 51            android:exported="false" />
-51-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:34:57-81
+51-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:34:57-81
 52
 53        <!-- Foreground Service -->
 54        <service
-54-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:37:9-41:56
+54-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:37:9-41:56
 55            android:name="com.parentalguard.child.service.MonitorService"
-55-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:38:13-51
+55-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:38:13-51
 56            android:enabled="true"
-56-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:39:13-35
+56-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:39:13-35
 57            android:exported="false"
-57-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:40:13-37
+57-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:40:13-37
 58            android:foregroundServiceType="dataSync" />
-58-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:41:13-53
+58-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:41:13-53
 59
 60        <!-- Accessibility Service (Blocking Engine) -->
 61        <service
-61-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:44:9-54:19
+61-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:44:9-54:19
 62            android:name="com.parentalguard.child.service.BlockerAccessibilityService"
-62-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:45:13-64
+62-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:45:13-64
 63            android:exported="true"
-63-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:47:13-36
+63-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:47:13-36
 64            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
-64-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:46:13-79
+64-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:46:13-79
 65            <intent-filter>
-65-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:48:13-50:29
+65-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:48:13-50:29
 66                <action android:name="android.accessibilityservice.AccessibilityService" />
-66-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:49:17-92
-66-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:49:25-89
+66-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:49:17-92
+66-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:49:25-89
 67            </intent-filter>
 68
 69            <meta-data
-69-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:51:13-53:72
+69-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:51:13-53:72
 70                android:name="android.accessibilityservice"
-70-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:52:17-60
+70-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:52:17-60
 71                android:resource="@xml/accessibility_service_config" />
-71-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:53:17-69
+71-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:53:17-69
 72        </service>
 73
 74        <activity
-74-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:56:9-61:40
+74-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:56:9-61:40
 75            android:name="com.parentalguard.child.ui.BlockingActivity"
-75-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:57:13-48
+75-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:57:13-48
 76            android:excludeFromRecents="true"
-76-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:59:13-46
+76-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:59:13-46
 77            android:exported="false"
-77-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:61:13-37
+77-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:61:13-37
 78            android:launchMode="singleInstance"
-78-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:60:13-48
+78-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:60:13-48
 79            android:theme="@style/Theme.AppCompat.NoActionBar" />
-79-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:58:13-63
+79-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:58:13-63
 80
 81        <!-- Device Admin -->
 82        <receiver
-82-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:64:9-76:20
+82-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:64:9-76:20
 83            android:name="com.parentalguard.child.receiver.AdminReceiver"
-83-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:65:13-51
+83-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:65:13-51
 84            android:description="@string/accessibility_service_description"
-84-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:67:13-76
+84-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:67:13-76
 85            android:exported="true"
-85-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:69:13-36
+85-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:69:13-36
 86            android:label="@string/app_name"
-86-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:66:13-45
+86-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:66:13-45
 87            android:permission="android.permission.BIND_DEVICE_ADMIN" >
-87-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:68:13-70
+87-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:68:13-70
 88            <meta-data
-88-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:70:13-72:65
+88-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:70:13-72:65
 89                android:name="android.app.device_admin"
-89-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:71:17-56
+89-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:71:17-56
 90                android:resource="@xml/device_admin_policies" />
-90-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:72:17-62
+90-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:72:17-62
 91
 92            <intent-filter>
-92-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:73:13-75:29
+92-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:73:13-75:29
 93                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
-93-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:74:17-82
-93-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:74:25-79
+93-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:74:17-82
+93-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:74:25-79
 94            </intent-filter>
 95        </receiver>
 96
 97        <!-- Package Receiver -->
 98        <receiver
-98-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:79:9-85:20
+98-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:79:9-85:20
 99            android:name="com.parentalguard.child.receiver.PackageReceiver"
-99-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:79:19-59
+99-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:79:19-59
 100            android:exported="true" >
-100-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:79:60-83
+100-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:79:60-83
 101            <intent-filter>
-101-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:80:13-84:29
+101-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:80:13-84:29
 102                <action android:name="android.intent.action.PACKAGE_ADDED" />
-102-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:81:17-78
-102-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:81:25-75
+102-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:81:17-78
+102-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:81:25-75
 103                <action android:name="android.intent.action.PACKAGE_REMOVED" />
-103-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:82:17-80
-103-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:82:25-77
+103-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:82:17-80
+103-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:82:25-77
 104
 105                <data android:scheme="package" />
-105-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:83:17-50
-105-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:83:23-47
+105-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:83:17-50
+105-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:83:23-47
 106            </intent-filter>
 107        </receiver>
 108
 109        <!-- Boot Receiver -->
 110        <receiver
-110-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:88:9-96:20
+110-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:88:9-96:20
 111            android:name="com.parentalguard.child.receiver.BootReceiver"
-111-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:89:13-50
+111-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:89:13-50
 112            android:enabled="true"
-112-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:90:13-35
+112-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:90:13-35
 113            android:exported="true" >
-113-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:91:13-36
+113-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:91:13-36
 114            <intent-filter>
-114-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:92:13-95:29
+114-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:92:13-95:29
 115                <action android:name="android.intent.action.BOOT_COMPLETED" />
-115-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:93:17-79
-115-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:93:25-76
+115-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:93:17-79
+115-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:93:25-76
 116                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-116-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:94:17-82
-116-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:94:25-79
+116-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:94:17-82
+116-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:94:25-79
 117            </intent-filter>
 118        </receiver>
 119
@@ -393,8 +393,8 @@
 211            <intent-filter>
 211-->[androidx.work:work-runtime:2.9.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\ce94410de41ddeeaa7ec57ad08586350\transformed\work-runtime-2.9.0\AndroidManifest.xml:116:13-120:29
 212                <action android:name="android.intent.action.BOOT_COMPLETED" />
-212-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:93:17-79
-212-->C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:93:25-76
+212-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:93:17-79
+212-->C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:93:25-76
 213                <action android:name="android.intent.action.TIME_SET" />
 213-->[androidx.work:work-runtime:2.9.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\ce94410de41ddeeaa7ec57ad08586350\transformed\work-runtime-2.9.0\AndroidManifest.xml:118:17-73
 213-->[androidx.work:work-runtime:2.9.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\ce94410de41ddeeaa7ec57ad08586350\transformed\work-runtime-2.9.0\AndroidManifest.xml:118:25-70

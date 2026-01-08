@@ -1,10 +1,10 @@
 -- Merging decision tree log ---
 manifest
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:2:1-100:12
-INJECTED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:2:1-100:12
-INJECTED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:2:1-100:12
-INJECTED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:2:1-100:12
-MERGED from [:common] C:\Dev\Parental Guard\ParentalControl\common\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:2:1-100:12
+INJECTED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:2:1-100:12
+INJECTED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:2:1-100:12
+INJECTED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:2:1-100:12
+MERGED from [:common] C:\Dev\Family Guard\ParentalControl\common\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\9c09e784ddbb2a323c8336379946d765\transformed\material-1.11.0\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.appcompat:appcompat-resources:1.6.1] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\931c20134f596ebcb92eb004b20042fa\transformed\jetified-appcompat-resources-1.6.1\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.constraintlayout:constraintlayout:2.0.1] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\3cf6998c1cbe77f7e951e1e66475d090\transformed\constraintlayout-2.0.1\AndroidManifest.xml:2:1-11:12
@@ -82,70 +82,70 @@ MERGED from [androidx.documentfile:documentfile:1.0.0] C:\Users\H_Oussama\.gradl
 MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\b6a95d9be61b2f3cdfc9f585ecdc5512\transformed\localbroadcastmanager-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.print:print:1.0.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\e22d596174d226baf23c366709e9e590\transformed\print-1.0.0\AndroidManifest.xml:17:1-22:12
 	package
-		INJECTED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml
+		INJECTED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml
 	android:versionName
-		INJECTED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml
+		INJECTED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml
 	xmlns:tools
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:3:5-51
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:3:5-51
 	android:versionCode
-		INJECTED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml
+		INJECTED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml
 	xmlns:android
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:2:11-69
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:2:11-69
 uses-permission#android.permission.INTERNET
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:5:5-67
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:5:5-67
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:5:22-64
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:5:22-64
 uses-permission#android.permission.ACCESS_NETWORK_STATE
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:6:5-79
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:6:5-79
 MERGED from [androidx.work:work-runtime:2.9.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\ce94410de41ddeeaa7ec57ad08586350\transformed\work-runtime-2.9.0\AndroidManifest.xml:24:5-79
 MERGED from [androidx.work:work-runtime:2.9.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\ce94410de41ddeeaa7ec57ad08586350\transformed\work-runtime-2.9.0\AndroidManifest.xml:24:5-79
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:6:22-76
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:6:22-76
 uses-permission#android.permission.ACCESS_WIFI_STATE
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:7:5-76
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:7:5-76
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:7:22-73
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:7:22-73
 uses-permission#android.permission.FOREGROUND_SERVICE
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:8:5-77
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:8:5-77
 MERGED from [androidx.work:work-runtime:2.9.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\ce94410de41ddeeaa7ec57ad08586350\transformed\work-runtime-2.9.0\AndroidManifest.xml:26:5-77
 MERGED from [androidx.work:work-runtime:2.9.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\ce94410de41ddeeaa7ec57ad08586350\transformed\work-runtime-2.9.0\AndroidManifest.xml:26:5-77
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:8:22-74
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:8:22-74
 uses-permission#android.permission.FOREGROUND_SERVICE_DATA_SYNC
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:9:5-87
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:9:5-87
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:9:22-84
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:9:22-84
 uses-permission#android.permission.RECEIVE_BOOT_COMPLETED
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:10:5-81
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:10:5-81
 MERGED from [androidx.work:work-runtime:2.9.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\ce94410de41ddeeaa7ec57ad08586350\transformed\work-runtime-2.9.0\AndroidManifest.xml:25:5-81
 MERGED from [androidx.work:work-runtime:2.9.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\ce94410de41ddeeaa7ec57ad08586350\transformed\work-runtime-2.9.0\AndroidManifest.xml:25:5-81
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:10:22-78
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:10:22-78
 uses-permission#android.permission.WAKE_LOCK
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:11:5-68
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:11:5-68
 MERGED from [androidx.work:work-runtime:2.9.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\ce94410de41ddeeaa7ec57ad08586350\transformed\work-runtime-2.9.0\AndroidManifest.xml:23:5-68
 MERGED from [androidx.work:work-runtime:2.9.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\ce94410de41ddeeaa7ec57ad08586350\transformed\work-runtime-2.9.0\AndroidManifest.xml:23:5-68
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:11:22-65
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:11:22-65
 uses-permission#android.permission.PACKAGE_USAGE_STATS
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:12:5-114
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:12:5-114
 	tools:ignore
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:12:76-111
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:12:76-111
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:12:22-75
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:12:22-75
 uses-permission#android.permission.SYSTEM_ALERT_WINDOW
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:13:5-78
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:13:5-78
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:13:22-75
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:13:22-75
 uses-permission#android.permission.QUERY_ALL_PACKAGES
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:14:5-119
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:14:5-119
 	tools:ignore
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:14:75-116
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:14:75-116
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:14:22-74
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:14:22-74
 application
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:16:5-98:19
-INJECTED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:16:5-98:19
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:16:5-98:19
+INJECTED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:16:5-98:19
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\9c09e784ddbb2a323c8336379946d765\transformed\material-1.11.0\AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\9c09e784ddbb2a323c8336379946d765\transformed\material-1.11.0\AndroidManifest.xml:22:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.0.1] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\3cf6998c1cbe77f7e951e1e66475d090\transformed\constraintlayout-2.0.1\AndroidManifest.xml:9:5-20
@@ -171,153 +171,153 @@ MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\H_Oussam
 MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\b82a00c4d92915c14fb98cde9beff510\transformed\jetified-startup-runtime-1.1.1\AndroidManifest.xml:25:5-31:19
 MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\b82a00c4d92915c14fb98cde9beff510\transformed\jetified-startup-runtime-1.1.1\AndroidManifest.xml:25:5-31:19
 	android:extractNativeLibs
-		INJECTED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml
+		INJECTED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.12.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\3ba43a761911e6fdddd2cf16d70d94cb\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
 	android:supportsRtl
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:21:9-35
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:21:9-35
 	android:label
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:20:9-48
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:20:9-48
 	android:icon
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:19:9-51
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:19:9-51
 	android:allowBackup
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:18:9-35
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:18:9-35
 	android:theme
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:22:9-46
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:22:9-46
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:17:9-33
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:17:9-33
 activity#com.parentalguard.child.MainActivity
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:25:9-32:20
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:25:9-32:20
 	android:exported
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:27:13-36
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:27:13-36
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:26:13-41
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:26:13-41
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:28:13-31:29
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:28:13-31:29
 action#android.intent.action.MAIN
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:29:17-69
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:29:17-69
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:29:25-66
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:29:25-66
 category#android.intent.category.LAUNCHER
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:30:17-77
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:30:17-77
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:30:27-74
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:30:27-74
 activity#com.parentalguard.child.ui.OnboardingActivity
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:34:9-83
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:34:9-83
 	android:exported
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:34:57-81
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:34:57-81
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:34:19-56
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:34:19-56
 service#com.parentalguard.child.service.MonitorService
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:37:9-41:56
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:37:9-41:56
 	android:enabled
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:39:13-35
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:39:13-35
 	android:exported
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:40:13-37
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:40:13-37
 	android:foregroundServiceType
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:41:13-53
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:41:13-53
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:38:13-51
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:38:13-51
 service#com.parentalguard.child.service.BlockerAccessibilityService
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:44:9-54:19
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:44:9-54:19
 	android:exported
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:47:13-36
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:47:13-36
 	android:permission
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:46:13-79
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:46:13-79
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:45:13-64
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:45:13-64
 intent-filter#action:name:android.accessibilityservice.AccessibilityService
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:48:13-50:29
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:48:13-50:29
 action#android.accessibilityservice.AccessibilityService
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:49:17-92
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:49:17-92
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:49:25-89
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:49:25-89
 meta-data#android.accessibilityservice
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:51:13-53:72
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:51:13-53:72
 	android:resource
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:53:17-69
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:53:17-69
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:52:17-60
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:52:17-60
 activity#com.parentalguard.child.ui.BlockingActivity
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:56:9-61:40
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:56:9-61:40
 	android:excludeFromRecents
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:59:13-46
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:59:13-46
 	android:launchMode
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:60:13-48
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:60:13-48
 	android:exported
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:61:13-37
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:61:13-37
 	android:theme
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:58:13-63
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:58:13-63
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:57:13-48
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:57:13-48
 receiver#com.parentalguard.child.receiver.AdminReceiver
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:64:9-76:20
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:64:9-76:20
 	android:label
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:66:13-45
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:66:13-45
 	android:exported
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:69:13-36
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:69:13-36
 	android:permission
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:68:13-70
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:68:13-70
 	android:description
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:67:13-76
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:67:13-76
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:65:13-51
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:65:13-51
 meta-data#android.app.device_admin
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:70:13-72:65
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:70:13-72:65
 	android:resource
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:72:17-62
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:72:17-62
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:71:17-56
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:71:17-56
 intent-filter#action:name:android.app.action.DEVICE_ADMIN_ENABLED
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:73:13-75:29
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:73:13-75:29
 action#android.app.action.DEVICE_ADMIN_ENABLED
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:74:17-82
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:74:17-82
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:74:25-79
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:74:25-79
 receiver#com.parentalguard.child.receiver.PackageReceiver
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:79:9-85:20
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:79:9-85:20
 	android:exported
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:79:60-83
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:79:60-83
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:79:19-59
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:79:19-59
 intent-filter#action:name:android.intent.action.PACKAGE_ADDED+action:name:android.intent.action.PACKAGE_REMOVED+data:scheme:package
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:80:13-84:29
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:80:13-84:29
 action#android.intent.action.PACKAGE_ADDED
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:81:17-78
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:81:17-78
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:81:25-75
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:81:25-75
 action#android.intent.action.PACKAGE_REMOVED
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:82:17-80
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:82:17-80
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:82:25-77
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:82:25-77
 data
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:83:17-50
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:83:17-50
 	android:scheme
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:83:23-47
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:83:23-47
 receiver#com.parentalguard.child.receiver.BootReceiver
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:88:9-96:20
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:88:9-96:20
 	android:enabled
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:90:13-35
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:90:13-35
 	android:exported
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:91:13-36
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:91:13-36
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:89:13-50
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:89:13-50
 intent-filter#action:name:android.intent.action.BOOT_COMPLETED+action:name:android.intent.action.QUICKBOOT_POWERON
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:92:13-95:29
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:92:13-95:29
 action#android.intent.action.BOOT_COMPLETED
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:93:17-79
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:93:17-79
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:93:25-76
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:93:25-76
 action#android.intent.action.QUICKBOOT_POWERON
-ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:94:17-82
+ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:94:17-82
 	android:name
-		ADDED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:94:25-79
+		ADDED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml:94:25-79
 uses-sdk
-INJECTED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml reason: use-sdk injection requested
-INJECTED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml
-INJECTED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml
-MERGED from [:common] C:\Dev\Parental Guard\ParentalControl\common\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
-MERGED from [:common] C:\Dev\Parental Guard\ParentalControl\common\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+INJECTED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml
+INJECTED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml
+MERGED from [:common] C:\Dev\Family Guard\ParentalControl\common\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:common] C:\Dev\Family Guard\ParentalControl\common\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\9c09e784ddbb2a323c8336379946d765\transformed\material-1.11.0\AndroidManifest.xml:20:5-44
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\9c09e784ddbb2a323c8336379946d765\transformed\material-1.11.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.appcompat:appcompat-resources:1.6.1] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\931c20134f596ebcb92eb004b20042fa\transformed\jetified-appcompat-resources-1.6.1\AndroidManifest.xml:20:5-44
@@ -471,9 +471,9 @@ MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] C:\User
 MERGED from [androidx.print:print:1.0.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\e22d596174d226baf23c366709e9e590\transformed\print-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.print:print:1.0.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\e22d596174d226baf23c366709e9e590\transformed\print-1.0.0\AndroidManifest.xml:20:5-44
 	android:targetSdkVersion
-		INJECTED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml
+		INJECTED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml
 	android:minSdkVersion
-		INJECTED from C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml
+		INJECTED from C:\Dev\Family Guard\ParentalControl\child-agent\src\main\AndroidManifest.xml
 activity#androidx.compose.ui.tooling.PreviewActivity
 ADDED from [androidx.compose.ui:ui-tooling-android:1.5.0] C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\4c2b16315fb7b5cc803b64bc95c93be6\transformed\jetified-ui-tooling-release\AndroidManifest.xml:23:9-25:39
 	android:exported

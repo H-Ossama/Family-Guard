@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Parental Guard</string>
+    <string name="app_name">Family Guard</string>
     
     <!-- Main Screen -->
     <string name="scan_qr">Scan QR Code</string>
@@ -82,11 +82,11 @@
     <string name="settings_language">Language</string>
     <string name="language_english">English</string>
     <string name="language_darija">العربية (Darija)</string>
-    <string name="about_title">About Parental Guard</string>
+    <string name="about_title">About Family Guard</string>
     <string name="about_section_title">About</string>
     <string name="app_version">Version 1.0.0</string>
     <string name="about_desc">Protecting your digital family</string>
-    <string name="about_dialog_desc">Parental Guard helps you keep your children safe online.</string>
+    <string name="about_dialog_desc">Family Guard helps you keep your children safe online.</string>
     <string name="label_features">Key Features:</string>
 
      <!-- Security -->

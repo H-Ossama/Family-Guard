@@ -1,6 +1,6 @@
-# 🛡️ Parental Guard
+# 🛡️ Family Guard
 
-Parental Guard is a comprehensive Android-based parental control solution designed to provide parents with robust monitoring and management tools for their children's digital safety. The system comprises two distinct applications: the **Parent Controller** and the **Child Agent**, seamlessly communicating to enforce safety boundaries.
+Family Guard is a comprehensive Android-based parental control solution designed to provide parents with robust monitoring and management tools for their children's digital safety. The system comprises two distinct applications: the **Parent Controller** and the **Child Agent**, seamlessly communicating to enforce safety boundaries.
 
 ---
 
@@ -72,7 +72,7 @@ The Child Agent hosts a lightweight Ktor server, allowing the Parent Controller 
 
 ## 🌍 Localization
 
-Parental Guard is built with inclusivity in mind, featuring:
+Family Guard is built with inclusivity in mind, featuring:
 - **Full Arabic/Darija Support**: Context-aware translations for the Moroccan region.
 - **Latin Numeral Support**: Ensuring consistency across localized formats.
 

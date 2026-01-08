@@ -43,7 +43,7 @@
             "outputFile": "com.parentalguard.child.child-agent-mergeDebugResources-2:/values-night-v8/values-night-v8.xml",
             "map": [
                 {
-                    "source": "C:\\Dev\\Parental Guard\\ParentalControl\\child-agent\\src\\main\\res\\values-night\\colors.xml",
+                    "source": "C:\\Dev\\Family Guard\\ParentalControl\\child-agent\\src\\main\\res\\values-night\\colors.xml",
                     "from": {
                         "startLines": "12,3,4,5,8,9,13",
                         "startColumns": "4,4,4,4,4,4,4",

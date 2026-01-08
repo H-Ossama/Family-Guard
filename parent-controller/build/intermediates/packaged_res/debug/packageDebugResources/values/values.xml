@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="about_desc">Protecting your digital family</string>
-    <string name="about_dialog_desc">Parental Guard helps you keep your children safe online.</string>
+    <string name="about_dialog_desc">Family Guard helps you keep your children safe online.</string>
     <string name="about_section_title">About</string>
-    <string name="about_title">About Parental Guard</string>
+    <string name="about_title">About Family Guard</string>
     <string name="action_add_device">Add Device</string>
     <string name="action_add_device_desc">Scan QR code</string>
     <string name="action_approve">Approve</string>
@@ -23,7 +23,7 @@
     <string name="action_unlock">Unlock</string>
     <string name="action_unlock_biometric">Biometric Unlock</string>
     <string name="add_to_whitelist">Add to Whitelist</string>
-    <string name="app_name">Parental Guard</string>
+    <string name="app_name">Family Guard</string>
     <string name="app_usage">App Usage</string>
     <string name="app_version">Version 1.0.0</string>
     <string name="appearance_title">Appearance</string>

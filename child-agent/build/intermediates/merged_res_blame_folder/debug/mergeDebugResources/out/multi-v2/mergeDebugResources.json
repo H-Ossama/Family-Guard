@@ -2103,7 +2103,7 @@
             "outputFile": "C:\\Users\\H_Oussama\\.gradle\\daemon\\9.0-milestone-1\\com.parentalguard.child.child-agent-debug-4:\\values-ar_values-ar.arsc.flat",
             "map": [
                 {
-                    "source": "C:\\Dev\\Parental Guard\\ParentalControl\\child-agent\\src\\main\\res\\values-ar\\strings.xml",
+                    "source": "C:\\Dev\\Family Guard\\ParentalControl\\child-agent\\src\\main\\res\\values-ar\\strings.xml",
                     "from": {
                         "startLines": "4,17,51,50,1,29,100,30,53,52,60,62,59,63,61,58,90,8,54,55,10,11,92,97,98,96,95,85,84,86,77,76,83,82,81,87,80,79,78,9,36,35,41,37,42,34,33,38,40,39,91,25,24,22,23,19,18,99,5,16,6,7,66,67,72,73,68,69,70,71,47,15,13,14,12,27,28,26,46,45",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -2212,7 +2212,7 @@
             "outputFile": "C:\\Users\\H_Oussama\\.gradle\\daemon\\9.0-milestone-1\\com.parentalguard.child.child-agent-debug-4:\\values-en_values-en.arsc.flat",
             "map": [
                 {
-                    "source": "C:\\Dev\\Parental Guard\\ParentalControl\\child-agent\\src\\main\\res\\values-en\\strings.xml",
+                    "source": "C:\\Dev\\Family Guard\\ParentalControl\\child-agent\\src\\main\\res\\values-en\\strings.xml",
                     "from": {
                         "startLines": "4,17,51,50,1,29,100,30,53,52,60,62,59,63,61,58,90,8,54,55,10,11,92,97,98,96,95,85,84,86,77,76,83,82,81,87,80,79,78,9,36,35,41,37,42,34,33,38,40,39,91,25,24,22,23,19,18,99,5,16,6,7,66,67,72,73,68,69,70,71,47,15,13,14,12,27,28,26,46,45",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -2694,7 +2694,7 @@
             "outputFile": "C:\\Users\\H_Oussama\\.gradle\\daemon\\9.0-milestone-1\\com.parentalguard.child.child-agent-debug-4:\\values-night-v8_values-night-v8.arsc.flat",
             "map": [
                 {
-                    "source": "C:\\Dev\\Parental Guard\\ParentalControl\\child-agent\\src\\main\\res\\values-night\\colors.xml",
+                    "source": "C:\\Dev\\Family Guard\\ParentalControl\\child-agent\\src\\main\\res\\values-night\\colors.xml",
                     "from": {
                         "startLines": "12,3,4,5,8,9,13",
                         "startColumns": "4,4,4,4,4,4,4",
@@ -3511,7 +3511,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Dev\\Parental Guard\\ParentalControl\\child-agent\\src\\main\\res\\values\\colors.xml",
+                    "source": "C:\\Dev\\Family Guard\\ParentalControl\\child-agent\\src\\main\\res\\values\\colors.xml",
                     "from": {
                         "startLines": "-1,-1,-1,-1,-1,-1,-1",
                         "startColumns": "-1,-1,-1,-1,-1,-1,-1",
@@ -3620,7 +3620,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Dev\\Parental Guard\\ParentalControl\\child-agent\\src\\main\\res\\values\\strings.xml",
+                    "source": "C:\\Dev\\Family Guard\\ParentalControl\\child-agent\\src\\main\\res\\values\\strings.xml",
                     "from": {
                         "startLines": "-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,46,-1",
                         "startColumns": "-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,4,-1",
@@ -3760,7 +3760,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Dev\\Parental Guard\\ParentalControl\\child-agent\\src\\main\\res\\values\\themes.xml",
+                    "source": "C:\\Dev\\Family Guard\\ParentalControl\\child-agent\\src\\main\\res\\values\\themes.xml",
                     "from": {
                         "startLines": "-1",
                         "startColumns": "-1",
@@ -5304,7 +5304,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Dev\\Parental Guard\\ParentalControl\\child-agent\\src\\main\\res\\values\\colors.xml",
+                    "source": "C:\\Dev\\Family Guard\\ParentalControl\\child-agent\\src\\main\\res\\values\\colors.xml",
                     "from": {
                         "startLines": "7,2,3,4,5,6,8",
                         "startColumns": "4,4,4,4,4,4,4",
@@ -5452,7 +5452,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Dev\\Parental Guard\\ParentalControl\\child-agent\\src\\main\\res\\values\\strings.xml",
+                    "source": "C:\\Dev\\Family Guard\\ParentalControl\\child-agent\\src\\main\\res\\values\\strings.xml",
                     "from": {
                         "startLines": "4,17,51,50,1,29,100,30,53,52,60,62,59,63,61,58,90,8,54,55,10,11,92,97,98,96,95,85,84,86,77,76,83,82,81,87,80,79,78,9,36,35,41,37,42,34,33,38,40,39,91,25,24,22,23,19,18,99,5,16,6,7,66,67,72,73,68,69,70,71,47,15,13,14,12,27,28,26,46,45",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -5632,7 +5632,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Dev\\Parental Guard\\ParentalControl\\child-agent\\src\\main\\res\\values\\themes.xml",
+                    "source": "C:\\Dev\\Family Guard\\ParentalControl\\child-agent\\src\\main\\res\\values\\themes.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

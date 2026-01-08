@@ -1,12 +1,12 @@
-com.parentalguard.child.child-agent-pngs-0 C:\Dev\Parental Guard\ParentalControl\child-agent\build\generated\res\pngs\debug
-com.parentalguard.child.child-agent-resValues-1 C:\Dev\Parental Guard\ParentalControl\child-agent\build\generated\res\resValues\debug
-com.parentalguard.child.child-agent-updated_navigation_xml-2 C:\Dev\Parental Guard\ParentalControl\child-agent\build\generated\updated_navigation_xml\debug
-com.parentalguard.child.child-agent-packageDebugResources-3 C:\Dev\Parental Guard\ParentalControl\child-agent\build\intermediates\incremental\debug\packageDebugResources\merged.dir
-com.parentalguard.child.child-agent-packageDebugResources-4 C:\Dev\Parental Guard\ParentalControl\child-agent\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
-com.parentalguard.child.child-agent-debug-5 C:\Dev\Parental Guard\ParentalControl\child-agent\build\intermediates\merged_res\debug\mergeDebugResources
-com.parentalguard.child.child-agent-debug-6 C:\Dev\Parental Guard\ParentalControl\child-agent\src\debug\res
-com.parentalguard.child.child-agent-main-7 C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\res
-com.parentalguard.child.child-agent-debug-8 C:\Dev\Parental Guard\ParentalControl\common\build\intermediates\packaged_res\debug\packageDebugResources
+com.parentalguard.child.child-agent-pngs-0 C:\Dev\Family Guard\ParentalControl\child-agent\build\generated\res\pngs\debug
+com.parentalguard.child.child-agent-resValues-1 C:\Dev\Family Guard\ParentalControl\child-agent\build\generated\res\resValues\debug
+com.parentalguard.child.child-agent-updated_navigation_xml-2 C:\Dev\Family Guard\ParentalControl\child-agent\build\generated\updated_navigation_xml\debug
+com.parentalguard.child.child-agent-packageDebugResources-3 C:\Dev\Family Guard\ParentalControl\child-agent\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+com.parentalguard.child.child-agent-packageDebugResources-4 C:\Dev\Family Guard\ParentalControl\child-agent\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+com.parentalguard.child.child-agent-debug-5 C:\Dev\Family Guard\ParentalControl\child-agent\build\intermediates\merged_res\debug\mergeDebugResources
+com.parentalguard.child.child-agent-debug-6 C:\Dev\Family Guard\ParentalControl\child-agent\src\debug\res
+com.parentalguard.child.child-agent-main-7 C:\Dev\Family Guard\ParentalControl\child-agent\src\main\res
+com.parentalguard.child.child-agent-debug-8 C:\Dev\Family Guard\ParentalControl\common\build\intermediates\packaged_res\debug\packageDebugResources
 com.parentalguard.child.child-agent-sqlite-2.4.0-9 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\0074150f0f0f10f278f93de05f12956f\transformed\sqlite-2.4.0\res
 com.parentalguard.child.child-agent-jetified-ui-tooling-data-release-10 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\04298ef2c3f14782446a8c4dda6ea9bb\transformed\jetified-ui-tooling-data-release\res
 com.parentalguard.child.child-agent-jetified-lifecycle-viewmodel-ktx-2.6.1-11 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\05fd14580776191aef4767eefb3aff45\transformed\jetified-lifecycle-viewmodel-ktx-2.6.1\res

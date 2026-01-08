@@ -85,7 +85,7 @@
     <string name="about_section_title">حول</string>
     <string name="app_version">الإصدار 1.0.0</string>
     <string name="about_desc">حماية لعائلتك الرقمية</string>
-    <string name="about_dialog_desc">يساعدك Parental Guard في الحفاظ على سلامة أطفالك على الإنترنت.</string>
+    <string name="about_dialog_desc">يساعدك Family Guard في الحفاظ على سلامة أطفالك على الإنترنت.</string>
     <string name="label_features">الميزات الرئيسية:</string>
     
     <!-- Security -->

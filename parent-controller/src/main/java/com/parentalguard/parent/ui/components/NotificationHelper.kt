@@ -12,7 +12,7 @@ import com.parentalguard.parent.R
 
 object NotificationHelper {
     private const val CHANNEL_ID = "parental_events"
-    private const val CHANNEL_NAME = "Parental Guard Events"
+    private const val CHANNEL_NAME = "Family Guard Events"
     private const val CHANNEL_DESC = "Notifications for child requests and status changes"
 
     fun createNotificationChannel(context: Context) {
