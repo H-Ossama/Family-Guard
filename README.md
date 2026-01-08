@@ -6,7 +6,7 @@ Family Guard is a comprehensive Android-based parental control solution designed
 
 ## 📸 Screenshots
 
-### 🎮 Parent Controller
+### 👨‍👩‍👧‍👦 Parent Controller
 <p align="center">
   <img src="screenshots/parent_dashboard.jpg" width="30%" />
   <img src="screenshots/device_overview.jpg" width="30%" />
@@ -18,7 +18,7 @@ Family Guard is a comprehensive Android-based parental control solution designed
   <img src="screenshots/parent_settings.jpg" width="30%" />
 </p>
 
-### 🕵️ Child Agent
+### 👶 Child Agent
 <p align="center">
   <img src="screenshots/child_welcome.jpg" width="30%" />
   <img src="screenshots/child_permissions.jpg" width="30%" />
