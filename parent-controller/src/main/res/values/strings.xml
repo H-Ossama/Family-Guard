@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Parental Guard</string>
+    
+    <!-- Main Screen -->
+    <string name="scan_qr">Scan QR Code</string>
+    <string name="discovered_devices">Discovered Devices:</string>
+    <string name="no_devices">No devices found</string>
+    <string name="connect">Connect</string>
+    <string name="back">Back</string>
+    
+    <!-- Device Control -->
+    <string name="lock_device">Lock Device</string>
+    <string name="unlock_device">Unlock Device</string>
+    
+    <!-- Navigation -->
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_reports">Reports</string>
+    <string name="nav_devices">Devices</string>
+    <string name="nav_settings">Settings</string>
+    <string name="tab_overview">Overview</string>
+    <string name="tab_apps">Apps</string>
+    <string name="tab_limits">Limits</string>
+    <string name="tab_reports">Reports</string>
+    
+    <string name="app_usage">App Usage</string>
+    <string name="control_label">Controls:</string>
+    <string name="refresh_stats">Refresh Stats</string>
+    <string name="block_1h">Block 1 Hour</string>
+    <string name="device_name">Device Name:</string>
+    <string name="rename_device">Rename</string>
+    <string name="device_renamed">Device Renamed Successfully</string>
+    
+    <!-- Permissions -->
+    <string name="camera_permission_required">Camera permission required to scan QR code</string>
+    <string name="scan_instruction">Scan the QR code on your child\'s device</string>
+    
+    <!-- Categories -->
+    <string name="category_limits">Category Limits</string>
+    <string name="set_category_limit">Set Category Limit</string>
+    <string name="category_social">Social</string>
+    <string name="category_games">Games</string>
+    <string name="category_education">Education</string>
+    <string name="category_productivity">Productivity</string>
+    <string name="category_entertainment">Entertainment</string>
+    <string name="category_other">Other</string>
+    <string name="time_limit_minutes">Time Limit (minutes):</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    
+    <!-- Unlock Requests -->
+    <string name="unlock_request_title">New Unlock Request</string>
+    <string name="unlock_request_message">%s requested temporary unlock</string>
+    <string name="approve">Approve</string>
+    <string name="deny">Deny</string>
+    <string name="unlock_duration">Duration (minutes):</string>
+    <string name="approve_unlock_success">Request Approved</string>
+    <string name="deny_unlock_success">Request Denied</string>
+    
+    <!-- Daily Reports -->
+    <string name="daily_report">Daily Report</string>
+    <string name="total_screen_time">Total Screen Time: %s</string>
+    <string name="most_used_apps">Most Used Apps</string>
+    <string name="category_usage">Category Usage</string>
+    <string name="view_report">View Report</string>
+    <string name="no_report">No report for today</string>
+    
+    <!-- Whitelist -->
+    <string name="whitelist">Whitelist</string>
+    <string name="whitelist_description">Always allowed apps</string>
+    <string name="add_to_whitelist">Add to Whitelist</string>
+    <string name="remove_from_whitelist">Remove from Whitelist</string>
+    
+    <!-- Time Formatting -->
+    <string name="hours_short">h</string>
+    <string name="minutes_short">m</string>
+    <string name="seconds_short">s</string>
+    
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_subtitle">Manage app preferences</string>
+    <string name="settings_language">Language</string>
+    <string name="language_english">English</string>
+    <string name="language_darija">العربية (Darija)</string>
+    <string name="about_title">About Parental Guard</string>
+    <string name="about_section_title">About</string>
+    <string name="app_version">Version 1.0.0</string>
+    <string name="about_desc">Protecting your digital family</string>
+    <string name="about_dialog_desc">Parental Guard helps you keep your children safe online.</string>
+    <string name="label_features">Key Features:</string>
+
+     <!-- Security -->
+    <string name="security_title">Security</string>
+    <string name="pin_protection_title">PIN Protection</string>
+    <string name="pin_protection_desc">Require PIN to access app</string>
+    <string name="biometric_title">Biometric Login</string>
+    <string name="biometric_desc">Use fingerprint to unlock</string>
+    
+    <string name="notifications_title">Notifications</string>
+    <string name="push_notif_title">Push Notifications</string>
+    <string name="push_notif_desc">Receive alerts and updates</string>
+    <string name="unlock_req_title">Unlock Requests</string>
+    <string name="unlock_req_desc">Get notified when child requests unlock</string>
+    <string name="usage_alerts_title">Usage Alerts</string>
+    <string name="usage_alerts_desc">Alert when limits are reached</string>
+    
+    <string name="appearance_title">Appearance</string>
+    <string name="dark_mode_title">Dark Mode</string>
+    <string name="dark_mode_desc">Enable dark theme</string>
+    
+    <string name="help_title">Help &amp; Support</string>
+    <string name="help_desc">Get help with the app</string>
+    <string name="privacy_title">Privacy Policy</string>
+    <string name="privacy_desc">Read our privacy policy</string>
+    
+    <string name="set_pin_btn">Set PIN</string>
+    <string name="enter_pin">Enter PIN</string>
+    <string name="confirm_pin">Confirm PIN</string>
+    <string name="pin_error_short">PIN must be at least 4 digits</string>
+    <string name="pin_error_mismatch">PINs do not match</string>
+    <string name="pin_dialog_title">Set PIN</string>
+    <string name="pin_dialog_desc">Create a 4-6 digit PIN to protect access to this app.</string>
+    <string name="close">Close</string>
+
+    <!-- About Features -->
+    <string name="feature_view_apps">View all installed apps</string>
+    <string name="feature_monitor_usage">Monitor app usage</string>
+    <string name="feature_time_limits">Set time limits</string>
+    <string name="feature_block_apps">Block apps remotely</string>
+    
+    <!-- Dashboard -->
+    <string name="welcome_back">Welcome Back</string>
+    <string name="section_connected_devices">Connected Devices</string>
+    <string name="view_all">View All</string>
+    <string name="section_quick_actions">Quick Actions</string>
+    <string name="action_lock_all">Lock All</string>
+    <string name="action_lock_all_desc">Lock all devices</string>
+    <string name="action_add_device">Add Device</string>
+    <string name="action_add_device_desc">Scan QR code</string>
+    <string name="tip_title">Pro Tip</string>
+    <string name="tip_desc">Set up usage limits for each app category to help manage screen time effectively.</string>
+    <string name="no_devices_title">No Devices Connected</string>
+    <string name="no_devices_desc">Scan the QR code on your child\'s device to connect</string>
+    
+    <!-- Status Chips & Stats -->
+    <string name="status_devices">Devices</string>
+    <string name="status_online">Online</string>
+    <string name="status_offline">Offline</string>
+    <string name="status_protection">Protection</string>
+    <string name="status_active">Active</string>
+    <string name="stat_total_devices">Total Devices</string>
+    <string name="stat_blocked_today">Blocked Today</string>
+    <string name="stat_screen_time">Screen Time</string>
+    <!-- Device Control - Dialogs -->
+    <string name="dialog_rename_title">Rename Device</string>
+    <string name="dialog_rename_label">Device Name</string>
+    <string name="dialog_edit_category_title">Edit App Category</string>
+    <string name="dialog_timer_title">Set App Timer</string>
+    <string name="dialog_timer_desc">App will lock automatically after:</string>
+    <string name="dialog_category_timer_title">Set Category Timer</string>
+    <string name="dialog_category_timer_desc">Category will lock automatically after:</string>
+    <string name="dialog_timer_custom">Custom...</string>
+    <string name="dialog_custom_timer_title">Custom Duration</string>
+    <string name="dialog_custom_timer_label">Enter duration in minutes:</string>
+    <string name="action_set_timer">Set Timer</string>
+    <string name="action_set">Set</string>
+    
+    <!-- Device Control - Actions -->
+    <string name="action_unhide_icon">Unhide Child App Icon</string>
+    <string name="action_hide_icon">Hide Child App Icon</string>
+    <string name="action_unblock">Unblock</string>
+    <string name="action_block">Block</string>
+    <string name="action_refresh_apps">Refresh Apps List</string>
+    <string name="action_cancel_timer">Cancel Timer</string>
+    <string name="action_refresh_report">Refresh Report</string>
+    
+    <!-- Device Control - Labels -->
+    <string name="label_todays_screen_time">Today\'s Screen Time</string>
+    <string name="label_limit_suffix">of 8h limit</string>
+    <string name="label_top_apps">Top Apps Today</string>
+    <string name="label_no_usage_data">No usage data available</string>
+    <string name="placeholder_search_apps">Search apps...</string>
+    <string name="label_all">All</string>
+    <string name="label_no_apps_found">No apps found</string>
+    <string name="title_category_limits">Category Time Limits</string>
+    <string name="desc_category_limits">Set daily time limits for each app category</string>
+    <string name="status_loading_report">Loading report...</string>
+    <string name="label_total">Total</string>
+    <string name="title_hourly_timeline">Hourly Usage Timeline</string>
+    <string name="desc_hourly_timeline">Shows how much the device was used during each hour of the day.</string>
+    <string name="label_no_hourly_data">No hourly data recorded</string>
+    <string name="title_usage_by_category">Usage by Category</string>
+    <string name="label_limit_mins">Limit: %d mins</string>
+    <string name="label_no_limit">No Limit</string>
+    <string name="label_apps_in_category">Apps in this category:</string>
+    <string name="label_more_apps">+ %d more</string>
+    <string name="label_apps">apps</string>
+    <string name="label_none">None</string>
+    <string name="label_daily_limit">Daily Limit: %d min</string>
+
+    <!-- Discovery -->
+    <string name="title_discovery">Device Discovery</string>
+    <string name="status_scanning">Scanning network...</string>
+    <string name="status_devices_saved">%d device(s) saved</string>
+    <string name="indicator_searching">Searching for devices on your network...</string>
+    <string name="empty_searching_title">Searching...</string>
+    <string name="empty_no_devices_found">No Devices Found</string>
+    <string name="empty_scanning_desc">Looking for devices on your local network</string>
+    <string name="empty_no_devices_desc">Make sure your child\'s device is connected to the same Wi-Fi network</string>
+    <string name="action_retry">Retry</string>
+    <!-- Unlock Request Screen -->
+    <string name="title_unlock_request">Unlock Request</string>
+    <string name="request_desc_part2">is requesting to unlock</string>
+    <string name="request_type_app">an app</string>
+    <string name="request_type_device">the device</string>
+    <string name="label_grant_access">Grant Temporary Access</string>
+    <string name="action_unlock">Unlock</string>
+    <string name="action_deny_request">Deny Request</string>
+    <string name="dialog_custom_duration_title">Custom Duration</string>
+    <string name="dialog_custom_duration_label">Enter unlock duration in minutes:</string>
+    <string name="placeholder_duration_example">e.g. 45</string>
+    <string name="action_approve">Approve</string>
+    <string name="label_10m">+10m</string>
+    <string name="label_15m">+15m</string>
+    <string name="label_custom">Custom</string>
+
+    <!-- PIN Lock Screen -->
+    <string name="title_app_locked">App Locked</string>
+    <string name="desc_enter_pin">Enter your PIN to continue</string>
+    <string name="label_pin">PIN</string>
+    <string name="error_invalid_pin">Invalid PIN. Please try again.</string>
+    <string name="action_unlock_biometric">Biometric Unlock</string>
+</resources>

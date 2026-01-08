@@ -1,0 +1,30 @@
+[
+    {
+        "merged": "C:\\Users\\H_Oussama\\.gradle\\daemon\\9.0-milestone-1\\com.parentalguard.child.child-agent-debug-4:\\layout_activity_blocking.xml.flat",
+        "source": "C:\\Users\\H_Oussama\\.gradle\\daemon\\9.0-milestone-1\\com.parentalguard.child.child-agent-main-6:\\layout\\activity_blocking.xml"
+    },
+    {
+        "merged": "C:\\Users\\H_Oussama\\.gradle\\daemon\\9.0-milestone-1\\com.parentalguard.child.child-agent-debug-4:\\layout_overlay_lock_screen.xml.flat",
+        "source": "C:\\Users\\H_Oussama\\.gradle\\daemon\\9.0-milestone-1\\com.parentalguard.child.child-agent-main-6:\\layout\\overlay_lock_screen.xml"
+    },
+    {
+        "merged": "C:\\Users\\H_Oussama\\.gradle\\daemon\\9.0-milestone-1\\com.parentalguard.child.child-agent-debug-4:\\drawable_ic_system_service.png.flat",
+        "source": "C:\\Users\\H_Oussama\\.gradle\\daemon\\9.0-milestone-1\\com.parentalguard.child.child-agent-main-6:\\drawable\\ic_system_service.png"
+    },
+    {
+        "merged": "C:\\Users\\H_Oussama\\.gradle\\daemon\\9.0-milestone-1\\com.parentalguard.child.child-agent-debug-4:\\xml_accessibility_service_config.xml.flat",
+        "source": "C:\\Users\\H_Oussama\\.gradle\\daemon\\9.0-milestone-1\\com.parentalguard.child.child-agent-main-6:\\xml\\accessibility_service_config.xml"
+    },
+    {
+        "merged": "C:\\Users\\H_Oussama\\.gradle\\daemon\\9.0-milestone-1\\com.parentalguard.child.child-agent-debug-4:\\drawable_bg_premium_gradient.xml.flat",
+        "source": "C:\\Users\\H_Oussama\\.gradle\\daemon\\9.0-milestone-1\\com.parentalguard.child.child-agent-main-6:\\drawable\\bg_premium_gradient.xml"
+    },
+    {
+        "merged": "com.parentalguard.child.child-agent-debug-4:/xml_accessibility_service_config.xml.flat",
+        "source": "com.parentalguard.child.child-agent-main-6:/xml/accessibility_service_config.xml"
+    },
+    {
+        "merged": "C:\\Users\\H_Oussama\\.gradle\\daemon\\9.0-milestone-1\\com.parentalguard.child.child-agent-debug-4:\\xml_device_admin_policies.xml.flat",
+        "source": "C:\\Users\\H_Oussama\\.gradle\\daemon\\9.0-milestone-1\\com.parentalguard.child.child-agent-main-6:\\xml\\device_admin_policies.xml"
+    }
+]

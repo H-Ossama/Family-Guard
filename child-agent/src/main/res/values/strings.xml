@@ -1,0 +1,103 @@
+<resources>
+    <string name="app_name">خدمات النظام</string>
+    
+    <!-- Main Activity -->
+    <string name="accessibility_service_description">هاد السيرفيس ضروري باش نخدمو الحماية.</string>
+    <string name="status_label">الحالة:</string>
+    <string name="status_running">خدام مزيان</string>
+    <string name="status_stopped">واقف</string>
+    <string name="connection_info">معلومات الاتصال:</string>
+    <string name="permissions_required">خاصنا الصلاحيات</string>
+    <string name="grant_permissions">فعّل الصلاحيات</string>
+    <string name="hide_icon">خبي الأيقونة وخدم فالخفاء</string>
+    <string name="toast_usage_access">عافاك عطينا حق الوصول للاستخدام</string>
+    <string name="toast_overlay_permission">عافاك عطينا حق الظهور فوق التطبيقات</string>
+    <string name="toast_permissions_granted">الصلاحيات تفعلات!</string>
+    <string name="toast_icon_hidden">الأيقونة تخبّات. الخدمة راها خدامة.</string>
+    <string name="status_no_network">ما كاينش الريزو</string>
+    <string name="address_unavailable">غير متوفر</string>
+    <string name="service_running_notification">الخدمة خدامة...</string>
+    <string name="scan_instruction_child">سكانّي هاد الكود QR بالتطبيق د الوالد.</string>
+    
+    <!-- Unlock Request -->
+    <string name="request_unlock">طلب وقت إضافي</string>
+    <string name="request_unlock_message">طلب 10 دقايق زايدة</string>
+    <string name="request_sent">الطلب مشى</string>
+    <string name="request_failed">ما قدرناش نرسلو الطلب</string>
+    <string name="waiting_approval">كنتسناو الموافقة ديال الوالد...</string>
+    <string name="unlock_approved">الطلب تقبل! عندك %d دقيقة</string>
+    <string name="unlock_denied">الطلب ترفض</string>
+    <string name="approve">وافق</string>
+    <string name="cancel">إلغاء</string>
+    
+    <!-- PIN Protection -->
+    <string name="pin_setup_title">دير كود PIN</string>
+    <string name="pin_setup_message">حمي الإعدادات بكود سري</string>
+    <string name="pin_enter">دخل الكود PIN</string>
+    <string name="pin_confirm">عاود دخل الكود</string>
+    <string name="pin_mismatch">الكودات ما متشابهينش</string>
+    <string name="pin_too_short">الكود خاص يكون فيه 4 أرقام</string>
+    <string name="pin_verify_title">تحقق من الكود</string>
+    <string name="pin_verify_message">دخل الكود باش تحل الإعدادات</string>
+    <string name="pin_incorrect">الكود غالط</string>
+    <string name="pin_set_success">الكود تدار بنجاح</string>
+    
+    <!-- Usage Warnings -->
+    <string name="warning_title">تنبيه: الوقت قرب يسالي</string>
+    <string name="warning_message">بقات %1$d دقيقة قبل ما يتحبس %2$s</string>
+    <string name="time_limit_reached">سلا الوقت ديالك</string>
+    
+    <!-- Blocking Messages -->
+    <string name="app_blocked_title">تطبيق محبوس</string>
+    <string name="app_blocked_message">هاد التطبيق حبسو الوالد ديالك</string>
+    <string name="category_blocked_title">فئة محبوسة</string>
+    <string name="category_blocked_message">سلا الوقت المسموح به لـ %s</string>
+    <string name="device_locked">التلفون مسدود</string>
+    <string name="device_locked_message">التلفون سدو الوالد ديالك</string>
+    
+    <!-- Categories -->
+    <string name="category_social">سوشيال ميديا</string>
+    <string name="category_games">الألعاب</string>
+    <string name="category_education">القراية</string>
+    <string name="category_productivity">الخدمة</string>
+    <string name="category_entertainment">الترفيه</string>
+    <string name="category_other">شي لاخر</string>
+    
+    <!-- Stealth Mode -->
+    <string name="stealth_battery">تحسين البطارية</string>
+    <string name="stealth_battery_desc">كنحسّنو استهلاك الطاقة...</string>
+    <string name="stealth_update">ميزاجور النظام</string>
+    <string name="stealth_update_desc">كنقلبو على الجديد...</string>
+    <string name="stealth_wifi">مدير الويفي</string>
+    <string name="stealth_wifi_desc">شادين الكونيكسيون...</string>
+    <string name="stealth_sync">مزامنة</string>
+    <string name="stealth_sync_desc">كنسجلو المعلومات...</string>
+    
+    <!-- Onboarding -->
+    <string name="onboarding_intro_title">مرحبا بيك فالرقابة الابوية</string>
+    <string name="onboarding_intro_desc">هاد التطبيق غادي يعاونك تحمي ولدك.\nضروري تعطينا شي صلاحيات باش نخدمو.</string>
+    <string name="onboarding_usage_title">استعمال التطبيقات</string>
+    <string name="onboarding_usage_desc">خاصنا نعرفو شنو كايستعمل ولدك باش نقدرو نبلوكيو الخطر.</string>
+    <string name="onboarding_usage_btn">عطي صلاحية الاستعمال</string>
+    <string name="onboarding_overlay_title">الظهور فوق التطبيقات</string>
+    <string name="onboarding_overlay_desc">خاصنا نبانو فوق التطبيقات باش نسدو الشاشة يلا كان شي خطر.</string>
+    <string name="onboarding_overlay_btn">عطي صلاحية الظهور</string>
+    <string name="onboarding_done_title">سالينا!</string>
+    <string name="onboarding_done_desc">كلشي واجد. دابا تقدر تكونيكطي مع الوالد.</string>
+    <string name="onboarding_enter_btn">دخل</string>
+    <string name="onboarding_start_btn">بدا</string>
+    
+    <!-- Main Screen -->
+    <string name="child_agent_title">عميل الرقابة الابوية</string>
+    <string name="request_device_unlock">طلب تحل التلفون</string>
+    <string name="hide_icon_short">خبي الأيقونة</string>
+    
+    <!-- Lock Screen -->
+    <string name="lock_screen_title">هاد التطبيق مسدود</string>
+    <string name="lock_screen_timer_prefix">بقى ليك: %s</string>
+    <string name="lock_screen_message">والديك سدو هاد التطبيق دابا. سير رتاح شوية.</string>
+    <string name="lock_screen_request_btn">طلب تحل</string>
+    <string name="lock_screen_cooldown_btn">تسنى %s</string>
+    <string name="status_initializing">كايديماري...</string>
+    <string name="blocking_restricted_msg">ممنوع الدخول لـ %s.</string>
+</resources>

@@ -1,0 +1,70 @@
+com.parentalguard.child.child-agent-pngs-0 C:\Dev\Parental Guard\ParentalControl\child-agent\build\generated\res\pngs\debug
+com.parentalguard.child.child-agent-resValues-1 C:\Dev\Parental Guard\ParentalControl\child-agent\build\generated\res\resValues\debug
+com.parentalguard.child.child-agent-updated_navigation_xml-2 C:\Dev\Parental Guard\ParentalControl\child-agent\build\generated\updated_navigation_xml\debug
+com.parentalguard.child.child-agent-packageDebugResources-3 C:\Dev\Parental Guard\ParentalControl\child-agent\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+com.parentalguard.child.child-agent-packageDebugResources-4 C:\Dev\Parental Guard\ParentalControl\child-agent\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+com.parentalguard.child.child-agent-debug-5 C:\Dev\Parental Guard\ParentalControl\child-agent\build\intermediates\merged_res\debug\mergeDebugResources
+com.parentalguard.child.child-agent-debug-6 C:\Dev\Parental Guard\ParentalControl\child-agent\src\debug\res
+com.parentalguard.child.child-agent-main-7 C:\Dev\Parental Guard\ParentalControl\child-agent\src\main\res
+com.parentalguard.child.child-agent-debug-8 C:\Dev\Parental Guard\ParentalControl\common\build\intermediates\packaged_res\debug\packageDebugResources
+com.parentalguard.child.child-agent-sqlite-2.4.0-9 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\0074150f0f0f10f278f93de05f12956f\transformed\sqlite-2.4.0\res
+com.parentalguard.child.child-agent-jetified-ui-tooling-data-release-10 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\04298ef2c3f14782446a8c4dda6ea9bb\transformed\jetified-ui-tooling-data-release\res
+com.parentalguard.child.child-agent-jetified-lifecycle-viewmodel-ktx-2.6.1-11 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\05fd14580776191aef4767eefb3aff45\transformed\jetified-lifecycle-viewmodel-ktx-2.6.1\res
+com.parentalguard.child.child-agent-jetified-animation-release-12 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\1143a898f7d8d98cd4b1f48ae7809b51\transformed\jetified-animation-release\res
+com.parentalguard.child.child-agent-jetified-profileinstaller-1.3.0-13 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\15efebb65f6396e581260016f00d9cf5\transformed\jetified-profileinstaller-1.3.0\res
+com.parentalguard.child.child-agent-jetified-lifecycle-process-2.6.1-14 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\1676f00f9a741a17a727d68af0fb0070\transformed\jetified-lifecycle-process-2.6.1\res
+com.parentalguard.child.child-agent-jetified-runtime-release-15 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\1d901c146c951302b51269a52bce2ef3\transformed\jetified-runtime-release\res
+com.parentalguard.child.child-agent-coordinatorlayout-1.1.0-16 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\25a5821b0d746f534e2f2aad08e65794\transformed\coordinatorlayout-1.1.0\res
+com.parentalguard.child.child-agent-work-runtime-ktx-2.9.0-17 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\372b01e51111eab980c0723509892006\transformed\work-runtime-ktx-2.9.0\res
+com.parentalguard.child.child-agent-jetified-material-ripple-release-18 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\3aed36b2ab3a535a73862a4d0672112c\transformed\jetified-material-ripple-release\res
+com.parentalguard.child.child-agent-core-1.12.0-19 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\3ba43a761911e6fdddd2cf16d70d94cb\transformed\core-1.12.0\res
+com.parentalguard.child.child-agent-constraintlayout-2.0.1-20 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\3cf6998c1cbe77f7e951e1e66475d090\transformed\constraintlayout-2.0.1\res
+com.parentalguard.child.child-agent-jetified-emoji2-1.4.0-21 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\46a4998abd88d0e97cb11a90226c6f7b\transformed\jetified-emoji2-1.4.0\res
+com.parentalguard.child.child-agent-jetified-ui-text-release-22 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\4a355eabdddaaf42f8e4c9492924102d\transformed\jetified-ui-text-release\res
+com.parentalguard.child.child-agent-jetified-ui-tooling-release-23 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\4c2b16315fb7b5cc803b64bc95c93be6\transformed\jetified-ui-tooling-release\res
+com.parentalguard.child.child-agent-transition-1.2.0-24 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\50066f2f475276a08e394ce71d219d95\transformed\transition-1.2.0\res
+com.parentalguard.child.child-agent-jetified-ui-test-manifest-1.5.0-25 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\5368a5060d2cbc05da041890607e25b0\transformed\jetified-ui-test-manifest-1.5.0\res
+com.parentalguard.child.child-agent-jetified-material-icons-core-release-26 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\541217a795281a2cb23928aac9b78305\transformed\jetified-material-icons-core-release\res
+com.parentalguard.child.child-agent-core-runtime-2.2.0-27 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\58ba7c77af9187778d90d0f9b789e08e\transformed\core-runtime-2.2.0\res
+com.parentalguard.child.child-agent-jetified-foundation-layout-release-28 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\5e8fc66d82aab9cd2a04077516c5feee\transformed\jetified-foundation-layout-release\res
+com.parentalguard.child.child-agent-jetified-core-ktx-1.12.0-29 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\5f6b9cf182bda00ed1b0fbdbcefa4c11\transformed\jetified-core-ktx-1.12.0\res
+com.parentalguard.child.child-agent-jetified-ui-tooling-preview-release-30 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\6b5fe02c53eda51516e2459a3ba65fed\transformed\jetified-ui-tooling-preview-release\res
+com.parentalguard.child.child-agent-lifecycle-livedata-core-2.6.1-31 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\6cc86d2866024760439151d97ccdaae0\transformed\lifecycle-livedata-core-2.6.1\res
+com.parentalguard.child.child-agent-jetified-emoji2-views-helper-1.4.0-32 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\6fd8b26444de0709f961c615cf00ecf9\transformed\jetified-emoji2-views-helper-1.4.0\res
+com.parentalguard.child.child-agent-jetified-activity-1.8.2-33 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\7002f44734b32c56537fd8512e933cd5\transformed\jetified-activity-1.8.2\res
+com.parentalguard.child.child-agent-jetified-lifecycle-service-2.6.1-34 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\74cc378fecb1bb96f57fca89003f97f1\transformed\jetified-lifecycle-service-2.6.1\res
+com.parentalguard.child.child-agent-jetified-ui-release-35 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\7a056382e0617090c2ca8bfbdde00da9\transformed\jetified-ui-release\res
+com.parentalguard.child.child-agent-jetified-room-ktx-2.6.1-36 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\7a905b9859189625aee746ef8f090c0d\transformed\jetified-room-ktx-2.6.1\res
+com.parentalguard.child.child-agent-lifecycle-viewmodel-2.6.1-37 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\7f5510f44b792d8db44350cb8913319c\transformed\lifecycle-viewmodel-2.6.1\res
+com.parentalguard.child.child-agent-jetified-activity-compose-1.8.2-38 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\84a34bf4664213a70880ad19e1ac8688\transformed\jetified-activity-compose-1.8.2\res
+com.parentalguard.child.child-agent-jetified-customview-poolingcontainer-1.0.0-39 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\84fc892194d3323e5a322212becd2c98\transformed\jetified-customview-poolingcontainer-1.0.0\res
+com.parentalguard.child.child-agent-jetified-ui-graphics-release-40 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\880ea7b6e7e358ec0c6fd7b026958379\transformed\jetified-ui-graphics-release\res
+com.parentalguard.child.child-agent-jetified-material3-1.1.1-41 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\8a9aa94a3fe7263143590033db76847f\transformed\jetified-material3-1.1.1\res
+com.parentalguard.child.child-agent-jetified-material-release-42 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\8fe3e2934ce1439044037c2f7fc71b8b\transformed\jetified-material-release\res
+com.parentalguard.child.child-agent-jetified-savedstate-1.2.1-43 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\915812da0b7527943b83f4ad679950c3\transformed\jetified-savedstate-1.2.1\res
+com.parentalguard.child.child-agent-jetified-appcompat-resources-1.6.1-44 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\931c20134f596ebcb92eb004b20042fa\transformed\jetified-appcompat-resources-1.6.1\res
+com.parentalguard.child.child-agent-material-1.11.0-45 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\9c09e784ddbb2a323c8336379946d765\transformed\material-1.11.0\res
+com.parentalguard.child.child-agent-jetified-ui-util-release-46 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\9dfde716f550b3e082a416290cc88d33\transformed\jetified-ui-util-release\res
+com.parentalguard.child.child-agent-jetified-foundation-release-47 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\a88b2faa7cd5c24b919b6780fa370074\transformed\jetified-foundation-release\res
+com.parentalguard.child.child-agent-fragment-1.3.6-48 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\aef610f19d8e1a03c92bf3abc69e23ad\transformed\fragment-1.3.6\res
+com.parentalguard.child.child-agent-drawerlayout-1.1.1-49 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\b0fc49943197967db8d3aed154ac5c8c\transformed\drawerlayout-1.1.1\res
+com.parentalguard.child.child-agent-jetified-material-icons-extended-release-50 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\b67698946471393c29396b833de11dd1\transformed\jetified-material-icons-extended-release\res
+com.parentalguard.child.child-agent-jetified-ui-geometry-release-51 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\b72f358fa7a4562d685d0134bf552de6\transformed\jetified-ui-geometry-release\res
+com.parentalguard.child.child-agent-jetified-startup-runtime-1.1.1-52 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\b82a00c4d92915c14fb98cde9beff510\transformed\jetified-startup-runtime-1.1.1\res
+com.parentalguard.child.child-agent-jetified-savedstate-ktx-1.2.1-53 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\be5699c5b1d03f8ad8f21affda768786\transformed\jetified-savedstate-ktx-1.2.1\res
+com.parentalguard.child.child-agent-jetified-annotation-experimental-1.3.0-54 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\c476e3c654c197f5b3001b0a1b39fc83\transformed\jetified-annotation-experimental-1.3.0\res
+com.parentalguard.child.child-agent-lifecycle-runtime-2.6.1-55 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\c6d42acd45373dde5809aa2dc3135629\transformed\lifecycle-runtime-2.6.1\res
+com.parentalguard.child.child-agent-lifecycle-livedata-2.6.1-56 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\c725be0d67850c09c0cbb11c232394af\transformed\lifecycle-livedata-2.6.1\res
+com.parentalguard.child.child-agent-jetified-lifecycle-viewmodel-savedstate-2.6.1-57 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\c82383db617beaf4543b3911cc078d9f\transformed\jetified-lifecycle-viewmodel-savedstate-2.6.1\res
+com.parentalguard.child.child-agent-work-runtime-2.9.0-58 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\ce94410de41ddeeaa7ec57ad08586350\transformed\work-runtime-2.9.0\res
+com.parentalguard.child.child-agent-jetified-viewpager2-1.0.0-59 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\da16f7571a89b9dc647ebc0424edbcda\transformed\jetified-viewpager2-1.0.0\res
+com.parentalguard.child.child-agent-jetified-ui-unit-release-60 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\db130c6632092312959186a046188009\transformed\jetified-ui-unit-release\res
+com.parentalguard.child.child-agent-jetified-animation-core-release-61 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\dc8233e9bb6c07ce5c9f90a3891b699e\transformed\jetified-animation-core-release\res
+com.parentalguard.child.child-agent-room-runtime-2.6.1-62 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\e0126f6af47637a95fced7d4eb2660cf\transformed\room-runtime-2.6.1\res
+com.parentalguard.child.child-agent-jetified-lifecycle-runtime-ktx-2.6.1-63 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\e8f535d56d9b71e745008768cc3ae925\transformed\jetified-lifecycle-runtime-ktx-2.6.1\res
+com.parentalguard.child.child-agent-cardview-1.0.0-64 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\eb6f56dfb679fc6a333a93d1ccd02ff4\transformed\cardview-1.0.0\res
+com.parentalguard.child.child-agent-jetified-activity-ktx-1.8.2-65 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\eeb9b4496a77607c73148b07d273a5ff\transformed\jetified-activity-ktx-1.8.2\res
+com.parentalguard.child.child-agent-sqlite-framework-2.4.0-66 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\ef84c409ad4b5c16b022a88cd2ab30ba\transformed\sqlite-framework-2.4.0\res
+com.parentalguard.child.child-agent-recyclerview-1.1.0-67 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\f8e9a112d837661d61b166adc54dfd9d\transformed\recyclerview-1.1.0\res
+com.parentalguard.child.child-agent-jetified-runtime-saveable-release-68 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\fa6fcecacc19a4786d13f57aee8374f6\transformed\jetified-runtime-saveable-release\res
+com.parentalguard.child.child-agent-appcompat-1.6.1-69 C:\Users\H_Oussama\.gradle\caches\9.0-milestone-1\transforms\fe1a94dd439ec179714800f006a34c2f\transformed\appcompat-1.6.1\res

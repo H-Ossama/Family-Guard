@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "com.parentalguard.parent.parent-controller-debug-5:/xml_backup_rules.xml.flat",
+        "source": "com.parentalguard.parent.parent-controller-main-7:/xml/backup_rules.xml"
+    },
+    {
+        "merged": "com.parentalguard.parent.parent-controller-debug-5:/drawable_ic_parent_logo.png.flat",
+        "source": "com.parentalguard.parent.parent-controller-main-7:/drawable/ic_parent_logo.png"
+    },
+    {
+        "merged": "com.parentalguard.parent.parent-controller-debug-5:/xml_data_extraction_rules.xml.flat",
+        "source": "com.parentalguard.parent.parent-controller-main-7:/xml/data_extraction_rules.xml"
+    }
+]

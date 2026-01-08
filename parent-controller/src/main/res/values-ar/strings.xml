@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">الرقابة الابوية</string>
+    
+    <!-- Main Screen -->
+    <string name="scan_qr">سكانّي الكود QR</string>
+    <string name="discovered_devices">الأجهزة اللي لقيناها:</string>
+    <string name="no_devices">ما كاين حتى جهاز</string>
+    <string name="connect">كونيكطي</string>
+    <string name="back">رجوع</string>
+    
+    <!-- Device Control -->
+    <string name="lock_device">قفل الجهاز</string>
+    <string name="unlock_device">فتح الجهاز</string>
+
+    <!-- Navigation -->
+    <string name="nav_dashboard">الرئيسية</string>
+    <string name="nav_devices">الأجهزة</string>
+    <string name="nav_settings">الإعدادات</string>
+    <string name="tab_overview">نظرة عامة</string>
+    <string name="tab_apps">التطبيقات</string>
+    <string name="tab_limits">الحدود</string>
+    <string name="tab_reports">التقارير</string>
+    
+    <string name="app_usage">استخدام التطبيقات</string>
+    <string name="control_label">التحكم:</string>
+    <string name="refresh_stats">جدد المعلومات</string>
+    <string name="block_1h">بلوكي ساعة</string>
+    <string name="device_name">سمية الجهاز:</string>
+    <string name="rename_device">بدل السمية</string>
+    <string name="device_renamed">السمية تبدلات بنجاح</string>
+    
+    <!-- Permissions -->
+    <string name="camera_permission_required">خاصك تعطي الإذن للكاميرا باش تسكاني</string>
+    <string name="scan_instruction">سكانّي QR اللي فتيليفون ولدك</string>
+    
+    <!-- Categories -->
+    <string name="category_limits">حدود الفئات</string>
+    <string name="set_category_limit">حدد وقت للفئة</string>
+    <string name="category_social">سوشيال ميديا</string>
+    <string name="category_games">الألعاب</string>
+    <string name="category_education">القراية</string>
+    <string name="category_productivity">الخدمة</string>
+    <string name="category_entertainment">الترفيه</string>
+    <string name="category_other">شي لاخر</string>
+    <string name="time_limit_minutes">الوقت المسموح (دقائق):</string>
+    <string name="save">سجّل</string>
+    <string name="cancel">إلغاء</string>
+    
+    <!-- Unlock Requests -->
+    <string name="unlock_request_title">طلب جديد</string>
+    <string name="unlock_request_message">%s بغا وقت إضافي</string>
+    <string name="approve">وافق</string>
+    <string name="deny">رفض</string>
+    <string name="unlock_duration">المدة (دقائق):</string>
+    <string name="approve_unlock_success">الطلب تأكسبطا</string>
+    <string name="deny_unlock_success">الطلب ترفض</string>
+    
+    <!-- Daily Reports -->
+    <string name="daily_report">التقرير اليومي</string>
+    <string name="total_screen_time">مجموع الوقت: %s</string>
+    <string name="most_used_apps">التطبيقات الاكثر استعمالا</string>
+    <string name="category_usage">الاستعمال حسب الفئة</string>
+    <string name="view_report">شوف التقرير</string>
+    <string name="no_report">ما كاين حتى تقرير اليوم</string>
+    
+    <!-- Whitelist -->
+    <string name="whitelist">القائمة البيضاء</string>
+    <string name="whitelist_description">تطبيقات مسموح بيها ديما</string>
+    <string name="add_to_whitelist">زيد للقائمة البيضاء</string>
+    <string name="remove_from_whitelist">حيد من القائمة البيضاء</string>
+    
+    <!-- Time Formatting -->
+    <string name="hours_short">س</string>
+    <string name="minutes_short">د</string>
+    <string name="seconds_short">ث</string>
+
+    <!-- Settings -->
+    <string name="settings_title">الإعدادات</string>
+    <string name="settings_subtitle">إدارة تفضيلات التطبيق</string>
+    <string name="settings_language">اللغة</string>
+    <string name="language_english">English</string>
+    <string name="language_darija">العربية (Darija)</string>
+    <string name="about_title">على الرقابة الابوية</string>
+    <string name="about_section_title">حول</string>
+    <string name="app_version">الإصدار 1.0.0</string>
+    <string name="about_desc">حماية لعائلتك الرقمية</string>
+    <string name="about_dialog_desc">يساعدك Parental Guard في الحفاظ على سلامة أطفالك على الإنترنت.</string>
+    <string name="label_features">الميزات الرئيسية:</string>
+    
+    <!-- Security -->
+    <string name="security_title">الأمان</string>
+    <string name="pin_protection_title">حماية بـ PIN</string>
+    <string name="pin_protection_desc">طلب كود للدخول للتطبيق</string>
+    <string name="biometric_title">الدخول بالبصمة</string>
+    <string name="biometric_desc">استعمل البصمة باش تحل</string>
+    
+    <string name="notifications_title">الإشعارات</string>
+    <string name="push_notif_title">إشعارات التنبيه</string>
+    <string name="push_notif_desc">توصّل بالتحديثات والتنبيهات</string>
+    <string name="unlock_req_title">طلبات الفتح</string>
+    <string name="unlock_req_desc">إشعار ملي الولد يطلب وقت زايد</string>
+    <string name="usage_alerts_title">تنبيهات الاستخدام</string>
+    <string name="usage_alerts_desc">تنبيه ملي يوصل للحدود</string>
+    
+    <string name="appearance_title">المظهر</string>
+    <string name="dark_mode_title">الوضع المظلم</string>
+    <string name="dark_mode_desc">فعّل الثيم الكحل</string>
+    
+    <string name="help_title">المساعدة والدعم</string>
+    <string name="help_desc">طلب المساعدة فالتطبيق</string>
+    <string name="privacy_title">سياسة الخصوصية</string>
+    <string name="privacy_desc">قرا سياسة الخصوصية ديالنا</string>
+
+    <string name="set_pin_btn">دير كود PIN</string>
+    <string name="enter_pin">كتب PIN</string>
+    <string name="confirm_pin">أكد PIN</string>
+    <string name="pin_error_short">PIN خاص يكون فيه 4 أرقام على الأقل</string>
+    <string name="pin_error_mismatch">الأرقام ما مطابقاش</string>
+    <string name="pin_dialog_title">إعداد PIN</string>
+    <string name="pin_dialog_desc">دير كود من 4 حتى 6 أرقام باش تحمي التطبيق.</string>
+    <string name="close">سد</string>
+
+    <!-- About Features -->
+    <string name="feature_view_apps">شوف كاع التطبيقات</string>
+    <string name="feature_monitor_usage">تبع الاستهلاك ديال التطبيقات</string>
+    <string name="feature_time_limits">حدد الوقت المسموح</string>
+    <string name="feature_block_apps">حبس التطبيقات عن بعد</string>
+    
+    <!-- Dashboard -->
+    <string name="welcome_back">مرحباً بك</string>
+    <string name="section_connected_devices">الأجهزة المتصلة</string>
+    <string name="view_all">شوف كلشي</string>
+    <string name="section_quick_actions">إجراءات سريعة</string>
+    <string name="action_lock_all">سد كلشي</string>
+    <string name="action_lock_all_desc">سد الأجهزة كاملين</string>
+    <string name="action_add_device">زيد جهاز</string>
+    <string name="action_add_device_desc">سكانّي QR code</string>
+    <string name="tip_title">نصيحة</string>
+    <string name="tip_desc">دير حدود لكل فئة باش تحكم في وقت الشاشة مزيان.</string>
+    <string name="no_devices_title">حتى شي جهاز ما مكونيكطي</string>
+    <string name="no_devices_desc">سكانّي QR code اللي فتلفون ولدك باش تكونيكطيه</string>
+    
+    <!-- Status Chips & Stats -->
+    <string name="status_devices">الأجهزة</string>
+    <string name="status_online">متصل</string>
+    <string name="status_offline">غير متصل</string>
+    <string name="status_protection">حماية</string>
+    <string name="status_active">خدّام</string>
+    <string name="stat_total_devices">مجموع الأجهزة</string>
+    <string name="stat_blocked_today">مبلوكيين اليوم</string>
+    <string name="stat_screen_time">وقت الشاشة</string>
+    <!-- Device Control - Dialogs -->
+    <string name="dialog_rename_title">بدل سمية الجهاز</string>
+    <string name="dialog_rename_label">سمية الجهاز</string>
+    <string name="dialog_edit_category_title">بدل الفئة</string>
+    <string name="dialog_timer_title">دير وقت للتطبيق</string>
+    <string name="dialog_timer_desc">التطبيق غايتسد أوتوماتيك من بعد:</string>
+    <string name="dialog_timer_custom">آخرين...</string>
+    <string name="dialog_custom_timer_title">مدة مخصصة</string>
+    <string name="dialog_custom_timer_label">دخل المدة بالدقائق:</string>
+    <string name="action_set_timer">دير الوقت</string>
+    <string name="action_set">صافي</string>
+    
+    <!-- Device Control - Actions -->
+    <string name="action_unhide_icon">بيّن أيقونة التطبيق</string>
+    <string name="action_hide_icon">خبي أيقونة التطبيق</string>
+    <string name="action_unblock">حيد البلوك</string>
+    <string name="action_block">بلوكي</string>
+    <string name="action_refresh_apps">جدد ليستة التطبيقات</string>
+    <string name="action_cancel_timer">لغي الوقت</string>
+    <string name="action_refresh_report">جدد التقرير</string>
+    
+    <!-- Device Control - Labels -->
+    <string name="label_todays_screen_time">وقت الشاشة اليوم</string>
+    <string name="label_limit_suffix">من 8 سوايع كحد أقصى</string>
+    <string name="label_top_apps">التطبيقات المستعملة بزاف اليوم</string>
+    <string name="label_no_usage_data">ما كاينش معلومات</string>
+    <string name="placeholder_search_apps">قلّب على التطبيقات...</string>
+    <string name="label_all">كلشي</string>
+    <string name="label_no_apps_found">ما لقينا حتى تطبيق</string>
+    <string name="title_category_limits">حدود الفئات</string>
+    <string name="desc_category_limits">دير حدود يومية لكل فئة</string>
+    <string name="status_loading_report">كيشارجي التقرير...</string>
+    <string name="label_total">المجموع</string>
+    <string name="title_hourly_timeline">الاستهلاك بالساعة</string>
+    <string name="label_no_hourly_data">ما كاينش معلومات بالساعة</string>
+    <string name="title_usage_by_category">الاستهلاك بالفئة</string>
+    <string name="label_limit_mins">حد: %d دقيقة</string>
+    <string name="label_no_limit">بلا حد</string>
+    <string name="label_apps_in_category">التطبيقات فهاد الفئة:</string>
+    <string name="label_more_apps">+ %d خرين</string>
+    <string name="label_none">والو</string>
+    <string name="label_daily_limit">حد يومي: %d دقيقة</string>
+
+    <!-- Discovery -->
+    <string name="title_discovery">كنقلب على الأجهزة</string>
+    <string name="status_scanning">كنسكانّي الريزو...</string>
+    <string name="status_devices_saved">%d أجهزة مسجلين</string>
+    <string name="indicator_searching">كنقلب على أجهزة فالريزو ديالك...</string>
+    <string name="empty_searching_title">كنقلب...</string>
+    <string name="empty_no_devices_found">ما لقينا والو</string>
+    <string name="empty_scanning_desc">كنقلب على أجهزة فالريزو ديالك</string>
+    <string name="empty_no_devices_desc">تأكد بلي تيليفون ولدك مكونيكطي لنفس الواي فاي</string>
+    <string name="action_retry">عاود جرب</string>
+    <!-- Unlock Request Screen -->
+    <string name="title_unlock_request">طلب إلغاء القفل</string>
+    <string name="request_desc_part2">يطلب إلغاء قفل</string>
+    <string name="request_type_app">تطبيق</string>
+    <string name="request_type_device">الجهاز</string>
+    <string name="label_grant_access">منح دخول مؤقت</string>
+    <string name="action_unlock">فتح القفل</string>
+    <string name="action_deny_request">رفض الطلب</string>
+    <string name="dialog_custom_duration_title">مدة مخصصة</string>
+    <string name="dialog_custom_duration_label">أدخل مدة الفتح بالدقائق:</string>
+    <string name="placeholder_duration_example">مثلاً 45</string>
+    <string name="action_approve">موافقة</string>
+    <string name="label_10m">+10د</string>
+    <string name="label_15m">+15د</string>
+    <string name="label_custom">مخصص</string>
+
+    <!-- PIN Lock Screen -->
+    <string name="title_app_locked">التطبيق مقفل</string>
+    <string name="desc_enter_pin">أدخل الرمز السري للمتابعة</string>
+    <string name="label_pin">الرمز السري</string>
+    <string name="error_invalid_pin">الرمز غير صحيح. حاول مرة أخرى.</string>
+    <string name="action_unlock_biometric">فتح بالبصمة</string>
+</resources>
