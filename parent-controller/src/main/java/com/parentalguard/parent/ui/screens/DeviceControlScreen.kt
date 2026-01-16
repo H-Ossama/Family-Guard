@@ -200,7 +200,7 @@ private fun DeviceControlTopBar(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(1f, fill = false)) {
                     Text(
-                        text = device.customName,
+                        text = device.customName.ifBlank { device.name },
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,

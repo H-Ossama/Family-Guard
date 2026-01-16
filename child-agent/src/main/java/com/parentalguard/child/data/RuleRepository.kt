@@ -1,5 +1,6 @@
 package com.parentalguard.child.data
 
+import android.content.Context
 import com.parentalguard.common.model.BlockingRule
 import com.parentalguard.common.model.CategoryLimit
 import com.parentalguard.common.model.AppCategory
@@ -9,6 +10,38 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 object RuleRepository {
+    private var persistentStateManager: PersistentStateManager? = null
+
+    fun initialize(context: Context) {
+        if (persistentStateManager != null) return
+        persistentStateManager = PersistentStateManager(context)
+        loadPersistedState()
+    }
+
+    private fun loadPersistedState() {
+        persistentStateManager?.let { manager ->
+            _rules.value = manager.loadRules()
+            _categoryLimits.value = manager.loadCategoryLimits()
+            
+            val (isLocked, lockUntil) = manager.loadGlobalLock()
+            // Check if timed lock has expired during downtime
+            if (isLocked && lockUntil > 0 && lockUntil <= System.currentTimeMillis()) {
+                _globalLock.value = false
+                _globalLockUntil.value = 0
+                manager.saveGlobalLock(false, 0)
+            } else {
+                _globalLock.value = isLocked
+                _globalLockUntil.value = lockUntil
+            }
+            
+            _temporaryUnlockUntil.value = manager.loadTemporaryUnlockUntil()
+            _appTimers.value = manager.loadAppTimers()
+            _categoryTimers.value = manager.loadCategoryTimers()
+            _lastUnlockRequestTime.value = manager.loadLastUnlockRequestTime()
+        }
+    }
+
+
     private val _rules = MutableStateFlow<List<BlockingRule>>(emptyList())
     val rules: StateFlow<List<BlockingRule>> = _rules.asStateFlow()
     
@@ -17,10 +50,12 @@ object RuleRepository {
 
     fun updateRules(newRules: List<BlockingRule>) {
         _rules.value = newRules
+        persistentStateManager?.saveRules(newRules)
     }
     
     fun updateCategoryLimits(limits: List<CategoryLimit>) {
         _categoryLimits.value = limits
+        persistentStateManager?.saveCategoryLimits(limits)
     }
 
     private val _globalLock = MutableStateFlow<Boolean>(false)
@@ -32,13 +67,18 @@ object RuleRepository {
     fun setGlobalLock(locked: Boolean) {
         _globalLock.value = locked
         if (!locked) _globalLockUntil.value = 0
+        persistentStateManager?.saveGlobalLock(locked, _globalLockUntil.value)
     }
 
     fun setGlobalLockUntil(timestamp: Long) {
         _globalLockUntil.value = timestamp
         if (timestamp > System.currentTimeMillis()) {
             _globalLock.value = true
+        } else {
+             _globalLock.value = false
+             _globalLockUntil.value = 0
         }
+        persistentStateManager?.saveGlobalLock(_globalLock.value, _globalLockUntil.value)
     }
     
     // Temporary unlock management
@@ -47,6 +87,7 @@ object RuleRepository {
     
     fun setTemporaryUnlock(untilTimestamp: Long) {
         _temporaryUnlockUntil.value = untilTimestamp
+        persistentStateManager?.saveTemporaryUnlockUntil(untilTimestamp)
     }
     
     fun isTemporarilyUnlocked(): Boolean {
@@ -121,6 +162,7 @@ object RuleRepository {
             current.remove(packageName)
         }
         _appTimers.value = current
+        persistentStateManager?.saveAppTimers(current)
     }
 
     // Category Timers
@@ -135,6 +177,7 @@ object RuleRepository {
             current.remove(category)
         }
         _categoryTimers.value = current
+        persistentStateManager?.saveCategoryTimers(current)
     }
 
     fun isCategoryTimerActive(category: AppCategory): Boolean {
@@ -152,7 +195,9 @@ object RuleRepository {
     val lastUnlockRequestTime: StateFlow<Long> = _lastUnlockRequestTime.asStateFlow()
 
     fun updateLastUnlockRequestTime() {
-        _lastUnlockRequestTime.value = System.currentTimeMillis()
+        val now = System.currentTimeMillis()
+        _lastUnlockRequestTime.value = now
+        persistentStateManager?.saveLastUnlockRequestTime(now)
     }
 
     // For testing/bootstrap

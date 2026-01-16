@@ -9,6 +9,7 @@ import android.os.Build
 class ChildApp : Application() {
     override fun onCreate() {
         super.onCreate()
+        com.parentalguard.child.data.RuleRepository.initialize(this)
         
         // Restore Language
         val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)

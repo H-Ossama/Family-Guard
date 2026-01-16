@@ -38,7 +38,7 @@ fun LockScreen(
                 modifier = Modifier.size(120.dp),
                 cornerRadius = 60.dp,
                 elevation = 24.dp,
-                backgroundColor = Error.copy(alpha = 0.2f)
+                backgroundColor = PremiumDanger.copy(alpha = 0.2f)
             ) {
                  Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                      Icon(
@@ -129,7 +129,10 @@ fun LockScreen(
                 },
                 enabled = !isCooldownActive,
                 icon = if (isCooldownActive) Icons.Default.Lock else Icons.Default.LockOpen,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                gradient = Brush.horizontalGradient(
+                    colors = listOf(PremiumPrimary, PremiumPrimaryVariant)
+                )
             )
         }
     }

@@ -137,10 +137,10 @@ private fun DashboardHeader(
             .fillMaxWidth()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(Primary, Secondary)
+                    colors = listOf(PremiumPrimary, PremiumPrimaryVariant)
                 )
             )
-            .padding(top = 16.dp, bottom = 32.dp)
+            .padding(top = 16.dp, bottom = 48.dp)
     ) {
         Column(
             modifier = Modifier
@@ -222,11 +222,11 @@ private fun StatusChip(
 ) {
     Row(
         modifier = modifier
-            .clip(MaterialTheme.shapes.small)
-            .background(Color.White.copy(alpha = 0.15f))
-            .padding(12.dp),
+            .clip(MaterialTheme.shapes.medium)
+            .background(Color.White.copy(alpha = 0.1f))
+            .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Icon(
             imageVector = icon,
@@ -317,7 +317,7 @@ private fun StatItem(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = Primary,
+            tint = PremiumPrimary,
             modifier = Modifier.size(24.dp)
         )
         Spacer(Modifier.height(4.dp))
@@ -358,7 +358,8 @@ private fun SectionHeader(
             TextButton(onClick = onAction) {
                 Text(
                     text = actionText,
-                    color = Primary
+                    color = PremiumPrimary,
+                    fontWeight = FontWeight.Bold
                 )
             }
         }
@@ -385,16 +386,16 @@ private fun DeviceCard(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(44.dp)
                         .clip(androidx.compose.foundation.shape.CircleShape)
-                        .background(PrimaryLight.copy(alpha = 0.2f)),
+                        .background(PremiumPrimary.copy(alpha = 0.08f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Smartphone,
                         contentDescription = null,
-                        tint = Primary,
-                        modifier = Modifier.size(24.dp)
+                        tint = PremiumPrimary,
+                        modifier = Modifier.size(22.dp)
                     )
                 }
                 StatusDot(isOnline = status.isOnline)
@@ -403,7 +404,7 @@ private fun DeviceCard(
             Spacer(Modifier.height(12.dp))
             
             Text(
-                text = device.customName,
+                text = device.customName.ifBlank { device.name },
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface

@@ -57,6 +57,7 @@ class MonitorService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        com.parentalguard.child.data.RuleRepository.initialize(this)
         startForeground()
         lockManager = com.parentalguard.child.ui.LockManager(applicationContext)
         startUsageMonitoring() // Coroutine
