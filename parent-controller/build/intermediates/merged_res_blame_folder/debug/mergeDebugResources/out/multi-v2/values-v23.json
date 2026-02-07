@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.parentalguard.parent.parent-controller-mergeDebugResources-3:/values-v23/values-v23.xml",
+            "outputFile": "com.parentalguard.parent.parent-controller-mergeDebugResources-62:/values-v23/values-v23.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\H_Oussama\\.gradle\\caches\\9.0-milestone-1\\transforms\\fe1a94dd439ec179714800f006a34c2f\\transformed\\appcompat-1.6.1\\res\\values-v23\\values-v23.xml",
+                    "source": "C:\\Users\\H_Oussama\\.gradle\\caches\\9.0-milestone-1\\transforms\\10ed8d208dcbe77fbdbb5870b4b739ea\\transformed\\appcompat-1.6.1\\res\\values-v23\\values-v23.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,20,34,35,36,39,43,44,45,46",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4",

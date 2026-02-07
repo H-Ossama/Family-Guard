@@ -28,6 +28,31 @@ class PersistentStateManager(context: Context) {
         private const val KEY_APP_TIMERS = "app_timers"
         private const val KEY_CATEGORY_TIMERS = "category_timers"
         private const val KEY_LAST_UNLOCK_REQUEST = "last_unlock_request"
+        private const val KEY_USAGE_LIMIT = "usage_limit"
+        private const val KEY_BREAK_DURATION = "break_duration"
+        private const val KEY_CURRENT_BREAK_USAGE = "current_break_usage"
+    }
+    
+    fun saveBreakRules(usageLimit: Long, breakDuration: Long) {
+        prefs.edit()
+            .putLong(KEY_USAGE_LIMIT, usageLimit)
+            .putLong(KEY_BREAK_DURATION, breakDuration)
+            .apply()
+    }
+
+    fun loadBreakRules(): Pair<Long, Long> {
+        return Pair(
+            prefs.getLong(KEY_USAGE_LIMIT, 0L),
+            prefs.getLong(KEY_BREAK_DURATION, 0L)
+        )
+    }
+
+    fun saveCurrentBreakUsage(usage: Long) {
+        prefs.edit().putLong(KEY_CURRENT_BREAK_USAGE, usage).apply()
+    }
+
+    fun loadCurrentBreakUsage(): Long {
+        return prefs.getLong(KEY_CURRENT_BREAK_USAGE, 0L)
     }
     
     fun saveGlobalLock(isLocked: Boolean, lockUntil: Long) {

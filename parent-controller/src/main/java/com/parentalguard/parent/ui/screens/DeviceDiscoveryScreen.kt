@@ -39,6 +39,7 @@ fun DeviceDiscoveryScreen(
     onStartScan: () -> Unit,
     onDeviceSelected: (ChildDevice) -> Unit,
     onScanQR: () -> Unit,
+    onResetAll: () -> Unit,
     viewModel: DiscoveryViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -53,7 +54,8 @@ fun DeviceDiscoveryScreen(
             isScanning = isScanning,
             deviceCount = devices.size,
             onScanQR = onScanQR,
-            onRefresh = { viewModel.refreshDevices() }
+            onRefresh = { viewModel.refreshDevices() },
+            onResetAll = onResetAll
         )
         
         // Content
@@ -79,14 +81,41 @@ private fun DiscoveryHeader(
     isScanning: Boolean,
     deviceCount: Int,
     onScanQR: () -> Unit,
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
+    onResetAll: () -> Unit
 ) {
+    var showResetDialog by remember { mutableStateOf(false) }
+    
+    if (showResetDialog) {
+        AlertDialog(
+            onDismissRequest = { showResetDialog = false },
+            title = { Text("Reset All Devices?") },
+            text = { Text("This will remove all saved devices and their data. This action cannot be undone.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onResetAll()
+                        showResetDialog = false
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Error)
+                ) {
+                    Text("Reset All")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(Primary, Secondary)
+                    colors = listOf(PremiumPrimary, PremiumPrimaryVariant)
                 )
             )
             .padding(16.dp)
@@ -102,7 +131,7 @@ private fun DiscoveryHeader(
                     text = stringResource(R.string.title_discovery),
                     style = MaterialTheme.typography.headlineSmall,
                     color = Color.White,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.ExtraBold
                 )
                 Text(
                     text = if (isScanning) stringResource(R.string.status_scanning) else stringResource(R.string.status_devices_saved, deviceCount),
@@ -112,6 +141,17 @@ private fun DiscoveryHeader(
             }
             
             Row(verticalAlignment = Alignment.CenterVertically) {
+                // Reset button
+                if (deviceCount > 0) {
+                    IconButton(onClick = { showResetDialog = true }) {
+                        Icon(
+                            imageVector = Icons.Default.DeleteSweep,
+                            contentDescription = "Reset All",
+                            tint = Color.White.copy(alpha = 0.7f)
+                        )
+                    }
+                }
+                
                 // Refresh button
                 IconButton(onClick = onRefresh) {
                     Icon(
@@ -185,9 +225,9 @@ private fun DeviceList(
     ) {
         items(
             items = devices,
-            key = { "${it.ip.hostAddress}:${it.port}" }
+            key = { it.deviceId }
         ) { device ->
-            val status = deviceStatuses[device.ip.hostAddress ?: ""] ?: DeviceStatusSummary()
+            val status = deviceStatuses[device.deviceId] ?: DeviceStatusSummary()
             DiscoveredDeviceCard(
                 device = device,
                 status = status,
@@ -286,6 +326,25 @@ private fun DiscoveredDeviceCard(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
+                                Icon(
+                                    imageVector = if (status.connectionType == com.parentalguard.parent.viewmodel.ConnectionType.LOCAL) 
+                                        Icons.Default.Wifi else Icons.Default.Cloud,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(10.dp),
+                                    tint = if (status.connectionType == com.parentalguard.parent.viewmodel.ConnectionType.LOCAL) Success else Info
+                                )
+                                Text(
+                                    text = if (status.connectionType == com.parentalguard.parent.viewmodel.ConnectionType.LOCAL) "Local" else "Server",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = if (status.connectionType == com.parentalguard.parent.viewmodel.ConnectionType.LOCAL) Success else Info
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .height(10.dp)
+                                        .width(1.dp)
+                                        .padding(horizontal = 2.dp)
+                                        .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                                )
                                 Icon(
                                     imageVector = if (status.isLocked) Icons.Default.Lock else Icons.Default.LockOpen,
                                     contentDescription = null,

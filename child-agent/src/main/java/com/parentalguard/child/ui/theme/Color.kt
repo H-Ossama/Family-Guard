@@ -2,71 +2,71 @@ package com.parentalguard.child.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Primary Palette - Deep Indigo to Teal Gradient
-val PrimaryDark = Color(0xFF1A237E)
-val Primary = Color(0xFF303F9F)
-val PrimaryLight = Color(0xFF5C6BC0)
+// Primary Palette - Modern Indigo & Violet
+val PrimaryDark = Color(0xFF121858)
+val Primary = Color(0xFF3F51B5)
+val PrimaryLight = Color(0xFF757DE8)
 
-// Secondary Palette - Teal Accents
-val SecondaryDark = Color(0xFF00695C)
-val Secondary = Color(0xFF00897B)
-val SecondaryLight = Color(0xFF4DB6AC)
+// Secondary Palette - Soft Cyan & Teal
+val SecondaryDark = Color(0xFF00796B)
+val Secondary = Color(0xFF00BFA5)
+val SecondaryLight = Color(0xFF5DF2D6)
 
-// Accent Colors
-val AccentGold = Color(0xFFFFB300)
-val AccentPurple = Color(0xFF7C4DFF)
-val AccentPink = Color(0xFFE91E63)
+// Accent Colors - Vibrant & Friendly
+val AccentGold = Color(0xFFFFD600)
+val AccentPurple = Color(0xFF9C27B0)
+val AccentPink = Color(0xFFFF4081)
+val AccentOrange = Color(0xFFFF6D00)
 
 // Surface Colors - Light Mode
 val SurfaceLight = Color(0xFFFFFFFF)
-val SurfaceVariantLight = Color(0xFFF5F7FA)
-val BackgroundLight = Color(0xFFF0F2F5)
+val SurfaceVariantLight = Color(0xFFF0F1F6)
+val BackgroundLight = Color(0xFFF8F9FF)
 val CardLight = Color(0xFFFFFFFF)
 
 // Surface Colors - Dark Mode
-val SurfaceDark = Color(0xFF1E1E2E)
-val SurfaceVariantDark = Color(0xFF2D2D3D)
-val BackgroundDark = Color(0xFF121218)
-val CardDark = Color(0xFF252536)
+val SurfaceDark = Color(0xFF0F121A)
+val SurfaceVariantDark = Color(0xFF1A1D29)
+val BackgroundDark = Color(0xFF080A0F)
+val CardDark = Color(0xFF161922)
 
 // Semantic Colors
-val Success = Color(0xFF4CAF50)
+val Success = Color(0xFF00C853)
 val SuccessLight = Color(0xFFE8F5E9)
-val Warning = Color(0xFFFF9800)
-val WarningLight = Color(0xFFFFF3E0)
-val Error = Color(0xFFE53935)
+val Warning = Color(0xFFFFAB00)
+val WarningLight = Color(0xFFFFF8E1)
+val Error = Color(0xFFFF1744)
 val ErrorLight = Color(0xFFFFEBEE)
-val Info = Color(0xFF2196F3)
+val Info = Color(0xFF2979FF)
 val InfoLight = Color(0xFFE3F2FD)
 
-// Text Colors - Light Mode
-val TextPrimaryLight = Color(0xFF1A1A2E)
-val TextSecondaryLight = Color(0xFF6B7280)
-val TextTertiaryLight = Color(0xFF9CA3AF)
+// Text Colors
+val TextPrimaryLight = Color(0xFF1C1E21)
+val TextSecondaryLight = Color(0xFF5F6368)
+val TextTertiaryLight = Color(0xFF9AA0A6)
 
-// Text Colors - Dark Mode
-val TextPrimaryDark = Color(0xFFF5F5F5)
-val TextSecondaryDark = Color(0xFFB0B0B0)
-val TextTertiaryDark = Color(0xFF6B6B6B)
+val TextPrimaryDark = Color(0xFFE8EAED)
+val TextSecondaryDark = Color(0xFFBDC1C6)
+val TextTertiaryDark = Color(0xFF80868B)
 
-// Category Colors (for app categories)
+// Category Colors
 val CategorySocial = Color(0xFF1877F2)
-val CategoryGames = Color(0xFFE91E63)
-val CategoryEducation = Color(0xFF4CAF50)
-val CategoryProductivity = Color(0xFF2196F3)
-val CategoryEntertainment = Color(0xFFFF5722)
-val CategoryOther = Color(0xFF9E9E9E)
+val CategoryGames = Color(0xFFFF3D00)
+val CategoryEducation = Color(0xFF00C853)
+val CategoryProductivity = Color(0xFF2979FF)
+val CategoryEntertainment = Color(0xFFFFD600)
+val CategoryOther = Color(0xFF78909C)
 
-// Gradient Colors
-val GradientStart = Color(0xFF1A237E)
-val GradientMiddle = Color(0xFF0D47A1)
-val GradientEnd = Color(0xFF00897B)
+// Gradient Colors - Deep Space to Midnight
+val GradientStart = Color(0xFF0F172A)
+val GradientMiddle = Color(0xFF1E293B)
+val GradientEnd = Color(0xFF334155)
 
 // Glass Effect Colors
-val GlassWhite = Color(0x40FFFFFF)
-val GlassDark = Color(0x401E1E2E)
+val GlassWhite = Color(0x2BFFFFFF)
+val GlassDark = Color(0x2B0F172A)
 
 // Status Colors
-val OnlineGreen = Color(0xFF22C55E)
-val OfflineRed = Color(0xFFEF4444)
+val OnlineGreen = Color(0xFF10B981)
+val OfflineRed = Color(0xFFF43F5E)
 val WarningOrange = Color(0xFFF59E0B)

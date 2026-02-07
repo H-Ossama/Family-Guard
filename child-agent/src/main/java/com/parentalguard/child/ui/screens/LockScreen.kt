@@ -2,14 +2,17 @@ package com.parentalguard.child.ui.screens
 
 import androidx.compose.ui.res.stringResource
 import com.parentalguard.child.R
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -24,81 +27,108 @@ fun LockScreen(
     onRequestUnlock: () -> Unit
 ) {
     val lockUntil by RuleRepository.globalLockUntil.collectAsState()
+    val lockReason by RuleRepository.lockReason.collectAsState()
     
     GradientBackground {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(32.dp),
+                .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            
-            GlassCard(
-                modifier = Modifier.size(120.dp),
-                cornerRadius = 60.dp,
-                elevation = 24.dp,
-                backgroundColor = PremiumDanger.copy(alpha = 0.2f)
+            // Friendly Illustration / Icon
+            Box(
+                modifier = Modifier
+                    .size(140.dp)
+                    .clip(androidx.compose.foundation.shape.CircleShape)
+                    .background(Color.White.copy(alpha = 0.1f))
+                    .padding(12.dp),
+                contentAlignment = Alignment.Center
             ) {
-                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                     Icon(
-                         imageVector = Icons.Default.Lock,
-                         contentDescription = null,
-                         tint = Color.White,
-                         modifier = Modifier.size(64.dp)
-                     )
-                 }
+                GlassCard(
+                    modifier = Modifier.fillMaxSize(),
+                    cornerRadius = 70.dp,
+                    elevation = 0.dp,
+                    backgroundColor = Color.White.copy(alpha = 0.15f)
+                ) {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = if (lockReason == "BREAK") Icons.Default.Warning else Icons.Default.Lock,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(64.dp)
+                        )
+                    }
+                }
             }
             
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(40.dp))
             
             Text(
-                text = stringResource(R.string.lock_screen_title),
-                style = MaterialTheme.typography.displaySmall,
+                text = if (lockReason == "BREAK") stringResource(R.string.take_a_break_title) else stringResource(R.string.lock_screen_title),
+                style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.ExtraBold),
                 color = Color.White,
-                fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
             
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             
-            if (lockUntil > 0) {
-                // Countdown Logic
-                var timeRemaining by remember(lockUntil) { mutableStateOf("") }
-                
-                LaunchedEffect(lockUntil) {
-                    while(true) {
-                        val diff = lockUntil - System.currentTimeMillis()
-                        if (diff <= 0) {
-                            timeRemaining = "00:00:00"
-                        } else {
-                            val hours = diff / 3600000
-                            val minutes = (diff % 3600000) / 60000
-                            val seconds = (diff % 60000) / 1000
-                            timeRemaining = String.format("%02d:%02d:%02d", hours, minutes, seconds)
-                        }
-                        delay(1000)
-                    }
-                }
-                
-                Text(
-                    text = stringResource(R.string.lock_screen_timer_prefix, timeRemaining),
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
-                
-                Spacer(modifier = Modifier.height(8.dp))
+            val breakDurationMinutes = remember(lockUntil) {
+                val diff = lockUntil - System.currentTimeMillis()
+                (diff / 60000).coerceAtLeast(1)
             }
 
             Text(
-                text = stringResource(R.string.lock_screen_message),
+                text = if (lockReason == "BREAK") 
+                    stringResource(R.string.take_a_break_message, breakDurationMinutes)
+                    else stringResource(R.string.lock_screen_message),
                 style = MaterialTheme.typography.bodyLarge,
-                color = Color.White.copy(alpha = 0.9f),
-                textAlign = TextAlign.Center
+                color = Color.White.copy(alpha = 0.8f),
+                textAlign = TextAlign.Center,
+                lineHeight = androidx.compose.ui.unit.TextUnit.Unspecified
             )
             
-            Spacer(modifier = Modifier.height(64.dp))
+            if (lockUntil > 0) {
+                Spacer(modifier = Modifier.height(32.dp))
+                
+                GlassCard(
+                    modifier = Modifier.fillMaxWidth(0.9f),
+                    backgroundColor = Color.White.copy(alpha = 0.08f),
+                    cornerRadius = 24.dp
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        var timeRemaining by remember(lockUntil) { mutableStateOf("") }
+                        
+                        LaunchedEffect(lockUntil) {
+                            while(true) {
+                                val diff = lockUntil - System.currentTimeMillis()
+                                if (diff <= 0) {
+                                    timeRemaining = "00:00:00"
+                                    break
+                                } else {
+                                    val hours = diff / 3600000
+                                    val minutes = (diff % 3600000) / 60000
+                                    val seconds = (diff % 60000) / 1000
+                                    timeRemaining = String.format("%02d:%02d:%02d", hours, minutes, seconds)
+                                }
+                                delay(1000)
+                            }
+                        }
+                        
+                        Text(
+                            text = stringResource(R.string.lock_screen_timer_prefix, timeRemaining),
+                            style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
+                            color = AccentGold
+                        )
+                    }
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(48.dp))
             
             val lastRequestTime by RuleRepository.lastUnlockRequestTime.collectAsState()
             val cooldownMs = 15 * 60 * 1000L
@@ -129,10 +159,9 @@ fun LockScreen(
                 },
                 enabled = !isCooldownActive,
                 icon = if (isCooldownActive) Icons.Default.Lock else Icons.Default.LockOpen,
-                modifier = Modifier.fillMaxWidth(),
-                gradient = Brush.horizontalGradient(
-                    colors = listOf(PremiumPrimary, PremiumPrimaryVariant)
-                )
+                modifier = Modifier
+                    .fillMaxWidth(0.85f)
+                    .height(64.dp)
             )
         }
     }

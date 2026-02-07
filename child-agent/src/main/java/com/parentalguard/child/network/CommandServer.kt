@@ -101,7 +101,9 @@ class CommandServer(private val context: Context) {
                         isLocked = isLocked,
                         isIconHidden = isIconHidden,
                         appTimers = appTimers,
-                        categoryTimers = RuleRepository.categoryTimers.value
+                        categoryTimers = RuleRepository.categoryTimers.value,
+                        usageLimitMs = RuleRepository.usageLimitMs.value,
+                        breakDurationMs = RuleRepository.breakDurationMs.value
                     )
                     call.respond(Packet.Response(true, stats = stats))
                 }
@@ -158,7 +160,8 @@ class CommandServer(private val context: Context) {
                             RuleRepository.updateCategoryLimits(packet.ruleSet!!.categoryLimits)
                             RuleRepository.setTemporaryUnlock(packet.ruleSet!!.temporaryUnlockUntil)
                             RuleRepository.setGlobalLockUntil(packet.ruleSet!!.globalLockUntil)
-                            Log.i("CommandServer", "Rules updated: ${packet.ruleSet!!.rules.size} rules, ${packet.ruleSet!!.categoryLimits.size} category limits")
+                            RuleRepository.setBreakRules(packet.ruleSet!!.usageLimitMs, packet.ruleSet!!.breakDurationMs)
+                            Log.i("CommandServer", "Rules updated: ${packet.ruleSet!!.rules.size} rules, Break: ${packet.ruleSet!!.usageLimitMs}/${packet.ruleSet!!.breakDurationMs}")
                             call.respond(Packet.Response(true, "Rules updated"))
                         } else {
                             call.respond(Packet.Response(false, "Invalid command"))

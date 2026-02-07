@@ -34,6 +34,7 @@ string back
 string biometric_desc
 string biometric_title
 string block_1h
+string btn_apply_break
 string camera_permission_required
 string cancel
 string category_education
@@ -56,6 +57,7 @@ string deny_unlock_success
 string desc_category_limits
 string desc_enter_pin
 string desc_hourly_timeline
+string desc_take_a_break
 string device_name
 string device_renamed
 string dialog_category_timer_desc
@@ -90,6 +92,7 @@ string label_15m
 string label_all
 string label_apps
 string label_apps_in_category
+string label_break_duration
 string label_custom
 string label_daily_limit
 string label_features
@@ -106,6 +109,7 @@ string label_pin
 string label_todays_screen_time
 string label_top_apps
 string label_total
+string label_usage_limit
 string language_darija
 string language_english
 string lock_device
@@ -172,6 +176,7 @@ string title_app_locked
 string title_category_limits
 string title_discovery
 string title_hourly_timeline
+string title_take_a_break
 string title_unlock_request
 string title_usage_by_category
 string total_screen_time

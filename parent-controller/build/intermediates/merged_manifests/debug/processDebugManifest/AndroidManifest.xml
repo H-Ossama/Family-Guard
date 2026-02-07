@@ -44,6 +44,7 @@
         android:icon="@drawable/ic_parent_logo"
         android:label="Parental Controller"
         android:supportsRtl="true"
+        android:testOnly="true"
         android:theme="@style/Theme.ParentalGuard" >
         <activity
             android:name="com.parentalguard.parent.MainActivity"

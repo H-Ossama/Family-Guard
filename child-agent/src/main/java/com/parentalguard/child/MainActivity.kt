@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private val connectionString = mutableStateOf("")
     private val status = mutableStateOf("")
     private val qrBitmap = mutableStateOf<Bitmap?>(null)
+    private val deviceName = mutableStateOf("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,8 +43,10 @@ class MainActivity : AppCompatActivity() {
                     connectionString = connectionString.value,
                     status = status.value,
                     qrBitmap = qrBitmap.value,
+                    deviceName = deviceName.value,
                     onRequestUnlock = { requestTemporaryUnlock() },
-                    onHideIcon = { hideLauncherIcon() }
+                    onHideIcon = { hideLauncherIcon() },
+                    onRenameDevice = { showRenameDialog() }
                 )
             }
         }
@@ -60,23 +63,56 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateConnectionInfo() {
-        // Get IP Address
         val ip = getLocalIpAddress()
-        val port = 8080 // Default Ktor port
+        val port = 8080
+        val deviceId = com.parentalguard.child.utils.DeviceUtils.getDeviceId(this)
+        // Use the DeviceUtils helper that accounts for custom name
+        val name = com.parentalguard.child.utils.DeviceUtils.getDeviceName(this)
+        deviceName.value = name
         
         if (ip != null) {
-            val connStr = "$ip:$port"
-            connectionString.value = connStr
-            status.value = getString(R.string.status_running) // Or formatted string resource
+            // New pairing format: deviceId|ip:port|deviceName
+            val connStr = "$deviceId|$ip:$port|$name"
+            connectionString.value = "$ip:$port" // Display only IP:Port for simplicity
+            status.value = getString(R.string.status_running)
             
-            // Generate QR
-            // Note: QRCodeGenerator must be accessible
             val bitmap = com.parentalguard.child.ui.QRCodeGenerator.generateQRCode(connStr, 512, 512)
             qrBitmap.value = bitmap
         } else {
             connectionString.value = getString(R.string.address_unavailable)
             status.value = getString(R.string.status_no_network)
         }
+    }
+
+    private fun showRenameDialog() {
+        val input = android.widget.EditText(this)
+        input.inputType = android.text.InputType.TYPE_CLASS_TEXT
+        input.setText(deviceName.value)
+        
+        // Add some padding
+        val container = android.widget.FrameLayout(this)
+        val params = android.widget.FrameLayout.LayoutParams(
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT, 
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        params.leftMargin = 50
+        params.rightMargin = 50
+        input.layoutParams = params
+        container.addView(input)
+
+        android.app.AlertDialog.Builder(this)
+            .setTitle("Rename Device")
+            .setView(container)
+            .setPositiveButton("Save") { _, _ ->
+                val newName = input.text.toString().trim()
+                if (newName.isNotEmpty()) {
+                    com.parentalguard.child.utils.DeviceUtils.setCustomDeviceName(this, newName)
+                    Toast.makeText(this, "Device renamed to $newName", Toast.LENGTH_SHORT).show()
+                    updateConnectionInfo() // Refresh UI
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun getLocalIpAddress(): String? {

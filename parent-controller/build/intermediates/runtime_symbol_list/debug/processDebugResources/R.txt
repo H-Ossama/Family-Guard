@@ -994,6 +994,7 @@ int string bottom_sheet_collapse_description 0x7f0d003d
 int string bottom_sheet_dismiss_description 0x7f0d003e
 int string bottom_sheet_drag_handle_description 0x7f0d003f
 int string bottom_sheet_expand_description 0x7f0d0040
+int string btn_apply_break 0x7f0d0135
 int string call_notification_answer_action 0x7f0d0041
 int string call_notification_answer_video_action 0x7f0d0042
 int string call_notification_decline_action 0x7f0d0043
@@ -1061,6 +1062,7 @@ int string deny_unlock_success 0x7f0d0080
 int string desc_category_limits 0x7f0d0081
 int string desc_enter_pin 0x7f0d0082
 int string desc_hourly_timeline 0x7f0d0083
+int string desc_take_a_break 0x7f0d0136
 int string device_name 0x7f0d0084
 int string device_renamed 0x7f0d0085
 int string dialog 0x7f0d0086
@@ -1110,6 +1112,7 @@ int string label_15m 0x7f0d00b1
 int string label_all 0x7f0d00b2
 int string label_apps 0x7f0d00b3
 int string label_apps_in_category 0x7f0d00b4
+int string label_break_duration 0x7f0d0137
 int string label_custom 0x7f0d00b5
 int string label_daily_limit 0x7f0d00b6
 int string label_features 0x7f0d00b7
@@ -1126,6 +1129,7 @@ int string label_pin 0x7f0d00c1
 int string label_todays_screen_time 0x7f0d00c2
 int string label_top_apps 0x7f0d00c3
 int string label_total 0x7f0d00c4
+int string label_usage_limit 0x7f0d0138
 int string language_darija 0x7f0d00c5
 int string language_english 0x7f0d00c6
 int string lock_device 0x7f0d00c7
@@ -1220,6 +1224,7 @@ int string title_app_locked 0x7f0d011f
 int string title_category_limits 0x7f0d0120
 int string title_discovery 0x7f0d0121
 int string title_hourly_timeline 0x7f0d0122
+int string title_take_a_break 0x7f0d0139
 int string title_unlock_request 0x7f0d0123
 int string title_usage_by_category 0x7f0d0124
 int string tooltip_long_press_label 0x7f0d0125

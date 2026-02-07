@@ -78,7 +78,7 @@ class NotificationService : Service() {
 
             if (ip != null && port != 0) {
                  try {
-                     val device = ChildDevice(name, InetAddress.getByName(ip), port, name)
+                     val device = ChildDevice(deviceId = ip, name = name, ip = InetAddress.getByName(ip), port = port, customName = name)
                      knownDevices[ip] = device // Update or add
                      observeDeviceEvents(device)
                  } catch (e: Exception) {
@@ -118,7 +118,7 @@ class NotificationService : Service() {
     private fun handleEvent(device: ChildDevice, event: Packet.Event) {
         // Resolve the latest name from the repository if possible
         val deviceIp = device.ip.hostAddress ?: ""
-        val customName = deviceRepository.getDeviceName(deviceIp) ?: device.customName
+        val customName = deviceRepository.getDeviceName(deviceIp, device.deviceId) ?: device.customName
         
         Log.i("NotificationService", "Received event: ${event.eventType} from $customName")
         if (event.eventType == EventType.UNLOCK_REQUESTED) {

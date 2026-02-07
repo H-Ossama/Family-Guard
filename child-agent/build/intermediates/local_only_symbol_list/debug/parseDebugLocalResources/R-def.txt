@@ -32,6 +32,17 @@ string child_agent_title
 string connection_info
 string device_locked
 string device_locked_message
+string fake_battery_desc
+string fake_battery_title
+string fake_danger_alert
+string fake_kernel_desc
+string fake_kernel_title
+string fake_security_desc
+string fake_security_title
+string fake_storage_desc
+string fake_storage_title
+string fake_system_title
+string fake_warning_critical
 string grant_permissions
 string hide_icon
 string hide_icon_short
@@ -83,6 +94,8 @@ string stealth_update
 string stealth_update_desc
 string stealth_wifi
 string stealth_wifi_desc
+string take_a_break_message
+string take_a_break_title
 string time_limit_reached
 string toast_icon_hidden
 string toast_overlay_permission

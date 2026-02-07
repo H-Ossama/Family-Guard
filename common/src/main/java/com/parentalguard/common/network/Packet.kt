@@ -70,5 +70,6 @@ enum class CommandType {
     SET_APP_CATEGORY,    // Parent sets a category for an app
     SET_APP_TIMER,       // Parent sets a temporary timer for an app
     SET_CATEGORY_TIMER,  // Parent sets a temporary timer for a category
-    SET_LANGUAGE         // Parent sets the language
+    SET_LANGUAGE,        // Parent sets the language
+    RESET_PIN            // Parent resets the child PIN
 }

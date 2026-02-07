@@ -1,44 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.parentalguard.parent.parent-controller-mergeDebugResources-3:/values-sv/values-sv.xml",
+            "outputFile": "com.parentalguard.parent.parent-controller-mergeDebugResources-62:/values-sv/values-sv.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\H_Oussama\\.gradle\\caches\\9.0-milestone-1\\transforms\\3ba43a761911e6fdddd2cf16d70d94cb\\transformed\\core-1.12.0\\res\\values-sv\\values-sv.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8,9",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,150,252,350,449,557,662,783",
-                        "endColumns": "94,101,97,98,107,104,120,100",
-                        "endOffsets": "145,247,345,444,552,657,778,879"
-                    },
-                    "to": {
-                        "startLines": "33,34,35,36,37,38,39,103",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "3273,3368,3470,3568,3667,3775,3880,10661",
-                        "endColumns": "94,101,97,98,107,104,120,100",
-                        "endOffsets": "3363,3465,3563,3662,3770,3875,3996,10757"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\H_Oussama\\.gradle\\caches\\9.0-milestone-1\\transforms\\2281c01262d729e0a8cb1feae6f095bf\\transformed\\biometric-1.1.0\\res\\values-sv\\values-sv.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,164,250,371,510,640,762,891,1027,1132,1284,1436",
-                        "endColumns": "108,85,120,138,129,121,128,135,104,151,151,126",
-                        "endOffsets": "159,245,366,505,635,757,886,1022,1127,1279,1431,1558"
-                    },
-                    "to": {
-                        "startLines": "43,76,81,82,83,84,85,86,87,88,89,90",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "4262,7977,8400,8521,8660,8790,8912,9041,9177,9282,9434,9586",
-                        "endColumns": "108,85,120,138,129,121,128,135,104,151,151,126",
-                        "endOffsets": "4366,8058,8516,8655,8785,8907,9036,9172,9277,9429,9581,9708"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\H_Oussama\\.gradle\\caches\\9.0-milestone-1\\transforms\\fe1a94dd439ec179714800f006a34c2f\\transformed\\appcompat-1.6.1\\res\\values-sv\\values-sv.xml",
+                    "source": "C:\\Users\\H_Oussama\\.gradle\\caches\\9.0-milestone-1\\transforms\\10ed8d208dcbe77fbdbb5870b4b739ea\\transformed\\appcompat-1.6.1\\res\\values-sv\\values-sv.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -55,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\H_Oussama\\.gradle\\caches\\9.0-milestone-1\\transforms\\8a9aa94a3fe7263143590033db76847f\\transformed\\jetified-material3-1.1.1\\res\\values-sv\\values-sv.xml",
+                    "source": "C:\\Users\\H_Oussama\\.gradle\\caches\\9.0-milestone-1\\transforms\\e285f308977187149773a7901da3a575\\transformed\\jetified-material3-1.1.1\\res\\values-sv\\values-sv.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -72,7 +38,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\H_Oussama\\.gradle\\caches\\9.0-milestone-1\\transforms\\59871966fd6757b7bef498a195bca87c\\transformed\\jetified-ui-release\\res\\values-sv\\values-sv.xml",
+                    "source": "C:\\Users\\H_Oussama\\.gradle\\caches\\9.0-milestone-1\\transforms\\769bf90e40b578f5b4cfb5dc42af2d5a\\transformed\\jetified-ui-release\\res\\values-sv\\values-sv.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -86,6 +52,40 @@
                         "startOffsets": "4001,4094,7881,8063,8238,9713,9789,9877,9966,10047,10111,10175,10261,10511,10859,10937,11004",
                         "endColumns": "92,87,95,98,87,75,87,88,80,63,63,85,89,68,77,66,119",
                         "endOffsets": "4089,4177,7972,8157,8321,9784,9872,9961,10042,10106,10170,10256,10346,10575,10932,10999,11119"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\H_Oussama\\.gradle\\caches\\9.0-milestone-1\\transforms\\7aa130490d1996c8fb46535543671a58\\transformed\\core-1.12.0\\res\\values-sv\\values-sv.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,150,252,350,449,557,662,783",
+                        "endColumns": "94,101,97,98,107,104,120,100",
+                        "endOffsets": "145,247,345,444,552,657,778,879"
+                    },
+                    "to": {
+                        "startLines": "33,34,35,36,37,38,39,103",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "3273,3368,3470,3568,3667,3775,3880,10661",
+                        "endColumns": "94,101,97,98,107,104,120,100",
+                        "endOffsets": "3363,3465,3563,3662,3770,3875,3996,10757"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\H_Oussama\\.gradle\\caches\\9.0-milestone-1\\transforms\\5d79ac73c2a7834bc6928e922817cb01\\transformed\\biometric-1.1.0\\res\\values-sv\\values-sv.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,164,250,371,510,640,762,891,1027,1132,1284,1436",
+                        "endColumns": "108,85,120,138,129,121,128,135,104,151,151,126",
+                        "endOffsets": "159,245,366,505,635,757,886,1022,1127,1279,1431,1558"
+                    },
+                    "to": {
+                        "startLines": "43,76,81,82,83,84,85,86,87,88,89,90",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "4262,7977,8400,8521,8660,8790,8912,9041,9177,9282,9434,9586",
+                        "endColumns": "108,85,120,138,129,121,128,135,104,151,151,126",
+                        "endOffsets": "4366,8058,8516,8655,8785,8907,9036,9172,9277,9429,9581,9708"
                     }
                 }
             ]

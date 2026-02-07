@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.parentalguard.child.child-agent-mergeDebugResources-2:/values-xlarge-v4/values-xlarge-v4.xml",
+            "outputFile": "com.parentalguard.child.child-agent-mergeDebugResources-63:/values-xlarge-v4/values-xlarge-v4.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\H_Oussama\\.gradle\\caches\\9.0-milestone-1\\transforms\\fe1a94dd439ec179714800f006a34c2f\\transformed\\appcompat-1.6.1\\res\\values-xlarge-v4\\values-xlarge-v4.xml",
+                    "source": "C:\\Users\\H_Oussama\\.gradle\\caches\\9.0-milestone-1\\transforms\\10ed8d208dcbe77fbdbb5870b4b739ea\\transformed\\appcompat-1.6.1\\res\\values-xlarge-v4\\values-xlarge-v4.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7",
                         "startColumns": "4,4,4,4,4,4",

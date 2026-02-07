@@ -38,6 +38,11 @@ object RuleRepository {
             _appTimers.value = manager.loadAppTimers()
             _categoryTimers.value = manager.loadCategoryTimers()
             _lastUnlockRequestTime.value = manager.loadLastUnlockRequestTime()
+
+            val (limit, duration) = manager.loadBreakRules()
+            _usageLimitMs.value = limit
+            _breakDurationMs.value = duration
+            _currentBreakUsageMs.value = manager.loadCurrentBreakUsage()
         }
     }
 
@@ -58,25 +63,54 @@ object RuleRepository {
         persistentStateManager?.saveCategoryLimits(limits)
     }
 
+    private val _usageLimitMs = MutableStateFlow<Long>(0)
+    val usageLimitMs: StateFlow<Long> = _usageLimitMs.asStateFlow()
+
+    private val _breakDurationMs = MutableStateFlow<Long>(0)
+    val breakDurationMs: StateFlow<Long> = _breakDurationMs.asStateFlow()
+
+    private val _currentBreakUsageMs = MutableStateFlow<Long>(0)
+    val currentBreakUsageMs: StateFlow<Long> = _currentBreakUsageMs.asStateFlow()
+
+    fun setBreakRules(limit: Long, duration: Long) {
+        _usageLimitMs.value = limit
+        _breakDurationMs.value = duration
+        persistentStateManager?.saveBreakRules(limit, duration)
+    }
+
+    fun setCurrentBreakUsage(usage: Long) {
+        _currentBreakUsageMs.value = usage
+        persistentStateManager?.saveCurrentBreakUsage(usage)
+    }
+
     private val _globalLock = MutableStateFlow<Boolean>(false)
     val globalLock: StateFlow<Boolean> = _globalLock.asStateFlow()
 
     private val _globalLockUntil = MutableStateFlow<Long>(0)
     val globalLockUntil: StateFlow<Long> = _globalLockUntil.asStateFlow()
 
-    fun setGlobalLock(locked: Boolean) {
+    private val _lockReason = MutableStateFlow<String?>(null)
+    val lockReason: StateFlow<String?> = _lockReason.asStateFlow()
+
+    fun setGlobalLock(locked: Boolean, reason: String? = null) {
         _globalLock.value = locked
-        if (!locked) _globalLockUntil.value = 0
+        _lockReason.value = reason
+        if (!locked) {
+            _globalLockUntil.value = 0
+            _lockReason.value = null
+        }
         persistentStateManager?.saveGlobalLock(locked, _globalLockUntil.value)
     }
 
-    fun setGlobalLockUntil(timestamp: Long) {
+    fun setGlobalLockUntil(timestamp: Long, reason: String? = null) {
         _globalLockUntil.value = timestamp
+        _lockReason.value = reason
         if (timestamp > System.currentTimeMillis()) {
             _globalLock.value = true
         } else {
              _globalLock.value = false
              _globalLockUntil.value = 0
+             _lockReason.value = null
         }
         persistentStateManager?.saveGlobalLock(_globalLock.value, _globalLockUntil.value)
     }

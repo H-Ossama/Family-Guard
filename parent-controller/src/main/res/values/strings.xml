@@ -230,4 +230,11 @@
     <string name="label_pin">PIN</string>
     <string name="error_invalid_pin">Invalid PIN. Please try again.</string>
     <string name="action_unlock_biometric">Biometric Unlock</string>
+
+    <!-- Take a Break -->
+    <string name="title_take_a_break">Take a Break</string>
+    <string name="desc_take_a_break">Forced breaks after cumulative usage</string>
+    <string name="label_usage_limit">Usage Limit (minutes)</string>
+    <string name="label_break_duration">Break Duration (minutes)</string>
+    <string name="btn_apply_break">Apply Break Rules</string>
 </resources>

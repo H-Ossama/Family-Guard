@@ -11,6 +11,7 @@ import java.net.InetAddress
 
 @Serializable
 data class SavedDevice(
+    val deviceId: String,
     val name: String,
     val ipAddress: String,
     val port: Int,
@@ -37,6 +38,7 @@ class DeviceRepository(context: Context) {
     fun saveDevices(devices: List<ChildDevice>) {
         val savedDevices = devices.map { device ->
             SavedDevice(
+                deviceId = device.deviceId,
                 name = device.name,
                 ipAddress = device.ip.hostAddress ?: "",
                 port = device.port,
@@ -58,6 +60,7 @@ class DeviceRepository(context: Context) {
             val savedDevices = json.decodeFromString<List<SavedDevice>>(jsonString)
             savedDevices.map { saved ->
                 ChildDevice(
+                    deviceId = saved.deviceId,
                     name = saved.name,
                     ip = InetAddress.getByName(saved.ipAddress),
                     port = saved.port,
@@ -74,7 +77,7 @@ class DeviceRepository(context: Context) {
      */
     fun updateDeviceName(device: ChildDevice, newName: String) {
         val devices = loadDevices().toMutableList()
-        val index = devices.indexOfFirst { it.ip == device.ip && it.port == device.port }
+        val index = devices.indexOfFirst { it.deviceId == device.deviceId }
         
         if (index != -1) {
             devices[index].customName = newName
@@ -87,10 +90,14 @@ class DeviceRepository(context: Context) {
      */
     fun addDevice(device: ChildDevice) {
         val devices = loadDevices().toMutableList()
+        val existingIndex = devices.indexOfFirst { it.deviceId == device.deviceId }
         
-        // Check if device already exists
-        if (devices.none { it.ip == device.ip && it.port == device.port }) {
+        if (existingIndex == -1) {
             devices.add(device)
+            saveDevices(devices)
+        } else {
+            // Update existing entry (IP might have changed)
+            devices[existingIndex] = device.copy(customName = devices[existingIndex].customName)
             saveDevices(devices)
         }
     }
@@ -100,15 +107,16 @@ class DeviceRepository(context: Context) {
      */
     fun removeDevice(device: ChildDevice) {
         val devices = loadDevices().toMutableList()
-        devices.removeAll { it.ip == device.ip && it.port == device.port }
+        devices.removeAll { it.deviceId == device.deviceId }
         saveDevices(devices)
     }
 
     /**
      * Get device name by IP address
      */
-    fun getDeviceName(ipAddress: String): String? {
+    fun getDeviceName(hostAddress: String, deviceId: String): String? {
         val devices = loadDevices()
-        return devices.find { it.ip.hostAddress == ipAddress }?.customName
+        return devices.find { it.deviceId == deviceId }?.customName ?: 
+               devices.find { it.ip.hostAddress == hostAddress }?.customName
     }
 }

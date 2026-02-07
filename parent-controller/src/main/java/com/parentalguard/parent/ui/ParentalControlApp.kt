@@ -144,12 +144,15 @@ fun ParentalControlApp(
                             selectedDevice = device
                             navController.navigate(Screen.DeviceControl.createRoute(device.ip.hostAddress ?: "unknown"))
                         },
+                        onViewAllDevices = {
+                            navController.navigate(Screen.Devices.route)
+                        },
                         onScanQR = {
                             navController.navigate(Screen.QRScanner.route)
                         },
                         onLockAll = {
                             devices.forEach { device ->
-                                controlViewModel.lockDevice(device, true)
+                                controlViewModel.lockDevice(device, true, discoveryViewModel)
                             }
                         }
                     )
@@ -168,6 +171,7 @@ fun ParentalControlApp(
                         onScanQR = {
                             navController.navigate(Screen.QRScanner.route)
                         },
+                        onResetAll = { discoveryViewModel.resetAllDevices() },
                         viewModel = discoveryViewModel
                     )
                 }
@@ -184,6 +188,7 @@ fun ParentalControlApp(
                         DeviceControlScreen(
                             device = device,
                             viewModel = controlViewModel,
+                            discoveryViewModel = discoveryViewModel,
                             onBack = { navController.popBackStack() }
                         )
                     } else {
@@ -198,9 +203,13 @@ fun ParentalControlApp(
                 composable(Screen.QRScanner.route) {
                     QRScannerScreen(
                         onQrScanned = { code ->
-                            discoveryViewModel.addManualDevice(code, 8080)
-                            navController.popBackStack()
-                        }
+                            discoveryViewModel.addManualDevice(code, 8080) { device ->
+                                navController.navigate(Screen.DeviceControl.createRoute(device.ip.hostAddress ?: "unknown")) {
+                                    popUpTo(Screen.Dashboard.route)
+                                }
+                            }
+                        },
+                        onBack = { navController.popBackStack() }
                     )
                 }
 
@@ -241,6 +250,7 @@ fun ParentalControlApp(
                         appPackageName = appPackageName,
                         appName = appName,
                         viewModel = controlViewModel,
+                        discoveryViewModel = discoveryViewModel,
                         onBack = { navController.popBackStack() }
                     )
                 }

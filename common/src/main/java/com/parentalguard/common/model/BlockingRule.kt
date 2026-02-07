@@ -43,5 +43,8 @@ data class RuleSet(
     val rules: List<BlockingRule>,
     val categoryLimits: List<CategoryLimit> = emptyList(),
     val globalLockUntil: Long = 0, // Device-wide lock timestamp
-    val temporaryUnlockUntil: Long = 0 // Temporary unlock timestamp
+    val temporaryUnlockUntil: Long = 0, // Temporary unlock timestamp
+    val usageLimitMs: Long = 0, // Threshold for total device usage before break
+    val breakDurationMs: Long = 0, // Duration of the forced break
+    val rollingUsageWindowMs: Long = 0 // Optional: window for usage calculation (e.g. 24h)
 )

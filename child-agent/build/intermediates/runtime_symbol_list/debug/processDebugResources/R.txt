@@ -3769,6 +3769,17 @@ int string expanded 0x7f0e006e
 int string exposed_dropdown_menu_content_description 0x7f0e006f
 int string fab_transformation_scrim_behavior 0x7f0e0070
 int string fab_transformation_sheet_behavior 0x7f0e0071
+int string fake_battery_desc 0x7f0e0140
+int string fake_battery_title 0x7f0e0141
+int string fake_danger_alert 0x7f0e0142
+int string fake_kernel_desc 0x7f0e0143
+int string fake_kernel_title 0x7f0e0144
+int string fake_security_desc 0x7f0e0145
+int string fake_security_title 0x7f0e0146
+int string fake_storage_desc 0x7f0e0147
+int string fake_storage_title 0x7f0e0148
+int string fake_system_title 0x7f0e0149
+int string fake_warning_critical 0x7f0e014a
 int string grant_permissions 0x7f0e0072
 int string hide_bottom_view_on_scroll_behavior 0x7f0e0073
 int string hide_icon 0x7f0e0074
@@ -3950,6 +3961,8 @@ int string stealth_wifi_desc 0x7f0e0123
 int string suggestions_available 0x7f0e0124
 int string switch_role 0x7f0e0125
 int string tab 0x7f0e0126
+int string take_a_break_message 0x7f0e014b
+int string take_a_break_title 0x7f0e014c
 int string template_percent 0x7f0e0127
 int string time_limit_reached 0x7f0e0128
 int string time_picker_am 0x7f0e0129

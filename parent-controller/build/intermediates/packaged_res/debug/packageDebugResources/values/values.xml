@@ -33,6 +33,7 @@
     <string name="biometric_desc">Use fingerprint to unlock</string>
     <string name="biometric_title">Biometric Login</string>
     <string name="block_1h">Block 1 Hour</string>
+    <string name="btn_apply_break">Apply Break Rules</string>
     <string name="camera_permission_required">Camera permission required to scan QR code</string>
     <string name="cancel">Cancel</string>
     <string name="category_education">Education</string>
@@ -55,6 +56,7 @@
     <string name="desc_category_limits">Set daily time limits for each app category</string>
     <string name="desc_enter_pin">Enter your PIN to continue</string>
     <string name="desc_hourly_timeline">Shows how much the device was used during each hour of the day.</string>
+    <string name="desc_take_a_break">Forced breaks after cumulative usage</string>
     <string name="device_name">Device Name:</string>
     <string name="device_renamed">Device Renamed Successfully</string>
     <string name="dialog_category_timer_desc">Category will lock automatically after:</string>
@@ -89,6 +91,7 @@
     <string name="label_all">All</string>
     <string name="label_apps">apps</string>
     <string name="label_apps_in_category">Apps in this category:</string>
+    <string name="label_break_duration">Break Duration (minutes)</string>
     <string name="label_custom">Custom</string>
     <string name="label_daily_limit">Daily Limit: %d min</string>
     <string name="label_features">Key Features:</string>
@@ -105,6 +108,7 @@
     <string name="label_todays_screen_time">Today\'s Screen Time</string>
     <string name="label_top_apps">Top Apps Today</string>
     <string name="label_total">Total</string>
+    <string name="label_usage_limit">Usage Limit (minutes)</string>
     <string name="language_darija">العربية (Darija)</string>
     <string name="language_english">English</string>
     <string name="lock_device">Lock Device</string>
@@ -171,6 +175,7 @@
     <string name="title_category_limits">Category Time Limits</string>
     <string name="title_discovery">Device Discovery</string>
     <string name="title_hourly_timeline">Hourly Usage Timeline</string>
+    <string name="title_take_a_break">Take a Break</string>
     <string name="title_unlock_request">Unlock Request</string>
     <string name="title_usage_by_category">Usage by Category</string>
     <string name="total_screen_time">Total Screen Time: %s</string>

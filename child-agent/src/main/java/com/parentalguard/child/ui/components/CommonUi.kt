@@ -50,10 +50,11 @@ fun GradientBackground(
                 GradientStart,
                 GradientMiddle,
                 GradientEnd,
-                GradientMiddle
+                GradientMiddle,
+                GradientStart
             ),
-            start = Offset(animatedOffset * 1000f, 0f),
-            end = Offset(1000f + animatedOffset * 500f, 1500f)
+            start = Offset(0f, animatedOffset * 2000f),
+            end = Offset(1000f, 1500f)
         )
     } else {
         Brush.verticalGradient(

@@ -30,6 +30,7 @@ import com.parentalguard.parent.ui.navigation.deviceTabs
 import com.parentalguard.parent.ui.theme.*
 import com.parentalguard.parent.viewmodel.ChildDevice
 import com.parentalguard.parent.viewmodel.DeviceControlViewModel
+import com.parentalguard.parent.viewmodel.DiscoveryViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import androidx.compose.ui.graphics.asImageBitmap
@@ -43,6 +44,7 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 fun DeviceControlScreen(
     device: ChildDevice,
     viewModel: DeviceControlViewModel,
+    discoveryViewModel: DiscoveryViewModel? = null,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -52,6 +54,7 @@ fun DeviceControlScreen(
     val dailyReport by viewModel.dailyReport.collectAsState()
     val appTimers by viewModel.appTimers.collectAsState()
     val categoryTimers by viewModel.categoryTimers.collectAsState()
+    val connectionType by viewModel.connectionType.collectAsState()
     
     var showRenameDialog by remember { mutableStateOf(false) }
 
@@ -79,6 +82,7 @@ fun DeviceControlScreen(
             DeviceControlTopBar(
                 device = device,
                 statusMessage = statusMessage,
+                connectionType = connectionType,
                 onBack = onBack,
                 onRename = { showRenameDialog = true },
                 onRefresh = {
@@ -160,12 +164,14 @@ fun DeviceControlScreen(
                     DeviceTab.Overview -> OverviewTab(
                         device = device,
                         viewModel = viewModel,
+                        discoveryViewModel = discoveryViewModel,
                         usageLogs = usageLogs,
                         activeRules = activeRules
                     )
                     DeviceTab.Apps -> AppsTab(
                         device = device,
                         viewModel = viewModel,
+                        discoveryViewModel = discoveryViewModel,
                         usageLogs = usageLogs,
                         activeRules = activeRules
                     )
@@ -191,21 +197,35 @@ fun DeviceControlScreen(
 private fun DeviceControlTopBar(
     device: ChildDevice,
     statusMessage: String?,
+    connectionType: com.parentalguard.parent.viewmodel.ConnectionType,
     onBack: () -> Unit,
     onRename: () -> Unit,
     onRefresh: () -> Unit
 ) {
-    TopAppBar(
-        title = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(modifier = Modifier.weight(1f, fill = false)) {
-                    Text(
-                        text = device.customName.ifBlank { device.name },
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+    Surface(
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 4.dp
+    ) {
+        TopAppBar(
+            title = {
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = device.customName.ifBlank { device.name },
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        IconButton(onClick = onRename) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = stringResource(R.string.rename_device),
+                                modifier = Modifier.size(16.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
                     if (statusMessage != null) {
                         Text(
                             text = statusMessage,
@@ -214,38 +234,62 @@ private fun DeviceControlTopBar(
                         )
                     }
                 }
-                IconButton(onClick = onRename) {
+            },
+            navigationIcon = {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
+                }
+            },
+            actions = {
+                val isOnline = connectionType != com.parentalguard.parent.viewmodel.ConnectionType.UNKNOWN
+                
+                IconButton(onClick = onRefresh) {
                     Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = stringResource(R.string.rename_device),
-                        modifier = Modifier.size(16.dp),
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = stringResource(R.string.refresh_stats),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-            }
-        },
-        navigationIcon = {
-            IconButton(onClick = onBack) {
-                Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
-            }
-        },
-        actions = {
-            IconButton(onClick = onRefresh) {
-                Icon(
-                    imageVector = Icons.Default.Refresh,
-                    contentDescription = stringResource(R.string.refresh_stats),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                
+                if (isOnline) {
+                    Surface(
+                        shape = MaterialTheme.shapes.extraSmall,
+                        color = (if (connectionType == com.parentalguard.parent.viewmodel.ConnectionType.LOCAL) Success else Info).copy(alpha = 0.1f),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, (if (connectionType == com.parentalguard.parent.viewmodel.ConnectionType.LOCAL) Success else Info).copy(alpha = 0.2f)),
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                imageVector = if (connectionType == com.parentalguard.parent.viewmodel.ConnectionType.LOCAL) 
+                                    Icons.Default.Wifi else Icons.Default.Cloud,
+                                contentDescription = null,
+                                modifier = Modifier.size(12.dp),
+                                tint = if (connectionType == com.parentalguard.parent.viewmodel.ConnectionType.LOCAL) Success else Info
+                            )
+                            Text(
+                                text = if (connectionType == com.parentalguard.parent.viewmodel.ConnectionType.LOCAL) "Local" else "Server",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = if (connectionType == com.parentalguard.parent.viewmodel.ConnectionType.LOCAL) Success else Info,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+                
+                StatusDot(
+                    isOnline = isOnline,
+                    modifier = Modifier.padding(end = 16.dp)
                 )
-            }
-            StatusDot(
-                isOnline = true,
-                modifier = Modifier.padding(end = 16.dp)
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = Color.Transparent
             )
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface
         )
-    )
+    }
 }
 
 @Composable
@@ -463,6 +507,7 @@ fun CustomTimerDialog(
 private fun OverviewTab(
     device: ChildDevice,
     viewModel: DeviceControlViewModel,
+    discoveryViewModel: DiscoveryViewModel?,
     usageLogs: List<AppUsageLog>,
     activeRules: List<com.parentalguard.common.model.BlockingRule>
 ) {
@@ -476,46 +521,52 @@ private fun OverviewTab(
     ) {
         // Quick Actions Card
         item {
-            PremiumCard(hasGradientAccent = true) {
-                Text(
-                    text = "Quick Actions",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                
-                Spacer(Modifier.height(16.dp))
-                
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    val isLocked by viewModel.isDeviceLocked.collectAsState()
+            Surface(
+                shape = MaterialTheme.shapes.large,
+                color = MaterialTheme.colorScheme.surface,
+                shadowElevation = 2.dp,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Protection Status",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                     
-                    GradientButton(
-                        text = if (isLocked) stringResource(R.string.unlock_device) else stringResource(R.string.lock_device),
-                        onClick = { viewModel.lockDevice(device, !isLocked) },
-                        icon = if (isLocked) Icons.Default.LockOpen else Icons.Default.Lock,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-                
-                Spacer(Modifier.height(12.dp))
-                
-                val isAppIconHidden by viewModel.isAppIconHidden.collectAsState()
-                OutlinedButton(
-                    onClick = { viewModel.setAppIconVisibility(device, isAppIconHidden) },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = if (isAppIconHidden) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surface
-                    )
-                ) {
-                    Icon(
-                        imageVector = if (isAppIconHidden) Icons.Default.Visibility else Icons.Default.VisibilityOff, 
-                        contentDescription = null, 
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(if (isAppIconHidden) stringResource(R.string.action_unhide_icon) else stringResource(R.string.action_hide_icon))
+                    Spacer(Modifier.height(16.dp))
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        val isLocked by viewModel.isDeviceLocked.collectAsState()
+                        
+                        GradientButton(
+                            text = if (isLocked) stringResource(R.string.unlock_device) else stringResource(R.string.lock_device),
+                            onClick = { viewModel.lockDevice(device, !isLocked, discoveryViewModel) },
+                            icon = if (isLocked) Icons.Default.LockOpen else Icons.Default.Lock,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    
+                    Spacer(Modifier.height(12.dp))
+                    
+                    val isAppIconHidden by viewModel.isAppIconHidden.collectAsState()
+                    OutlinedButton(
+                        onClick = { viewModel.setAppIconVisibility(device, isAppIconHidden) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        Icon(
+                            imageVector = if (isAppIconHidden) Icons.Default.Visibility else Icons.Default.VisibilityOff, 
+                            contentDescription = null, 
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(if (isAppIconHidden) stringResource(R.string.action_unhide_icon) else stringResource(R.string.action_hide_icon))
+                    }
                 }
             }
         }
@@ -531,22 +582,23 @@ private fun OverviewTab(
                     Column {
                         Text(
                             text = stringResource(R.string.label_todays_screen_time),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.primary
                         )
                         Text(
                             text = formatDuration(totalScreenTime),
                             style = MaterialTheme.typography.headlineMedium,
-                            color = Primary,
-                            fontWeight = FontWeight.Bold
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontWeight = FontWeight.ExtraBold
                         )
                     }
                     
                     CircularProgressCard(
                         progress = (totalScreenTime / (8 * 60 * 60 * 1000f)).coerceIn(0f, 1f),
-                        size = 80.dp,
-                        strokeWidth = 8.dp,
-                        label = stringResource(R.string.label_limit_suffix)
+                        size = 70.dp,
+                        strokeWidth = 10.dp,
+                        label = "Goal"
                     )
                 }
             }
@@ -554,49 +606,50 @@ private fun OverviewTab(
         
         // Top Apps
         item {
-            PremiumCard {
-                Text(
-                    text = stringResource(R.string.label_top_apps),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                
-                Spacer(Modifier.height(12.dp))
-                
-                val topApps = usageLogs.sortedByDescending { it.totalTimeInForeground }.take(5)
-                
-                if (topApps.isEmpty()) {
+            Text(
+                text = stringResource(R.string.label_top_apps),
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+            
+            Spacer(Modifier.height(8.dp))
+            
+            val topApps = usageLogs.sortedByDescending { it.totalTimeInForeground }.take(5)
+            
+            if (topApps.isEmpty()) {
+                Surface(
+                    shape = MaterialTheme.shapes.medium,
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text(
                         text = stringResource(R.string.label_no_usage_data),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(24.dp),
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
-                } else {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        topApps.forEach { app ->
-                            val isBlocked = activeRules.any { it.packageName == app.packageName && (it.blockEndTime > System.currentTimeMillis() || it.isPermanentlyBlocked) }
+                }
+            } else {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    topApps.forEach { app ->
+                        val isBlocked = activeRules.any { it.packageName == app.packageName && (it.blockEndTime > System.currentTimeMillis() || it.isPermanentlyBlocked) }
+                        Surface(
+                            shape = MaterialTheme.shapes.medium,
+                            color = MaterialTheme.colorScheme.surface,
+                            shadowElevation = 1.dp
+                        ) {
                             TopAppItem(
                                 app = app,
                                 isBlocked = isBlocked,
                                 totalScreenTime = totalScreenTime, 
-                                onBlock = { viewModel.toggleAppBlock(device, app.packageName) },
+                                onBlock = { viewModel.toggleAppBlock(device, app.packageName, discoveryViewModel) },
                                 iconBase64 = viewModel.getAppIcon(app.packageName)
                             )
                         }
                     }
                 }
-            }
-        }
-        
-        // Refresh Button
-        item {
-            OutlinedButton(
-                onClick = { viewModel.fetchStats(device) },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(Icons.Default.Refresh, contentDescription = null)
-                Spacer(Modifier.width(8.dp))
-                Text(stringResource(R.string.refresh_stats))
             }
         }
     }
@@ -705,6 +758,7 @@ private fun TopAppItem(
 private fun AppsTab(
     device: ChildDevice,
     viewModel: DeviceControlViewModel,
+    discoveryViewModel: DiscoveryViewModel?,
     usageLogs: List<AppUsageLog>,
     activeRules: List<com.parentalguard.common.model.BlockingRule>
 ) {
@@ -841,7 +895,7 @@ private fun AppsTab(
                     AppListItem(
                         app = app,
                         isBlocked = isBlocked,
-                        onBlock = { viewModel.toggleAppBlock(device, app.packageName) },
+                        onBlock = { viewModel.toggleAppBlock(device, app.packageName, discoveryViewModel) },
                         onEditCategory = { showEditCategoryDialog = app.packageName to app.category },
                         onSetTimer = { showTimerDialog = app.packageName },
                         onCancelTimer = { viewModel.cancelAppTimer(device, app.packageName) },
@@ -1095,6 +1149,8 @@ private fun LimitsTab(
     categoryTimers: Map<AppCategory, Long>
 ) {
     val categoryLimits by viewModel.categoryLimits.collectAsState()
+    val usageLimitMs by viewModel.usageLimitMs.collectAsState()
+    val breakDurationMs by viewModel.breakDurationMs.collectAsState()
     
     var showCategoryTimerDialog by remember { mutableStateOf<AppCategory?>(null) }
     
@@ -1113,8 +1169,80 @@ private fun LimitsTab(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        // Take a Break Section
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                ),
+                shape = MaterialTheme.shapes.large
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = stringResource(R.string.title_take_a_break),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = stringResource(R.string.desc_take_a_break),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    
+                    Spacer(Modifier.height(16.dp))
+                    
+                    var limitInput by remember(usageLimitMs) { 
+                        mutableStateOf(if (usageLimitMs > 0) (usageLimitMs / 60000).toString() else "60") 
+                    }
+                    var durationInput by remember(breakDurationMs) { 
+                        mutableStateOf(if (breakDurationMs > 0) (breakDurationMs / 60000).toString() else "15") 
+                    }
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = limitInput,
+                            onValueChange = { if (it.all { c -> c.isDigit() }) limitInput = it },
+                            label = { Text(stringResource(R.string.label_usage_limit)) },
+                            modifier = Modifier.weight(1f),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            singleLine = true
+                        )
+                        OutlinedTextField(
+                            value = durationInput,
+                            onValueChange = { if (it.all { c -> c.isDigit() }) durationInput = it },
+                            label = { Text(stringResource(R.string.label_break_duration)) },
+                            modifier = Modifier.weight(1f),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            singleLine = true
+                        )
+                    }
+                    
+                    Spacer(Modifier.height(12.dp))
+                    
+                    Button(
+                        onClick = {
+                            val limit = limitInput.toLongOrNull()?.let { it * 60000 } ?: 0L
+                            val duration = durationInput.toLongOrNull()?.let { it * 60000 } ?: 0L
+                            viewModel.updateBreakRules(device, limit, duration)
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        Icon(Icons.Default.Timer, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text(stringResource(R.string.btn_apply_break))
+                    }
+                }
+            }
+        }
+
         item {
             Text(
                 text = stringResource(R.string.title_category_limits),

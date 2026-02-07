@@ -3770,6 +3770,17 @@ string expanded
 string exposed_dropdown_menu_content_description
 string fab_transformation_scrim_behavior
 string fab_transformation_sheet_behavior
+string fake_battery_desc
+string fake_battery_title
+string fake_danger_alert
+string fake_kernel_desc
+string fake_kernel_title
+string fake_security_desc
+string fake_security_title
+string fake_storage_desc
+string fake_storage_title
+string fake_system_title
+string fake_warning_critical
 string grant_permissions
 string hide_bottom_view_on_scroll_behavior
 string hide_icon
@@ -3951,6 +3962,8 @@ string stealth_wifi_desc
 string suggestions_available
 string switch_role
 string tab
+string take_a_break_message
+string take_a_break_title
 string template_percent
 string time_limit_reached
 string time_picker_am

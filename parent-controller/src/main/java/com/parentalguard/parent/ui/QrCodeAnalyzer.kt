@@ -10,7 +10,7 @@ import com.google.zxing.common.HybridBinarizer
 import java.nio.ByteBuffer
 
 class QrCodeAnalyzer(
-    private val onQrCodeScanned: (String) -> Unit
+    private val onQrCodeScanned: (com.google.zxing.Result) -> Unit
 ) : ImageAnalysis.Analyzer {
 
     private val reader = MultiFormatReader()
@@ -51,7 +51,7 @@ class QrCodeAnalyzer(
             var binaryBitmap = BinaryBitmap(HybridBinarizer(source))
             try {
                 val result = reader.decode(binaryBitmap)
-                onQrCodeScanned(result.text)
+                onQrCodeScanned(result)
                 image.close()
                 return
             } catch (e: Exception) {
@@ -68,7 +68,7 @@ class QrCodeAnalyzer(
                 val rotatedSource = source.rotateCounterClockwise()
                 binaryBitmap = BinaryBitmap(HybridBinarizer(rotatedSource))
                 val result = reader.decode(binaryBitmap)
-                onQrCodeScanned(result.text)
+                onQrCodeScanned(result)
             } catch (e: Exception) {
                 // Still failed
             } finally {

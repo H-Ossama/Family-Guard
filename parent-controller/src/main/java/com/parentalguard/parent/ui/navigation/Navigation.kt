@@ -79,7 +79,6 @@ sealed class BottomNavItem(
 
 val bottomNavItems = listOf(
     BottomNavItem.Dashboard,
-    BottomNavItem.Reports,
     BottomNavItem.Devices,
     BottomNavItem.Settings
 )

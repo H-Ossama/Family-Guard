@@ -104,8 +104,8 @@ val PremiumHorizontalGradient = Brush.horizontalGradient(
 
 val CardGradient = Brush.linearGradient(
     colors = listOf(
-        Color(0xFF1A237E).copy(alpha = 0.9f),
-        Color(0xFF00897B).copy(alpha = 0.9f)
+        Primary.copy(alpha = 0.9f),
+        Secondary.copy(alpha = 0.9f)
     )
 )
 

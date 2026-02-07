@@ -13,6 +13,14 @@ object DeviceUtils {
         }
     }
 
+    fun getDeviceId(context: Context): String {
+        return try {
+            android.provider.Settings.Secure.getString(context.contentResolver, android.provider.Settings.Secure.ANDROID_ID) ?: "unknown_device"
+        } catch (e: Exception) {
+            "unknown_device"
+        }
+    }
+
     fun getInstalledApps(context: Context, includeIcons: Boolean = false): List<com.parentalguard.common.model.AppInfo> {
         val pm = context.packageManager
         val apps = pm.getInstalledPackages(0)
@@ -72,5 +80,22 @@ object DeviceUtils {
         } catch (e: Exception) {
             return null
         }
+    }
+
+    private const val PREFS_NAME = "device_prefs"
+    private const val KEY_CUSTOM_NAME = "custom_device_name"
+
+    fun getDeviceName(context: Context): String {
+        return getCustomDeviceName(context) ?: android.os.Build.MODEL
+    }
+
+    fun getCustomDeviceName(context: Context): String? {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getString(KEY_CUSTOM_NAME, null)
+    }
+
+    fun setCustomDeviceName(context: Context, name: String) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_CUSTOM_NAME, name).apply()
     }
 }

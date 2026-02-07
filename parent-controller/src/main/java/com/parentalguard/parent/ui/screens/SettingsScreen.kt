@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.os.LocaleListCompat
 import com.parentalguard.parent.R
 import com.parentalguard.parent.ui.components.*
@@ -47,243 +48,161 @@ fun SettingsScreen(
     val prefs = remember { context.getSharedPreferences("parent_prefs", android.content.Context.MODE_PRIVATE) }
     var biometricEnabled by remember { mutableStateOf(prefs.getBoolean("biometric_enabled", false)) }
     
-    Column(modifier = modifier.fillMaxSize()) {
-        // Header
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(Primary, Secondary)
-                    )
-                )
-                .padding(24.dp)
-        ) {
-            Column {
-                Text(
-                    text = stringResource(R.string.settings_title),
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = stringResource(R.string.settings_subtitle),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.8f)
-                )
-            }
-        }
-        
+    Box(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            contentPadding = PaddingValues(bottom = 32.dp)
         ) {
-            // Security Section
+            // Header
             item {
-                SettingsSection(title = stringResource(R.string.security_title)) {
-                    SettingsItem(
-                        icon = Icons.Outlined.Lock,
-                        title = stringResource(R.string.pin_protection_title),
-                        subtitle = stringResource(R.string.pin_protection_desc),
-                        onClick = { showPinDialog = true },
-                        trailing = {
-                            Icon(
-                                imageVector = Icons.Default.ChevronRight,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(PremiumPrimary, PremiumPrimaryVariant)
                             )
-                        }
-                    )
-                    
-                    SettingsDivider(modifier = Modifier.padding(start = 56.dp))
-                    
-                    SettingsItem(
-                        icon = Icons.Outlined.Fingerprint,
-                        title = stringResource(R.string.biometric_title),
-                        subtitle = stringResource(R.string.biometric_desc),
-                        trailing = {
-                            Switch(
-                                checked = biometricEnabled,
-                                onCheckedChange = { 
-                                    biometricEnabled = it 
-                                    prefs.edit().putBoolean("biometric_enabled", it).apply()
-                                },
-                                enabled = true
-                            )
-                        }
-                    )
-                }
-            }
-            
-            // Notifications Section
-            item {
-                SettingsSection(title = stringResource(R.string.notifications_title)) {
-                    SettingsItem(
-                        icon = Icons.Outlined.Notifications,
-                        title = stringResource(R.string.push_notif_title),
-                        subtitle = stringResource(R.string.push_notif_desc),
-                        trailing = {
-                            Switch(
-                                checked = notificationsEnabled,
-                                onCheckedChange = { notificationsEnabled = it }
-                            )
-                        }
-                    )
-                    
-                    SettingsDivider(modifier = Modifier.padding(start = 56.dp))
-                    
-                    SettingsItem(
-                        icon = Icons.Outlined.NotificationsActive,
-                        title = stringResource(R.string.unlock_req_title),
-                        subtitle = stringResource(R.string.unlock_req_desc),
-                        trailing = {
-                            Switch(
-                                checked = true,
-                                onCheckedChange = { }
-                            )
-                        }
-                    )
-                    
-                    SettingsDivider(modifier = Modifier.padding(start = 56.dp))
-                    
-                    SettingsItem(
-                        icon = Icons.Outlined.ReportProblem,
-                        title = stringResource(R.string.usage_alerts_title),
-                        subtitle = stringResource(R.string.usage_alerts_desc),
-                        trailing = {
-                            Switch(
-                                checked = true,
-                                onCheckedChange = { }
-                            )
-                        }
-                    )
-                }
-            }
-            
-            // Appearance Section
-            item {
-                var currentThemeMode by remember { 
-                    mutableStateOf(ThemePreferences.getThemeMode(context)) 
-                }
-                var showThemeDialog by remember { mutableStateOf(false) }
-                
-                SettingsSection(title = stringResource(R.string.appearance_title)) {
-                    SettingsItem(
-                        icon = Icons.Outlined.DarkMode,
-                        title = stringResource(R.string.dark_mode_title),
-                        subtitle = ThemePreferences.getThemeModeDisplayName(currentThemeMode),
-                        onClick = { showThemeDialog = true },
-                        trailing = {
-                            Icon(
-                                imageVector = Icons.Default.ChevronRight,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    )
-                    
-                    SettingsDivider(modifier = Modifier.padding(start = 56.dp))
-                    
-                    SettingsItem(
-                        icon = Icons.Outlined.Language,
-                        title = stringResource(R.string.settings_language),
-                        subtitle = getCurrentLanguageName(),
-                        onClick = { showLanguageDialog = true },
-                        trailing = {
-                            Icon(
-                                imageVector = Icons.Default.ChevronRight,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    )
-                }
-                
-                // Theme Selection Dialog
-                if (showThemeDialog) {
-                    ThemeSelectionDialog(
-                        currentMode = currentThemeMode,
-                        onDismiss = { showThemeDialog = false },
-                        onThemeSelected = { mode ->
-                            currentThemeMode = mode
-                            ThemePreferences.saveThemeMode(context, mode)
-                            showThemeDialog = false
-                            // Force recomposition by recreating activity
-                            (context as? android.app.Activity)?.recreate()
-                        }
-                    )
-                }
-            }
-            
-            // About Section
-            item {
-                SettingsSection(title = stringResource(R.string.about_section_title)) {
-                    SettingsItem(
-                        icon = Icons.Outlined.Info,
-                        title = stringResource(R.string.about_title),
-                        subtitle = stringResource(R.string.app_version, "1.0.0"),
-                        onClick = { showAboutDialog = true },
-                        trailing = {
-                            Icon(
-                                imageVector = Icons.Default.ChevronRight,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    )
-                    
-                    SettingsDivider(modifier = Modifier.padding(start = 56.dp))
-                    
-                    SettingsItem(
-                        icon = Icons.Outlined.Help,
-                        title = stringResource(R.string.help_title),
-                        subtitle = stringResource(R.string.help_desc),
-                        onClick = { },
-                        trailing = {
-                            Icon(
-                                imageVector = Icons.Default.ChevronRight,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    )
-                    
-                    SettingsDivider(modifier = Modifier.padding(start = 56.dp))
-                    
-                    SettingsItem(
-                        icon = Icons.Outlined.Policy,
-                        title = stringResource(R.string.privacy_title),
-                        subtitle = stringResource(R.string.privacy_desc),
-                        onClick = { },
-                        trailing = {
-                            Icon(
-                                imageVector = Icons.Default.ChevronRight,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    )
-                }
-            }
-            
-            // Footer
-            item {
-                Spacer(Modifier.height(32.dp))
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        )
+                        .padding(top = 24.dp, bottom = 48.dp)
                 ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.settings_title),
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = Color.White,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                        Text(
+                            text = "Manage your preferences and security",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White.copy(alpha = 0.8f)
+                        )
+                        
+                        Spacer(Modifier.height(16.dp))
+                        
+                        Surface(
+                            shape = androidx.compose.foundation.shape.CircleShape,
+                            color = Color.White.copy(alpha = 0.1f),
+                            modifier = Modifier.clip(androidx.compose.foundation.shape.CircleShape)
+                        ) {
+                            Text(
+                                "VERSION 1.0.2 PREMIUM",
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 1.sp
+                            )
+                        }
+                    }
+                }
+            }
+            
+            // Content
+            item {
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .offset(y = (-24).dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    // Security Section
+                    SettingsSection(title = stringResource(R.string.security_title)) {
+                        SettingsItem(
+                            icon = Icons.Outlined.Lock,
+                            title = stringResource(R.string.pin_protection_title),
+                            subtitle = stringResource(R.string.pin_protection_desc),
+                            onClick = { showPinDialog = true }
+                        )
+                        
+                        SettingsDivider(modifier = Modifier.padding(start = 56.dp))
+                        
+                        SettingsItem(
+                            icon = Icons.Outlined.Fingerprint,
+                            title = stringResource(R.string.biometric_title),
+                            subtitle = stringResource(R.string.biometric_desc),
+                            trailing = {
+                                Switch(
+                                    checked = biometricEnabled,
+                                    onCheckedChange = { 
+                                        biometricEnabled = it 
+                                        prefs.edit().putBoolean("biometric_enabled", it).apply()
+                                    }
+                                )
+                            }
+                        )
+                    }
+
+                    // Appearance Section
+                    var currentThemeMode by remember { 
+                        mutableStateOf(ThemePreferences.getThemeMode(context)) 
+                    }
+                    var showThemeDialog by remember { mutableStateOf(false) }
+                    
+                    SettingsSection(title = stringResource(R.string.appearance_title)) {
+                        SettingsItem(
+                            icon = Icons.Outlined.DarkMode,
+                            title = stringResource(R.string.dark_mode_title),
+                            subtitle = ThemePreferences.getThemeModeDisplayName(currentThemeMode),
+                            onClick = { showThemeDialog = true }
+                        )
+                        
+                        SettingsDivider(modifier = Modifier.padding(start = 56.dp))
+                        
+                        SettingsItem(
+                            icon = Icons.Outlined.Language,
+                            title = stringResource(R.string.settings_language),
+                            subtitle = getCurrentLanguageName(),
+                            onClick = { showLanguageDialog = true }
+                        )
+                    }
+                    
+                    if (showThemeDialog) {
+                        ThemeSelectionDialog(
+                            currentMode = currentThemeMode,
+                            onDismiss = { showThemeDialog = false },
+                            onThemeSelected = { mode ->
+                                currentThemeMode = mode
+                                ThemePreferences.saveThemeMode(context, mode)
+                                showThemeDialog = false
+                                (context as? android.app.Activity)?.recreate()
+                            }
+                        )
+                    }
+
+                    // About Section
+                    SettingsSection(title = stringResource(R.string.about_section_title)) {
+                        SettingsItem(
+                            icon = Icons.Outlined.Info,
+                            title = stringResource(R.string.about_title),
+                            subtitle = "Learn more about Family Guard",
+                            onClick = { showAboutDialog = true }
+                        )
+                        
+                        SettingsDivider(modifier = Modifier.padding(start = 56.dp))
+                        
+                        SettingsItem(
+                            icon = Icons.Outlined.Help,
+                            title = stringResource(R.string.help_title),
+                            subtitle = stringResource(R.string.help_desc),
+                            onClick = { }
+                        )
+                    }
+                    
+                    Spacer(Modifier.height(24.dp))
+                    
                     Text(
-                        text = stringResource(R.string.app_name),
-                        style = MaterialTheme.typography.titleSmall,
-                        color = Primary,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = stringResource(R.string.about_desc),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        text = "FAMILY GUARD",
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Black,
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                        letterSpacing = 4.sp
                     )
                 }
             }

@@ -995,6 +995,7 @@ string bottom_sheet_collapse_description
 string bottom_sheet_dismiss_description
 string bottom_sheet_drag_handle_description
 string bottom_sheet_expand_description
+string btn_apply_break
 string call_notification_answer_action
 string call_notification_answer_video_action
 string call_notification_decline_action
@@ -1062,6 +1063,7 @@ string deny_unlock_success
 string desc_category_limits
 string desc_enter_pin
 string desc_hourly_timeline
+string desc_take_a_break
 string device_name
 string device_renamed
 string dialog
@@ -1111,6 +1113,7 @@ string label_15m
 string label_all
 string label_apps
 string label_apps_in_category
+string label_break_duration
 string label_custom
 string label_daily_limit
 string label_features
@@ -1127,6 +1130,7 @@ string label_pin
 string label_todays_screen_time
 string label_top_apps
 string label_total
+string label_usage_limit
 string language_darija
 string language_english
 string lock_device
@@ -1221,6 +1225,7 @@ string title_app_locked
 string title_category_limits
 string title_discovery
 string title_hourly_timeline
+string title_take_a_break
 string title_unlock_request
 string title_usage_by_category
 string tooltip_long_press_label

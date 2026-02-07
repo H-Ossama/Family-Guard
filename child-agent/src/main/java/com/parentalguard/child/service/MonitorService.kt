@@ -7,6 +7,7 @@ import android.content.IntentFilter
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.parentalguard.child.ChildApp
+import com.parentalguard.child.network.CommandServer
 import com.parentalguard.child.R
 import android.content.pm.ServiceInfo
 import android.os.Build
@@ -22,9 +23,27 @@ class MonitorService : Service() {
 
     private val serviceScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO + kotlinx.coroutines.Job())
 
-    private var commandServer: com.parentalguard.child.network.CommandServer? = null
+    private lateinit var commandServer: CommandServer
+    private lateinit var cloudRelayClient: com.parentalguard.child.network.CloudRelayClient
     private var serviceRegistrar: com.parentalguard.child.network.ServiceRegistrar? = null
     private var lockManager: com.parentalguard.child.ui.LockManager? = null
+
+    override fun onCreate() {
+        super.onCreate()
+        commandServer = CommandServer(this)
+        cloudRelayClient = com.parentalguard.child.network.CloudRelayClient(this)
+        
+        serviceScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            try {
+                commandServer.start() // Starts on port 8080
+                cloudRelayClient.start()
+                serviceRegistrar = com.parentalguard.child.network.ServiceRegistrar(applicationContext)
+                serviceRegistrar?.registerService(8080)
+            } catch (e: Exception) {
+                Log.e("MonitorService", "Failed to start server/service", e)
+            }
+        }
+    }
 
     private val internalReceiver = object : android.content.BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -155,9 +174,25 @@ class MonitorService : Service() {
                         lastMonitoredPackage = topPackage
                     }
 
+                    val ruleRepo = com.parentalguard.child.data.RuleRepository
+
+                    // Update "Take a Break" usage tracking
+                    if (topPackage != null && topPackage != packageName && !lockManager!!.isShowing) {
+                        val limit = ruleRepo.usageLimitMs.value
+                        if (limit > 0) {
+                            val currentUsage = ruleRepo.currentBreakUsageMs.value + 1000 // 1 second
+                            ruleRepo.setCurrentBreakUsage(currentUsage)
+                            
+                            if (currentUsage >= limit) {
+                                val breakDuration = ruleRepo.breakDurationMs.value
+                                Log.i("MonitorService", "Usage limit reached ($currentUsage/$limit). Triggering break for $breakDuration ms")
+                                ruleRepo.setGlobalLockUntil(System.currentTimeMillis() + breakDuration, "BREAK")
+                                ruleRepo.setCurrentBreakUsage(0) // Reset for after the break
+                            }
+                        }
+                    }
+
                     if (packageToEvaluate != null && packageToEvaluate != packageName) {
-                        val ruleRepo = com.parentalguard.child.data.RuleRepository
-                        
                         // Check for App Timer (Temporary Allowance / Enforcement)
                         val timerActive = ruleRepo.isAppTimerActive(packageToEvaluate)
                         val timerSet = ruleRepo.appTimers.value.containsKey(packageToEvaluate)

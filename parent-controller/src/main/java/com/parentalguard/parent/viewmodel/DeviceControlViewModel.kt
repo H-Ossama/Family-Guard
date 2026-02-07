@@ -15,7 +15,7 @@ import androidx.lifecycle.AndroidViewModel
 import com.parentalguard.parent.data.ReportsRepository
 
 class DeviceControlViewModel(application: Application) : AndroidViewModel(application) {
-    private val client = DeviceClient()
+    private val client = DeviceClient(application)
     private val reportsRepository = ReportsRepository(application)
 
     private val _usageLogs = MutableStateFlow<List<AppUsageLog>>(emptyList())
@@ -39,8 +39,17 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
     private val _isAppIconHidden = MutableStateFlow(false)
     val isAppIconHidden: StateFlow<Boolean> = _isAppIconHidden.asStateFlow()
 
+    private val _connectionType = MutableStateFlow(ConnectionType.UNKNOWN)
+    val connectionType: StateFlow<ConnectionType> = _connectionType.asStateFlow()
+
     private val _appTimers = MutableStateFlow<Map<String, Long>>(emptyMap())
     val appTimers: StateFlow<Map<String, Long>> = _appTimers.asStateFlow()
+
+    private val _usageLimitMs = MutableStateFlow<Long>(0)
+    val usageLimitMs: StateFlow<Long> = _usageLimitMs.asStateFlow()
+
+    private val _breakDurationMs = MutableStateFlow<Long>(0)
+    val breakDurationMs: StateFlow<Long> = _breakDurationMs.asStateFlow()
 
     private val _appIcons = MutableStateFlow<Map<String, String>>(emptyMap())
 
@@ -48,14 +57,18 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
         viewModelScope.launch {
             // Check if we need to fetch icons (if map is empty)
             val includeIcons = _appIcons.value.isEmpty()
-            val response = client.getStats(device.ip.hostAddress ?: "", device.port, includeIcons)
+            val deviceResponse = client.getStatsWithConnectionType(device.ip.hostAddress ?: "", device.port, device.deviceId, includeIcons)
+            val response = deviceResponse.response
             
             if (response != null && response.success) {
+                _connectionType.value = deviceResponse.connectionType
                 _usageLogs.value = response.stats?.usageLogs ?: emptyList()
                 _activeRules.value = response.stats?.activeRules ?: emptyList()
                 _isDeviceLocked.value = response.stats?.isLocked ?: false
                 _isAppIconHidden.value = response.stats?.isIconHidden ?: false
                 _appTimers.value = response.stats?.appTimers ?: emptyMap()
+                _usageLimitMs.value = response.stats?.usageLimitMs ?: 0L
+                _breakDurationMs.value = response.stats?.breakDurationMs ?: 0L
                 
                 // Process icons if included
                 if (includeIcons) {
@@ -78,7 +91,7 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
     // Helper to request icons explicitly (e.g. on pull to refresh if needed)
     fun refreshIcons(device: ChildDevice) {
         viewModelScope.launch {
-            val response = client.getStats(device.ip.hostAddress ?: "", device.port, true)
+            val response = client.getStats(device.ip.hostAddress ?: "", device.port, device.deviceId, true)
             if (response != null && response.success) {
                 val newIcons = response.stats?.installedApps?.mapNotNull { app ->
                     if (app.iconBase64 != null) app.packageName to app.iconBase64!! else null
@@ -97,7 +110,7 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
 
     fun fetchDailyReport(device: ChildDevice) {
         viewModelScope.launch {
-            val response = client.getDailyReport(device.ip.hostAddress ?: "", device.port)
+            val response = client.getDailyReport(device.ip.hostAddress ?: "", device.port, device.deviceId)
             if (response != null && response.success && response.dailyReport != null) {
                 _dailyReport.value = response.dailyReport
                 // Save to historical reports
@@ -109,7 +122,7 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
         }
     }
 
-    fun toggleAppBlock(device: ChildDevice, packageName: String) {
+    fun toggleAppBlock(device: ChildDevice, packageName: String, discoveryViewModel: DiscoveryViewModel? = null) {
         viewModelScope.launch {
             val currentRule = _activeRules.value.find { it.packageName == packageName }
             // Check if currently blocked (rule exists and not expired)
@@ -123,14 +136,14 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
                 _activeRules.value + BlockingRule(packageName, 0, System.currentTimeMillis() + 3600000)
             }
             
-            val response = client.updateRules(device.ip.hostAddress ?: "", device.port, newRules)
+            val response = client.updateRules(device.ip.hostAddress ?: "", device.port, device.deviceId, newRules)
              if (response != null && response.success) {
                 _activeRules.value = newRules
                 _statusMessage.value = if (isBlocked) "App unblocked" else "App blocked"
                 
                 // CRITICAL: If unblocking, also clear any app timer that might be enforcing the block
                 if (isBlocked) {
-                    client.setAppTimer(device.ip.hostAddress ?: "", device.port, packageName, 0L)
+                    client.setAppTimer(device.ip.hostAddress ?: "", device.port, device.deviceId, packageName, 0L)
                 }
                 
                 fetchStats(device)
@@ -142,7 +155,7 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
 
     fun setAppIconVisibility(device: ChildDevice, visible: Boolean) {
         viewModelScope.launch {
-            val response = client.setAppIconVisibility(device.ip.hostAddress ?: "", device.port, visible)
+            val response = client.setAppIconVisibility(device.ip.hostAddress ?: "", device.port, device.deviceId, visible)
             if (response != null && response.success) {
                 _statusMessage.value = if (visible) "App unhidden on child device" else "App hidden on child device"
             } else {
@@ -154,7 +167,7 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
     fun renameDevice(device: ChildDevice, newName: String) {
         viewModelScope.launch {
             device.customName = newName
-            val response = client.updateDeviceName(device.ip.hostAddress ?: "", device.port, newName)
+            val response = client.updateDeviceName(device.ip.hostAddress ?: "", device.port, device.deviceId, newName)
             if (response != null && response.success) {
                 _statusMessage.value = "Device renamed"
             } else {
@@ -170,7 +183,7 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
             limits.add(CategoryLimit(category, durationMinutes * 60 * 1000L))
             _categoryLimits.value = limits
             
-            val response = client.updateCategoryLimits(device.ip.hostAddress ?: "", device.port, limits)
+            val response = client.updateCategoryLimits(device.ip.hostAddress ?: "", device.port, device.deviceId, limits)
             if (response != null && response.success) {
                 _statusMessage.value = "Category limit set"
             } else {
@@ -179,11 +192,15 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
         }
     }
     
-    fun approveUnlockRequest(device: ChildDevice, durationMinutes: Int = 10, packageName: String? = null) {
+    fun approveUnlockRequest(device: ChildDevice, durationMinutes: Int = 10, packageName: String? = null, discoveryViewModel: DiscoveryViewModel? = null) {
         viewModelScope.launch {
-            val response = client.approveUnlock(device.ip.hostAddress ?: "", device.port, durationMinutes * 60 * 1000L, packageName)
+            val response = client.approveUnlock(device.ip.hostAddress ?: "", device.port, device.deviceId, durationMinutes * 60 * 1000L, packageName)
             if (response != null && response.success) {
                 _statusMessage.value = "Unlock approved for $durationMinutes minutes"
+                // If this was a device unlock, update shared status
+                if (packageName == null) {
+                    discoveryViewModel?.updateDeviceStatus(device.deviceId, false)
+                }
                 fetchStats(device)
             } else {
                 _statusMessage.value = "Failed to approve unlock"
@@ -193,7 +210,7 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
     
     fun denyUnlockRequest(device: ChildDevice) {
         viewModelScope.launch {
-            val response = client.denyUnlock(device.ip.hostAddress ?: "", device.port)
+            val response = client.denyUnlock(device.ip.hostAddress ?: "", device.port, device.deviceId)
             if (response != null && response.success) {
                 _statusMessage.value = "Unlock request denied"
                 fetchStats(device)
@@ -205,7 +222,7 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
 
     fun resetPin(device: ChildDevice) {
         viewModelScope.launch {
-            val response = client.resetPin(device.ip.hostAddress ?: "", device.port)
+            val response = client.resetPin(device.ip.hostAddress ?: "", device.port, device.deviceId)
             if (response != null && response.success) {
                 _statusMessage.value = "PIN reset successfully"
             } else {
@@ -216,12 +233,16 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
     
     // ... existing code ...
 
-    fun lockDevice(device: ChildDevice, locked: Boolean) {
+    fun lockDevice(device: ChildDevice, locked: Boolean, discoveryViewModel: DiscoveryViewModel? = null) {
         viewModelScope.launch {
-            val response = client.setLock(device.ip.hostAddress ?: "", device.port, locked)
+            val response = client.setLock(device.ip.hostAddress ?: "", device.port, device.deviceId, locked)
             if (response != null && response.success) {
                 _isDeviceLocked.value = locked
                 _statusMessage.value = if (locked) "Device LOCKED" else "Device UNLOCKED"
+                
+                // NEW: Update shared status immediately
+                discoveryViewModel?.updateDeviceStatus(device.deviceId, locked)
+                
                 fetchStats(device)
             } else {
                 _statusMessage.value = "Failed to toggle lock"
@@ -230,7 +251,7 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
     }
     fun setAppCategory(device: ChildDevice, packageName: String, category: AppCategory) {
         viewModelScope.launch {
-            val response = client.setAppCategory(device.ip.hostAddress ?: "", device.port, packageName, category)
+            val response = client.setAppCategory(device.ip.hostAddress ?: "", device.port, device.deviceId, packageName, category)
             if (response != null && response.success) {
                 _statusMessage.value = "Category updated"
                 // Ideally refresh stats to reflect change if immediate response needed, but device might take a moment
@@ -243,7 +264,7 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
 
     fun setAppTimer(device: ChildDevice, packageName: String, durationMinutes: Int) {
          viewModelScope.launch {
-            val response = client.setAppTimer(device.ip.hostAddress ?: "", device.port, packageName, durationMinutes * 60 * 1000L)
+            val response = client.setAppTimer(device.ip.hostAddress ?: "", device.port, device.deviceId, packageName, durationMinutes * 60 * 1000L)
             if (response != null && response.success) {
                 _statusMessage.value = "Timer set for $durationMinutes mins"
                 fetchStats(device)
@@ -255,7 +276,7 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
 
     fun cancelAppTimer(device: ChildDevice, packageName: String) {
         viewModelScope.launch {
-            val response = client.setAppTimer(device.ip.hostAddress ?: "", device.port, packageName, 0L)
+            val response = client.setAppTimer(device.ip.hostAddress ?: "", device.port, device.deviceId, packageName, 0L)
             if (response != null && response.success) {
                 _statusMessage.value = "Timer canceled"
                 fetchStats(device)
@@ -270,7 +291,7 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
 
     fun setCategoryTimer(device: ChildDevice, category: AppCategory, durationMinutes: Int) {
         viewModelScope.launch {
-            val response = client.setCategoryTimer(device.ip.hostAddress ?: "", device.port, category, durationMinutes * 60 * 1000L)
+            val response = client.setCategoryTimer(device.ip.hostAddress ?: "", device.port, device.deviceId, category, durationMinutes * 60 * 1000L)
             if (response != null && response.success) {
                 _statusMessage.value = "Category timer set for $durationMinutes mins"
                 fetchStats(device)
@@ -282,12 +303,32 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
 
     fun cancelCategoryTimer(device: ChildDevice, category: AppCategory) {
         viewModelScope.launch {
-            val response = client.setCategoryTimer(device.ip.hostAddress ?: "", device.port, category, 0L)
+            val response = client.setCategoryTimer(device.ip.hostAddress ?: "", device.port, device.deviceId, category, 0L)
             if (response != null && response.success) {
                 _statusMessage.value = "Category timer canceled"
                 fetchStats(device)
             } else {
                 _statusMessage.value = "Failed to cancel category timer"
+            }
+        }
+    }
+
+    fun updateBreakRules(device: ChildDevice, usageLimitMs: Long, breakDurationMs: Long) {
+        viewModelScope.launch {
+            val response = client.setBreakRules(
+                device.ip.hostAddress ?: "", 
+                device.port, 
+                device.deviceId, 
+                _activeRules.value,
+                usageLimitMs,
+                breakDurationMs
+            )
+            if (response != null && response.success) {
+                _usageLimitMs.value = usageLimitMs
+                _breakDurationMs.value = breakDurationMs
+                _statusMessage.value = "Break rules updated"
+            } else {
+                _statusMessage.value = "Failed to update break rules"
             }
         }
     }
