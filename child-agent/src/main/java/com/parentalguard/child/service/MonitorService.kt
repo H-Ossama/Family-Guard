@@ -66,7 +66,12 @@ class MonitorService : Service() {
                              appPackageName = appPackageName,
                              appName = appName
                          )
-                         commandServer?.broadcast(event)
+                         commandServer.broadcast(event)
+                         
+                         // Also send to cloud relay if available
+                         serviceScope.launch {
+                             cloudRelayClient.sendEvent(event)
+                         }
                      } catch (e: Exception) {
                          Log.e("MonitorService", "Failed to broadcast internal event", e)
                      }

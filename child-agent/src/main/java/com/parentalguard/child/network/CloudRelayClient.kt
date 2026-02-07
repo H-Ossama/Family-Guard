@@ -276,4 +276,22 @@ class CloudRelayClient(private val context: Context) {
         try {
             session?.send(Frame.Text(json.encodeToString(message)))
         } catch (e: Exception) {
-            Log.e("CloudRelayClient", "Failed to se
+            Log.e("CloudRelayClient", "Failed to send to relay", e)
+        }
+    }
+
+    suspend fun sendEvent(event: Packet.Event) {
+        val payload = json.encodeToString<Packet>(event)
+        val message = RelayMessage(
+            type = "EVENT",
+            payload = payload
+        )
+        sendToRelay(message)
+    }
+
+    fun stop() {
+        job?.cancel()
+        job = null
+        session = null
+    }
+}
