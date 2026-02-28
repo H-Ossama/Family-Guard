@@ -30,22 +30,39 @@ class PersistentStateManager(context: Context) {
         private const val KEY_LAST_UNLOCK_REQUEST = "last_unlock_request"
         private const val KEY_USAGE_LIMIT = "usage_limit"
         private const val KEY_BREAK_DURATION = "break_duration"
+        private const val KEY_BREAK_WARNING = "break_warning"
+        private const val KEY_EDUCATION_ONLY = "education_only"
+        private const val KEY_ALLOW_EXTENSIONS = "allow_extensions"
         private const val KEY_CURRENT_BREAK_USAGE = "current_break_usage"
     }
     
-    fun saveBreakRules(usageLimit: Long, breakDuration: Long) {
+    fun saveBreakRules(usageLimit: Long, breakDuration: Long, warningMs: Long, educationOnly: Boolean, allowExtensions: Boolean) {
         prefs.edit()
             .putLong(KEY_USAGE_LIMIT, usageLimit)
             .putLong(KEY_BREAK_DURATION, breakDuration)
+            .putLong(KEY_BREAK_WARNING, warningMs)
+            .putBoolean(KEY_EDUCATION_ONLY, educationOnly)
+            .putBoolean(KEY_ALLOW_EXTENSIONS, allowExtensions)
             .apply()
     }
 
-    fun loadBreakRules(): Pair<Long, Long> {
-        return Pair(
+    fun loadBreakRules(): BreakRuleData {
+        return BreakRuleData(
             prefs.getLong(KEY_USAGE_LIMIT, 0L),
-            prefs.getLong(KEY_BREAK_DURATION, 0L)
+            prefs.getLong(KEY_BREAK_DURATION, 0L),
+            prefs.getLong(KEY_BREAK_WARNING, 0L),
+            prefs.getBoolean(KEY_EDUCATION_ONLY, false),
+            prefs.getBoolean(KEY_ALLOW_EXTENSIONS, false)
         )
     }
+
+    data class BreakRuleData(
+        val usageLimit: Long,
+        val breakDuration: Long,
+        val warningMs: Long,
+        val educationOnly: Boolean,
+        val allowExtensions: Boolean
+    )
 
     fun saveCurrentBreakUsage(usage: Long) {
         prefs.edit().putLong(KEY_CURRENT_BREAK_USAGE, usage).apply()

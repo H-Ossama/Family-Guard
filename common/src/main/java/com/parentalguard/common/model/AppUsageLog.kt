@@ -50,7 +50,11 @@ data class DeviceStats(
     val categoryTimers: Map<AppCategory, Long> = emptyMap(), // Map of Category -> ExpirationTimestamp
     val deviceName: String? = null, // Custom device name from child
     val usageLimitMs: Long = 0,
-    val breakDurationMs: Long = 0
+    val breakDurationMs: Long = 0,
+    val breakWarningMs: Long = 0,
+    val educationOnly: Boolean = false,
+    val allowExtensions: Boolean = false,
+    val lockReason: String? = null
 )
 
 @Serializable

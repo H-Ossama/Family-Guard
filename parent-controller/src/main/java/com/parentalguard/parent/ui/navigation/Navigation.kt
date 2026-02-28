@@ -90,6 +90,7 @@ sealed class DeviceTab(val titleResId: Int, val icon: ImageVector) {
     object Overview : DeviceTab(R.string.tab_overview, Icons.Default.Info)
     object Apps : DeviceTab(R.string.tab_apps, Icons.Default.Apps)
     object Limits : DeviceTab(R.string.tab_limits, Icons.Default.Timer)
+    object Break : DeviceTab(R.string.title_take_a_break, Icons.Default.Coffee) // Using Coffee icon for "Break"
     object Reports : DeviceTab(R.string.tab_reports, Icons.Default.BarChart)
 }
 
@@ -97,5 +98,6 @@ val deviceTabs = listOf(
     DeviceTab.Overview,
     DeviceTab.Apps,
     DeviceTab.Limits,
+    DeviceTab.Break,
     DeviceTab.Reports
 )

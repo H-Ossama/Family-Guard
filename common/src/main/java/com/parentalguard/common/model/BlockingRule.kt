@@ -27,6 +27,7 @@ data class BlockingRule(
     val maxDailyTimeMs: Long,
     val blockEndTime: Long = 0, // Timestamp when block expires. 0 if not blocked.
     val isPermanentlyBlocked: Boolean = false,
+    val isInternetBlocked: Boolean = false,
     val category: AppCategory = AppCategory.OTHER,
     val isWhitelisted: Boolean = false, // If true, never block this app
     val schedule: List<TimeRange> = emptyList() // Periods when the app is blocked
@@ -46,5 +47,8 @@ data class RuleSet(
     val temporaryUnlockUntil: Long = 0, // Temporary unlock timestamp
     val usageLimitMs: Long = 0, // Threshold for total device usage before break
     val breakDurationMs: Long = 0, // Duration of the forced break
+    val breakWarningMs: Long = 0, // Minutes before break to show warning (0 = disabled)
+    val educationOnly: Boolean = false, // If true, only block non-educational apps during break
+    val allowExtensions: Boolean = false, // If true, child can request "One More Minute"
     val rollingUsageWindowMs: Long = 0 // Optional: window for usage calculation (e.g. 24h)
 )

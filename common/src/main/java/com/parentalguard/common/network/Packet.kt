@@ -20,7 +20,8 @@ sealed class Packet {
         val packageName: String? = null,
         val category: com.parentalguard.common.model.AppCategory? = null,
         val timerDurationMs: Long? = null,
-        val languageCode: String? = null
+        val languageCode: String? = null,
+        val relayParentId: String? = null
     ) : Packet()
 
     @Serializable
@@ -36,6 +37,7 @@ sealed class Packet {
         val eventType: EventType, // Renamed from 'type' to avoid JSON discriminator conflict
         val payload: String? = null,
         val timestamp: Long = System.currentTimeMillis(),
+        val deviceId: String? = null,          // ID of child device 
         // Unlock request details
         val deviceName: String? = null,        // Name of child device requesting unlock
         val requestType: String? = null,       // "DEVICE" or "APP"
@@ -50,7 +52,8 @@ enum class EventType {
     APP_INSTALLED,
     APP_REMOVED,
     LOCK_STATUS_CHANGED,
-    UNLOCK_REQUESTED
+    UNLOCK_REQUESTED,
+    EXTENSION_REQUESTED
 }
 
 @Serializable
@@ -71,5 +74,9 @@ enum class CommandType {
     SET_APP_TIMER,       // Parent sets a temporary timer for an app
     SET_CATEGORY_TIMER,  // Parent sets a temporary timer for a category
     SET_LANGUAGE,        // Parent sets the language
-    RESET_PIN            // Parent resets the child PIN
+    RESET_PIN,           // Parent resets the child PIN
+    SET_RELAY_PARENT_ID, // Parent informs child of its Relay ID
+    APPROVE_EXTENSION,   // Parent approves "One More Minute"
+    DENY_EXTENSION,      // Parent denies extension request
+    STOP_BREAK           // Parent manually stops a break session
 }

@@ -55,6 +55,8 @@ class CloudRelayClient(private val context: Context) {
     private var session: DefaultClientWebSocketSession? = null
     private var job: Job? = null
     private val deviceId = DeviceUtils.getDeviceId(context)
+    private val parentId: String?
+        get() = context.getSharedPreferences("relay_prefs", Context.MODE_PRIVATE).getString("parent_id", null)
 
     fun start() {
         if (job?.isActive == true) return
@@ -234,6 +236,15 @@ class CloudRelayClient(private val context: Context) {
                              Packet.Response(false, "Invalid language code")
                         }
                     }
+                    com.parentalguard.common.network.CommandType.SET_RELAY_PARENT_ID -> {
+                        if (command.relayParentId != null) {
+                            val prefs = context.getSharedPreferences("relay_prefs", Context.MODE_PRIVATE)
+                            prefs.edit().putString("parent_id", command.relayParentId).apply()
+                            Packet.Response(true, "Relay Parent ID updated")
+                        } else {
+                            Packet.Response(false, "Invalid relay parent ID")
+                        }
+                    }
                     else -> Packet.Response(false, "Command not implemented: ${command.commandType}")
                 }
             } catch (e: Exception) {
@@ -283,6 +294,7 @@ class CloudRelayClient(private val context: Context) {
     suspend fun sendEvent(event: Packet.Event) {
         val payload = json.encodeToString<Packet>(event)
         val message = RelayMessage(
+            targetDeviceId = parentId,
             type = "EVENT",
             payload = payload
         )

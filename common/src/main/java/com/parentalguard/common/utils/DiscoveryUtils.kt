@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import android.util.Log
 
 object DiscoveryUtils {
-    const val SERVICE_TYPE = "_parentalguard._tcp."
+    const val SERVICE_TYPE = "_parentalguard._tcp" // Removed trailing dot
     const val SERVICE_NAME_PREFIX = "PG_Child_"
 
     fun discoverServices(context: Context): Flow<NsdServiceInfo> = callbackFlow {

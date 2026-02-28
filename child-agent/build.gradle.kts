@@ -40,6 +40,9 @@ android {
         kotlinCompilerExtensionVersion = "1.5.8"
     }
     packaging {
+        jniLibs {
+            useLegacyPackaging = false
+        }
         resources {
             excludes += "META-INF/INDEX.LIST"
             excludes += "META-INF/io.netty.versions.properties"

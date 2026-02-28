@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -32,6 +33,7 @@ import com.parentalguard.parent.R
 import com.parentalguard.parent.ui.components.*
 import com.parentalguard.parent.ui.theme.*
 import java.util.Locale
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,7 +50,11 @@ fun SettingsScreen(
     val prefs = remember { context.getSharedPreferences("parent_prefs", android.content.Context.MODE_PRIVATE) }
     var biometricEnabled by remember { mutableStateOf(prefs.getBoolean("biometric_enabled", false)) }
     
-    Box(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(brush = PremiumGradient)
+    ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(bottom = 32.dp)
@@ -58,12 +64,13 @@ fun SettingsScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
                         .background(
                             brush = Brush.verticalGradient(
-                                colors = listOf(PremiumPrimary, PremiumPrimaryVariant)
+                                colors = LiquidGradientPrimary
                             )
                         )
-                        .padding(top = 24.dp, bottom = 48.dp)
+                        .padding(top = 48.dp, bottom = 80.dp) // Adjusted for consistency
                 ) {
                     Column(
                         modifier = Modifier
@@ -74,24 +81,25 @@ fun SettingsScreen(
                             text = stringResource(R.string.settings_title),
                             style = MaterialTheme.typography.headlineMedium,
                             color = Color.White,
-                            fontWeight = FontWeight.ExtraBold
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = (-1).sp
                         )
                         Text(
-                            text = "Manage your preferences and security",
+                            text = "Control your parental preferences",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.White.copy(alpha = 0.8f)
                         )
                         
                         Spacer(Modifier.height(16.dp))
                         
-                        Surface(
-                            shape = androidx.compose.foundation.shape.CircleShape,
-                            color = Color.White.copy(alpha = 0.1f),
-                            modifier = Modifier.clip(androidx.compose.foundation.shape.CircleShape)
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color.White.copy(alpha = 0.15f))
+                                .padding(horizontal = 10.dp, vertical = 4.dp)
                         ) {
                             Text(
-                                "VERSION 1.0.2 PREMIUM",
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                                "PREMIUM VERSION 1.1.0",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = Color.White,
                                 fontWeight = FontWeight.Bold,
@@ -106,34 +114,31 @@ fun SettingsScreen(
             item {
                 Column(
                     modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .offset(y = (-24).dp),
-                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                        .fillMaxWidth()
+                        .offset(y = (-30).dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     // Security Section
-                    SettingsSection(title = stringResource(R.string.security_title)) {
-                        SettingsItem(
+                    LiquidGlassSection(title = stringResource(R.string.security_title)) {
+                        SettingsItemRow(
                             icon = Icons.Outlined.Lock,
                             title = stringResource(R.string.pin_protection_title),
                             subtitle = stringResource(R.string.pin_protection_desc),
                             onClick = { showPinDialog = true }
                         )
                         
-                        SettingsDivider(modifier = Modifier.padding(start = 56.dp))
+                        LiquidGlassDivider()
                         
-                        SettingsItem(
+                        LiquidGlassSwitch(
+                            checked = biometricEnabled,
+                            onCheckedChange = { 
+                                biometricEnabled = it 
+                                prefs.edit().putBoolean("biometric_enabled", it).apply()
+                            },
+                            label = stringResource(R.string.biometric_title),
+                            sublabel = stringResource(R.string.biometric_desc),
                             icon = Icons.Outlined.Fingerprint,
-                            title = stringResource(R.string.biometric_title),
-                            subtitle = stringResource(R.string.biometric_desc),
-                            trailing = {
-                                Switch(
-                                    checked = biometricEnabled,
-                                    onCheckedChange = { 
-                                        biometricEnabled = it 
-                                        prefs.edit().putBoolean("biometric_enabled", it).apply()
-                                    }
-                                )
-                            }
+                            modifier = Modifier.padding(horizontal = 16.dp)
                         )
                     }
 
@@ -143,21 +148,32 @@ fun SettingsScreen(
                     }
                     var showThemeDialog by remember { mutableStateOf(false) }
                     
-                    SettingsSection(title = stringResource(R.string.appearance_title)) {
-                        SettingsItem(
+                    LiquidGlassSection(title = stringResource(R.string.appearance_title)) {
+                        SettingsItemRow(
                             icon = Icons.Outlined.DarkMode,
                             title = stringResource(R.string.dark_mode_title),
                             subtitle = ThemePreferences.getThemeModeDisplayName(currentThemeMode),
                             onClick = { showThemeDialog = true }
                         )
                         
-                        SettingsDivider(modifier = Modifier.padding(start = 56.dp))
+                        LiquidGlassDivider()
                         
-                        SettingsItem(
+                        SettingsItemRow(
                             icon = Icons.Outlined.Language,
                             title = stringResource(R.string.settings_language),
                             subtitle = getCurrentLanguageName(),
                             onClick = { showLanguageDialog = true }
+                        )
+                        
+                        LiquidGlassDivider()
+
+                        LiquidGlassSwitch(
+                            checked = notificationsEnabled,
+                            onCheckedChange = { notificationsEnabled = it },
+                            label = "Push Notifications",
+                            sublabel = "Get real-time alerts",
+                            icon = Icons.Outlined.Notifications,
+                            modifier = Modifier.padding(horizontal = 16.dp)
                         )
                     }
                     
@@ -175,17 +191,17 @@ fun SettingsScreen(
                     }
 
                     // About Section
-                    SettingsSection(title = stringResource(R.string.about_section_title)) {
-                        SettingsItem(
+                    LiquidGlassSection(title = stringResource(R.string.about_section_title)) {
+                        SettingsItemRow(
                             icon = Icons.Outlined.Info,
                             title = stringResource(R.string.about_title),
                             subtitle = "Learn more about Family Guard",
                             onClick = { showAboutDialog = true }
                         )
                         
-                        SettingsDivider(modifier = Modifier.padding(start = 56.dp))
+                        LiquidGlassDivider()
                         
-                        SettingsItem(
+                        SettingsItemRow(
                             icon = Icons.Outlined.Help,
                             title = stringResource(R.string.help_title),
                             subtitle = stringResource(R.string.help_desc),
@@ -193,7 +209,7 @@ fun SettingsScreen(
                         )
                     }
                     
-                    Spacer(Modifier.height(24.dp))
+                    Spacer(Modifier.height(40.dp))
                     
                     Text(
                         text = "FAMILY GUARD",
@@ -201,8 +217,8 @@ fun SettingsScreen(
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Black,
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                        letterSpacing = 4.sp
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                        letterSpacing = 6.sp
                     )
                 }
             }
@@ -239,6 +255,59 @@ fun SettingsScreen(
 }
 
 @Composable
+private fun SettingsItemRow(
+    icon: ImageVector,
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(LiquidBlue.copy(alpha = 0.1f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = LiquidBlue,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+        
+        Spacer(Modifier.width(12.dp))
+        
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold
+            )
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        
+        Icon(
+            imageVector = Icons.Default.ChevronRight,
+            contentDescription = null,
+            tint = Color.LightGray,
+            modifier = Modifier.size(20.dp)
+        )
+    }
+}
+
+@Composable
 fun getCurrentLanguageName(): String {
     val locale = AppCompatDelegate.getApplicationLocales().get(0) ?: Locale.getDefault()
     return when (locale.language) {
@@ -259,7 +328,7 @@ private fun LanguageSelectionDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = stringResource(R.string.settings_language)) },
+        title = { Text(text = stringResource(R.string.settings_language), fontWeight = FontWeight.Bold) },
         text = {
             Column {
                 Row(
@@ -269,9 +338,9 @@ private fun LanguageSelectionDialog(
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = stringResource(R.string.language_english))
+                    Text(text = stringResource(R.string.language_english), style = MaterialTheme.typography.bodyLarge)
                 }
-                Divider()
+                Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -279,15 +348,16 @@ private fun LanguageSelectionDialog(
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = stringResource(R.string.language_darija))
+                    Text(text = stringResource(R.string.language_darija), style = MaterialTheme.typography.bodyLarge)
                 }
             }
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel))
+                Text(stringResource(R.string.cancel), color = LiquidBlue)
             }
-        }
+        },
+        shape = RoundedCornerShape(24.dp)
     )
 }
 
@@ -336,99 +406,23 @@ private fun ThemeSelectionDialog(
                             Icon(
                                 imageVector = Icons.Default.Check,
                                 contentDescription = null,
-                                tint = Primary
+                                tint = LiquidBlue
                             )
                         }
                     }
                     if (mode != ThemePreferences.ThemeMode.values().last()) {
-                        Divider()
+                        Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
                     }
                 }
             }
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel))
+                Text(stringResource(R.string.cancel), color = LiquidBlue)
             }
-        }
+        },
+        shape = RoundedCornerShape(24.dp)
     )
-}
-
-@Composable
-private fun SettingsSection(
-    title: String,
-    content: @Composable ColumnScope.() -> Unit
-) {
-    Column {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleSmall,
-            color = Primary,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 8.dp, start = 4.dp)
-        )
-        
-        Card(
-            shape = MaterialTheme.shapes.medium,
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                content()
-            }
-        }
-    }
-}
-
-@Composable
-private fun SettingsItem(
-    icon: ImageVector,
-    title: String,
-    subtitle: String,
-    onClick: (() -> Unit)? = null,
-    trailing: @Composable (() -> Unit)? = null
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .then(
-                if (onClick != null) Modifier.clickable { onClick() } 
-                else Modifier
-            )
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = Primary,
-            modifier = Modifier.size(24.dp)
-        )
-        
-        Spacer(Modifier.width(16.dp))
-        
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium
-            )
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        
-        if (trailing != null) {
-            Spacer(Modifier.width(8.dp))
-            trailing()
-        }
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -465,7 +459,8 @@ private fun PinSetupDialog(
                     label = { Text(stringResource(R.string.enter_pin)) },
                     visualTransformation = PasswordVisualTransformation(),
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
                 )
                 
                 OutlinedTextField(
@@ -475,7 +470,8 @@ private fun PinSetupDialog(
                     visualTransformation = PasswordVisualTransformation(),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
-                    isError = error != null
+                    isError = error != null,
+                    shape = RoundedCornerShape(12.dp)
                 )
                 
                 if (error != null) {
@@ -488,7 +484,7 @@ private fun PinSetupDialog(
             }
         },
         confirmButton = {
-            GradientButton(
+            LiquidGlassButton(
                 text = stringResource(R.string.set_pin_btn),
                 onClick = {
                     when {
@@ -501,9 +497,10 @@ private fun PinSetupDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel))
+                Text(stringResource(R.string.cancel), color = LiquidBlue)
             }
-        }
+        },
+        shape = RoundedCornerShape(24.dp)
     )
 }
 
@@ -521,10 +518,10 @@ private fun AboutDialog(
                 Box(
                     modifier = Modifier
                         .size(48.dp)
-                        .clip(MaterialTheme.shapes.medium)
+                        .clip(RoundedCornerShape(14.dp))
                         .background(
                             brush = Brush.linearGradient(
-                                colors = listOf(Primary, Secondary)
+                                colors = listOf(LiquidBlue, LiquidPurple)
                             )
                         ),
                     contentAlignment = Alignment.Center
@@ -542,7 +539,7 @@ private fun AboutDialog(
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = stringResource(R.string.app_version, "1.0.0"),
+                        text = stringResource(R.string.app_version, "1.1.0"),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -558,7 +555,7 @@ private fun AboutDialog(
                     style = MaterialTheme.typography.bodyMedium
                 )
                 
-                SettingsDivider()
+                Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
                 
                 Text(
                     text = stringResource(R.string.label_features),
@@ -595,18 +592,9 @@ private fun AboutDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.close), color = Primary)
+                Text(stringResource(R.string.close), color = LiquidBlue, fontWeight = FontWeight.Bold)
             }
-        }
-    )
-}
-
-@Composable
-private fun SettingsDivider(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(1.dp)
-            .background(MaterialTheme.colorScheme.outlineVariant)
+        },
+        shape = RoundedCornerShape(24.dp)
     )
 }

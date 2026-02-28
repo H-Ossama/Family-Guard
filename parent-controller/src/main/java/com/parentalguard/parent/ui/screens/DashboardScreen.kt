@@ -1,7 +1,9 @@
 package com.parentalguard.parent.ui.screens
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,13 +23,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.zIndex
 import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
 import com.parentalguard.parent.R
 import com.parentalguard.parent.ui.components.*
 import com.parentalguard.parent.ui.theme.*
 import com.parentalguard.parent.viewmodel.ChildDevice
 import com.parentalguard.parent.viewmodel.DeviceStatusSummary
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,38 +44,71 @@ fun DashboardScreen(
     onViewAllDevices: () -> Unit,
     onScanQR: () -> Unit,
     onLockAll: () -> Unit,
+    onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val totalScreenTimeMs = devices.sumOf { deviceStatuses[it.deviceId]?.todayScreenTimeMs ?: 0L }
     val onlineCount = devices.count { deviceStatuses[it.deviceId]?.isOnline == true }
+    val deviceCount = devices.size
 
-    Box(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(brush = PremiumGradient)
+    ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(bottom = 100.dp)
         ) {
-            // Header
+            // Header Section
             item {
                 DashboardHeader(
                     onlineCount = onlineCount,
-                    totalCount = devices.size
+                    totalCount = deviceCount,
+                    onRefresh = onRefresh
                 )
             }
             
-            // Stats Overview
+            // Metrics Section (Gauges)
             item {
-                StatsOverviewRow(
-                    deviceCount = devices.size,
-                    onlineCount = onlineCount,
-                    totalScreenTimeMs = totalScreenTimeMs,
+                Row(
                     modifier = Modifier
+                        .fillMaxWidth()
                         .padding(horizontal = 16.dp)
-                        .offset(y = (-32).dp)
-                        .zIndex(1f)
-                )
+                        .offset(y = (-40).dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    LiquidGlassCard(
+                        modifier = Modifier.weight(1f),
+                        backgroundColor = LiquidCardBackground
+                    ) {
+                        LiquidGlassGauge(
+                            value = if (deviceCount > 0) onlineCount.toFloat() / deviceCount else 0f,
+                            label = "Online",
+                            size = 80.dp,
+                            color = GlassSuccess,
+                            subtext = "$onlineCount/$deviceCount"
+                        )
+                    }
+                    
+                    LiquidGlassCard(
+                        modifier = Modifier.weight(1f),
+                        backgroundColor = LiquidCardBackground
+                    ) {
+                        // Max 8 hours as goal
+                        val goalMs = 8 * 60 * 60 * 1000L
+                        LiquidGlassGauge(
+                            value = (totalScreenTimeMs.toFloat() / goalMs).coerceIn(0f, 1f),
+                            label = "Usage",
+                            size = 80.dp,
+                            color = GlassAccentPurple,
+                            subtext = formatDuration(totalScreenTimeMs)
+                        )
+                    }
+                }
             }
             
-            // Connected Devices Section
+            // Devices Section
             item {
                 SectionHeader(
                     title = stringResource(R.string.section_connected_devices),
@@ -88,14 +127,9 @@ fun DashboardScreen(
             } else {
                 items(devices) { device ->
                     val status = deviceStatuses[device.deviceId] ?: DeviceStatusSummary()
-                    FullWidthDeviceCard(
-                        deviceName = device.customName.ifBlank { device.name },
-                        statusText = if (status.isOnline) stringResource(R.string.status_online) else stringResource(R.string.status_offline),
-                        isOnline = status.isOnline,
-                        batteryLevel = status.batteryLevel,
-                        usageText = formatDuration(status.todayScreenTimeMs),
-                        isLocked = status.isLocked,
-                        connectionType = status.connectionType,
+                    LiquidDeviceCard(
+                        device = device,
+                        status = status,
                         onClick = { onDeviceClick(device) },
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
                     )
@@ -109,52 +143,104 @@ fun DashboardScreen(
             }
             
             item {
-                QuickActionsRow(
-                    onLockAll = onLockAll,
-                    onScanQR = onScanQR,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    LiquidGlassButton(
+                        text = stringResource(R.string.action_lock_all),
+                        onClick = onLockAll,
+                        icon = Icons.Default.Lock,
+                        gradient = listOf(GlassError, GlassAccentPink),
+                        modifier = Modifier.weight(1f)
+                    )
+                    LiquidGlassButton(
+                        text = "Add Device",
+                        onClick = onScanQR,
+                        icon = Icons.Default.Add,
+                        gradient = LiquidGradientPrimary,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
             }
             
             // Tips Section
             item {
-                Spacer(Modifier.height(24.dp))
-                TipsCard(modifier = Modifier.padding(horizontal = 16.dp))
+                Spacer(Modifier.height(32.dp))
+                LiquidGlassCard(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    backgroundColor = GlassInfo.copy(alpha = 0.1f),
+                    borderColor = GlassInfo.copy(alpha = 0.2f)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.TipsAndUpdates,
+                            contentDescription = null,
+                            tint = GlassInfo,
+                            modifier = Modifier.size(28.dp)
+                        )
+                        Column {
+                            Text(
+                                text = "Pro Tip",
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = GlassInfo
+                            )
+                            Text(
+                                text = "Set up a bedtime schedule to automatically lock devices at night.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
                 Spacer(Modifier.height(24.dp))
             }
         }
         
-        // FAB
-        GradientFAB(
-            icon = Icons.Default.QrCodeScanner,
-            onClick = onScanQR,
-            contentDescription = stringResource(R.string.scan_qr),
+        // FAB (Modernized)
+        Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(24.dp)
-        )
+        ) {
+            FloatingActionButton(
+                onClick = onScanQR,
+                containerColor = GlassPrimary,
+                contentColor = Color.White,
+                shape = RoundedCornerShape(20.dp),
+                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 8.dp)
+            ) {
+                Icon(Icons.Default.QrCodeScanner, contentDescription = "Scan QR")
+            }
+        }
     }
 }
 
 @Composable
 private fun DashboardHeader(
     onlineCount: Int,
-    totalCount: Int
+    totalCount: Int,
+    onRefresh: () -> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(PremiumPrimary, PremiumPrimaryVariant)
+                    colors = LiquidGradientPrimary
                 )
             )
-            .padding(top = 24.dp, bottom = 64.dp)
+            .padding(top = 48.dp, bottom = 80.dp) // Increased top padding for status bar
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = 24.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -163,79 +249,142 @@ private fun DashboardHeader(
             ) {
                 Column {
                     Text(
-                        text = stringResource(R.string.app_name),
-                        style = MaterialTheme.typography.headlineSmall,
+                        text = "Parental Guard",
+                        style = MaterialTheme.typography.headlineMedium,
                         color = Color.White,
-                        fontWeight = FontWeight.ExtraBold
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = (-1).sp
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Surface(
-                            shape = androidx.compose.foundation.shape.CircleShape,
-                            color = Success.copy(alpha = 0.2f),
-                            modifier = Modifier.size(8.dp).border(1.dp, Success, androidx.compose.foundation.shape.CircleShape)
-                        ) {}
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(GlassSuccess)
+                        )
                         Spacer(Modifier.width(6.dp))
                         Text(
-                            text = stringResource(R.string.status_active).uppercase(),
+                            text = "SYSTEM ACTIVE",
                             style = MaterialTheme.typography.labelSmall,
-                            color = Success,
+                            color = Color.White.copy(alpha = 0.9f),
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.2.sp
                         )
                     }
                 }
                 
-                // Active indicator
-                Icon(
-                    imageVector = Icons.Default.Shield,
-                    contentDescription = null,
-                    tint = Color.White.copy(alpha = 0.9f),
-                    modifier = Modifier.size(32.dp)
-                )
+                IconButton(
+                    onClick = onRefresh,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .background(Color.White.copy(alpha = 0.2f))
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "Refresh",
+                        tint = Color.White
+                    )
+                }
             }
-            
-            Spacer(Modifier.height(16.dp))
-            
-            Text(
-                text = "$onlineCount/$totalCount Devices Protected",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White.copy(alpha = 0.8f)
-            )
         }
     }
 }
 
 @Composable
-private fun StatsOverviewRow(
-    deviceCount: Int,
-    onlineCount: Int,
-    totalScreenTimeMs: Long,
+private fun LiquidDeviceCard(
+    device: ChildDevice,
+    status: DeviceStatusSummary,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    LiquidGlassCard(
+        modifier = modifier.clickable { onClick() },
+        padding = 12.dp
     ) {
-        CompactStatChip(
-            icon = Icons.Default.Smartphone,
-            value = "$deviceCount",
-            label = "Devices",
-            modifier = Modifier.weight(1f)
-        )
-        CompactStatChip(
-            icon = Icons.Default.Wifi,
-            value = "$onlineCount",
-            label = "Online",
-            color = Success,
-            modifier = Modifier.weight(1f)
-        )
-        CompactStatChip(
-            icon = Icons.Default.AccessTime,
-            value = formatDuration(totalScreenTimeMs),
-            label = "Usage",
-            color = AccentOrange,
-            modifier = Modifier.weight(1.3f)
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Icon with background
+            Box(
+                modifier = Modifier
+                    .size(50.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = if (status.isOnline) LiquidGradientPrimary else listOf(Color.Gray, Color.LightGray)
+                        )
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Smartphone,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(26.dp)
+                )
+            }
+            
+            Spacer(Modifier.width(16.dp))
+            
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = device.customName.ifBlank { device.name },
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = if (status.isOnline) "Online" else "Offline",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (status.isOnline) Success else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    if (status.isOnline) {
+                        Spacer(Modifier.width(8.dp))
+                        Icon(
+                            imageVector = if (status.connectionType == com.parentalguard.parent.viewmodel.ConnectionType.LOCAL) 
+                                Icons.Default.Wifi else Icons.Default.Cloud,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(12.dp)
+                        )
+                    }
+                }
+            }
+            
+            Column(horizontalAlignment = Alignment.End) {
+                if (status.isOnline) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (status.isLocked) {
+                            Icon(
+                                imageVector = Icons.Default.Lock,
+                                contentDescription = null,
+                                tint = Error,
+                                modifier = Modifier.size(14.dp)
+                            )
+                            Spacer(Modifier.width(4.dp))
+                        }
+                        Text(
+                            text = "${status.batteryLevel}%",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                Text(
+                    text = formatDuration(status.todayScreenTimeMs),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = LiquidBlue
+                )
+            }
+            
+            Spacer(Modifier.width(8.dp))
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = null,
+                tint = Color.LightGray
+            )
+        }
     }
 }
 
@@ -268,7 +417,7 @@ private fun SectionHeader(
         if (actionText != null && onAction != null) {
             Text(
                 text = actionText,
-                color = Primary,
+                color = LiquidBlue,
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable { onAction() }
@@ -282,7 +431,7 @@ private fun EmptyDevicesCard(
     onScanQR: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    PremiumCard(modifier = modifier.fillMaxWidth()) {
+    LiquidGlassCard(modifier = modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -311,126 +460,12 @@ private fun EmptyDevicesCard(
             
             Spacer(Modifier.height(24.dp))
             
-            GradientButton(
+            LiquidGlassButton(
                 text = stringResource(R.string.scan_qr),
                 onClick = onScanQR,
                 icon = Icons.Default.QrCodeScanner,
                 modifier = Modifier.fillMaxWidth()
             )
-        }
-    }
-}
-
-@Composable
-private fun QuickActionsRow(
-    onLockAll: () -> Unit,
-    onScanQR: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        QuickActionCard(
-            icon = Icons.Default.Lock,
-            title = stringResource(R.string.action_lock_all),
-            subtitle = "Lock all devices",
-            color = Error,
-            onClick = onLockAll,
-            modifier = Modifier.weight(1f)
-        )
-        QuickActionCard(
-            icon = Icons.Default.Add,
-            title = "Add Device",
-            subtitle = "Scan child QR",
-            color = Primary,
-            onClick = onScanQR,
-            modifier = Modifier.weight(1f)
-        )
-    }
-}
-
-@Composable
-private fun QuickActionCard(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    title: String,
-    subtitle: String,
-    color: Color,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier.clickable { onClick() },
-        shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surface,
-        shadowElevation = 2.dp
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(MaterialTheme.shapes.medium)
-                    .background(color.copy(alpha = 0.1f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = color,
-                    modifier = Modifier.size(22.dp)
-                )
-            }
-            Column {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun TipsCard(modifier: Modifier = Modifier) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
-        color = InfoLight.copy(alpha = 0.3f),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Info.copy(alpha = 0.1f))
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Default.TipsAndUpdates,
-                contentDescription = null,
-                tint = Info,
-                modifier = Modifier.size(28.dp)
-            )
-            Column {
-                Text(
-                    text = stringResource(R.string.tip_title),
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = Info
-                )
-                Text(
-                    text = stringResource(R.string.tip_desc),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
         }
     }
 }

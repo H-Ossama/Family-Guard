@@ -20,8 +20,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalDensity
 import com.parentalguard.child.ui.theme.*
+
+@Composable
+fun Dp.toSp(): TextUnit = with(LocalDensity.current) { this@toSp.toSp() }
 
 /**
  * Premium animated gradient background with subtle animation
@@ -163,6 +168,71 @@ fun GradientButton(
             Text(
                 text = text,
                 color = Color.White,
+                style = MaterialTheme.typography.labelLarge
+            )
+        }
+    }
+}
+
+/**
+ * Premium gradient outlined button
+ */
+@Composable
+fun GradientOutlinedButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    icon: ImageVector? = null
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.96f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "scale"
+    )
+    
+    // Gradient border brush
+    val borderBrush = Brush.horizontalGradient(
+        listOf(Primary, Secondary)
+    )
+    
+    Box(
+        modifier = modifier
+            .scale(scale)
+            .clip(ButtonShape)
+            //.background(Color.Transparent)
+            .border(width = 2.dp, brush = borderBrush, shape = ButtonShape)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = rememberRipple(color = Primary),
+                enabled = enabled,
+                onClick = onClick
+            )
+            .padding(horizontal = 24.dp, vertical = 14.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = Primary, 
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.width(8.dp))
+            }
+            Text(
+                text = text,
+                color = if (enabled) Color.White else Color.Gray,
                 style = MaterialTheme.typography.labelLarge
             )
         }

@@ -63,6 +63,8 @@ class DiscoveryViewModel(application: Application) : AndroidViewModel(applicatio
     init {
         // Load saved devices on startup
         loadSavedDevices()
+        // Start network discovery automatically
+        startDiscovery()
     }
 
     private fun loadSavedDevices() {
@@ -144,12 +146,23 @@ class DiscoveryViewModel(application: Application) : AndroidViewModel(applicatio
                     observeDeviceEvents(newDevice)
                 } else {
                     // Update IP/Port if they changed (same device, new network)
+                    Log.i("DiscoveryViewModel", "Updating existing device ${newDevice.deviceId} with new IP ${newDevice.ip}")
                     currentList[existingIndex].ip = newDevice.ip
                     _devices.value = currentList
                     saveDevices()
+                    connectionHealthCache.remove(newDevice.deviceId) // Clear failure cache
+                    observeDeviceEvents(currentList[existingIndex]) // Refresh monitoring
                 }
-                refreshDevices()
-                onDeviceAdded?.invoke(newDevice)
+                refreshDevices()                // Sync Relay Parent ID immediately while we have local connection
+                viewModelScope.launch {
+                    try {
+                        deviceClient.syncRelayParentId(ip, port)
+                        Log.i("DiscoveryViewModel", "Synced Relay Parent ID to $ip")
+                    } catch (e: Exception) {
+                        Log.e("DiscoveryViewModel", "Failed to sync relay ID", e)
+                    }
+                }
+                                onDeviceAdded?.invoke(newDevice)
             } catch (e: Exception) {
                 Log.e("DiscoveryViewModel", "Failed to add device from QR: $qrCode", e)
             }
@@ -167,18 +180,25 @@ class DiscoveryViewModel(application: Application) : AndroidViewModel(applicatio
         
         viewModelScope.launch {
             DiscoveryUtils.discoverServices(getApplication()).collect { serviceInfo ->
-                // Check if device already has a saved custom name
+                val sName = serviceInfo.serviceName
+                val discoveredDeviceId = if (sName.startsWith(DiscoveryUtils.SERVICE_NAME_PREFIX)) {
+                    sName.removePrefix(DiscoveryUtils.SERVICE_NAME_PREFIX)
+                } else {
+                    @Suppress("DEPRECATION")
+                    "nsd_${serviceInfo.host?.hostAddress ?: ""}"
+                }
+
                 @Suppress("DEPRECATION")
                 val hostAddress = serviceInfo.host?.hostAddress ?: ""
                 val existingCustomName = withContext(Dispatchers.IO) {
-                    deviceRepository.getDeviceName(hostAddress, "nsd_$hostAddress")
+                    deviceRepository.getDeviceName(hostAddress, discoveredDeviceId)
                 }
                 
                 @Suppress("DEPRECATION")
                 val host = serviceInfo.host
                 
                 val newDevice = ChildDevice(
-                    deviceId = "nsd_$hostAddress",
+                    deviceId = discoveredDeviceId,
                     name = serviceInfo.serviceName,
                     ip = host,
                     port = serviceInfo.port,
@@ -195,9 +215,14 @@ class DiscoveryViewModel(application: Application) : AndroidViewModel(applicatio
                     observeDeviceEvents(newDevice)
                 } else {
                     // Update IP in case it changed on the local network
-                    currentList[existingIndex].ip = newDevice.ip
-                    _devices.value = currentList
-                    saveDevices()
+                    if (currentList[existingIndex].ip != newDevice.ip) {
+                        Log.i("DiscoveryViewModel", "Updating IP for ${newDevice.deviceId} to ${newDevice.ip}")
+                        currentList[existingIndex].ip = newDevice.ip
+                        _devices.value = currentList
+                        saveDevices()
+                        connectionHealthCache.remove(newDevice.deviceId) // Clear failure cache on IP update
+                        observeDeviceEvents(currentList[existingIndex]) // Update background monitoring IP
+                    }
                 }
                 refreshDevices()
             }
@@ -246,10 +271,10 @@ class DiscoveryViewModel(application: Application) : AndroidViewModel(applicatio
     private val connectionHealthCache = ConcurrentHashMap<String, Long>() // deviceId -> lastFailTime
 
     fun refreshDevices() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val devices = _devices.value
-            val results = devices.map { device ->
-                async {
+        viewModelScope.launch {
+            val devicesList = _devices.value
+            val results = devicesList.map { device ->
+                viewModelScope.async(Dispatchers.IO) {
                     val status = fetchDeviceStatus(device)
                     device.deviceId to status
                 }
@@ -260,13 +285,14 @@ class DiscoveryViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     private suspend fun fetchDeviceStatus(device: ChildDevice): DeviceStatusSummary {
-        return withTimeoutOrNull(10000) { // Increased to 10s for Cloud Relay fallback
+        return withContext(Dispatchers.IO) {
             val ip = device.ip.hostAddress ?: ""
-            Log.d("DiscoveryViewModel", "Fetching status for ${device.customName} (${device.deviceId}) at $ip:${device.port}")
             
             // Check cache for recent failures to decide if we should try direct or go straight to relay
             val lastFail = connectionHealthCache[device.deviceId] ?: 0L
-            val skipDirect = System.currentTimeMillis() - lastFail < 60_000 // Skip direct for 1 min after failure
+            val skipDirect = System.currentTimeMillis() - lastFail < 15_000 // Reduced to 15s
+
+            Log.d("DiscoveryViewModel", "Checking status for ${device.customName} at $ip (skipDirect=$skipDirect)")
 
             val responseResult = deviceClient.getStatsWithConnectionType(
                 ip, 
@@ -276,24 +302,10 @@ class DiscoveryViewModel(application: Application) : AndroidViewModel(applicatio
                 skipDirect = skipDirect
             )
 
-            Log.d("DiscoveryViewModel", "Response for ${device.deviceId}: success=${responseResult.response?.success}, connectionType=${responseResult.connectionType}")
-
             if (responseResult.response != null && responseResult.response.success) {
-                val response = responseResult.response
-                val stats = response.stats
-                
-                // Check if device name was renamed from child side
-                stats?.deviceName?.let { remoteName ->
-                    if (remoteName.isNotBlank() && remoteName != device.customName) {
-                        Log.i("DiscoveryViewModel", "Syncing new device name from child: $remoteName")
-                        viewModelScope.launch {
-                            updateDeviceName(device, remoteName)
-                        }
-                    }
-                }
-
+                val stats = responseResult.response.stats
                 val screenTime = stats?.usageLogs?.sumOf { it.totalTimeInForeground } ?: 0L
-                Log.d("DiscoveryViewModel", "Successfully got stats for ${device.deviceId}: battery=${stats?.batteryLevel}")
+                
                 DeviceStatusSummary(
                     isOnline = true,
                     isLocked = stats?.isLocked ?: false,
@@ -304,15 +316,12 @@ class DiscoveryViewModel(application: Application) : AndroidViewModel(applicatio
                     connectionType = responseResult.connectionType
                 )
             } else {
-                Log.w("DiscoveryViewModel", "Failed to get stats for ${device.deviceId}: response=${responseResult.response?.message}, skipDirect=$skipDirect")
-                if (!skipDirect) {
+                if (!skipDirect && responseResult.connectionType == ConnectionType.UNKNOWN) {
+                    Log.w("DiscoveryViewModel", "Local & Cloud both failed for ${device.deviceId}")
                     connectionHealthCache[device.deviceId] = System.currentTimeMillis()
                 }
-                DeviceStatusSummary(isOnline = false, connectionType = ConnectionType.UNKNOWN)
+                DeviceStatusSummary(isOnline = false, connectionType = responseResult.connectionType)
             }
-        } ?: run {
-            Log.e("DiscoveryViewModel", "Timeout fetching status for ${device.deviceId}")
-            DeviceStatusSummary(isOnline = false, connectionType = ConnectionType.UNKNOWN)
         }
     }
     fun syncLanguage(languageCode: String) {

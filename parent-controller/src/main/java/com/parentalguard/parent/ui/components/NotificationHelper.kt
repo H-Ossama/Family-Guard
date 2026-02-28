@@ -74,4 +74,36 @@ object NotificationHelper {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(deviceId.hashCode(), builder.build())
     }
+
+    fun showExtensionRequestNotification(
+        context: Context,
+        deviceId: String,
+        deviceName: String
+    ) {
+        val intent = Intent(context, MainActivity::class.java).apply {
+            action = MainActivity.ACTION_UNLOCK_REQUEST
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("deviceId", deviceId)
+            putExtra("deviceName", deviceName)
+            putExtra("requestType", "EXTENSION")
+        }
+        
+        val pendingIntent = PendingIntent.getActivity(
+            context, 
+            deviceId.hashCode() + 1,
+            intent, 
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_parent_logo)
+            .setContentTitle("One More Minute Request")
+            .setContentText("$deviceName requested 1 more minute before the break.")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
+
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(deviceId.hashCode() + 1, builder.build())
+    }
 }

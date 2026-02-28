@@ -24,10 +24,11 @@ import java.util.concurrent.ConcurrentHashMap
 class NotificationService : Service() {
 
     private val serviceScope = CoroutineScope(Dispatchers.IO + Job())
-    private val deviceClient = DeviceClient()
+    private lateinit var deviceClient: DeviceClient
     private val observationJobs = ConcurrentHashMap<String, Job>()
+    private val activeJobIps = ConcurrentHashMap<String, String>() // deviceId -> last used IP
     
-    // In-memory cache of known devices (IP -> Device)
+    // In-memory cache of known devices (deviceId -> Device)
     private val knownDevices = ConcurrentHashMap<String, ChildDevice>()
     private lateinit var deviceRepository: DeviceRepository
 
@@ -37,6 +38,7 @@ class NotificationService : Service() {
         private const val EXTRA_IP = "extra_ip"
         private const val EXTRA_PORT = "extra_port"
         private const val EXTRA_NAME = "extra_name"
+        private const val EXTRA_DEVICE_ID = "extra_device_id"
 
         fun startMonitoring(context: Context, device: ChildDevice) {
             val intent = Intent(context, NotificationService::class.java).apply {
@@ -44,6 +46,7 @@ class NotificationService : Service() {
                 putExtra(EXTRA_IP, device.ip.hostAddress)
                 putExtra(EXTRA_PORT, device.port)
                 putExtra(EXTRA_NAME, device.customName)
+                putExtra(EXTRA_DEVICE_ID, device.deviceId)
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(intent)
@@ -57,6 +60,7 @@ class NotificationService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        deviceClient = DeviceClient(this)
         deviceRepository = DeviceRepository(this)
         loadSavedDevices()
         createNotificationChannel()
@@ -66,7 +70,8 @@ class NotificationService : Service() {
     private fun loadSavedDevices() {
         val saved = deviceRepository.loadDevices()
         saved.forEach { device ->
-            knownDevices[device.ip.hostAddress ?: ""] = device
+            knownDevices[device.deviceId] = device
+            observeDeviceEvents(device) // Start monitoring on service startup
         }
     }
 
@@ -75,11 +80,12 @@ class NotificationService : Service() {
             val ip = intent.getStringExtra(EXTRA_IP)
             val port = intent.getIntExtra(EXTRA_PORT, 0)
             val name = intent.getStringExtra(EXTRA_NAME) ?: "Unknown"
+            val deviceId = intent.getStringExtra(EXTRA_DEVICE_ID)
 
-            if (ip != null && port != 0) {
+            if (ip != null && port != 0 && deviceId != null) {
                  try {
-                     val device = ChildDevice(deviceId = ip, name = name, ip = InetAddress.getByName(ip), port = port, customName = name)
-                     knownDevices[ip] = device // Update or add
+                     val device = ChildDevice(deviceId = deviceId, name = name, ip = InetAddress.getByName(ip), port = port, customName = name)
+                     knownDevices[deviceId] = device // Update or add
                      observeDeviceEvents(device)
                  } catch (e: Exception) {
                      Log.e("NotificationService", "Error adding device", e)
@@ -90,26 +96,37 @@ class NotificationService : Service() {
     }
 
     private fun observeDeviceEvents(device: ChildDevice) {
-        val deviceId = device.ip.hostAddress ?: return
-        if (observationJobs.containsKey(deviceId)) return
+        val deviceId = device.deviceId
+        val deviceIp = device.ip.hostAddress ?: ""
+        
+        val existingJob = observationJobs[deviceId]
+        val activeIp = activeJobIps[deviceId]
+        
+        // If IP is same as what we are already tracking, no need to restart
+        if (existingJob?.isActive == true && activeIp == deviceIp) {
+            return
+        }
+        
+        // Cancel old job if it exists (e.g. IP changed)
+        existingJob?.cancel()
+        knownDevices[deviceId] = device
+        activeJobIps[deviceId] = deviceIp
 
-        Log.i("NotificationService", "Starting observation for ${device.customName} ($deviceId)")
+        Log.i("NotificationService", "Starting observation for ${device.customName} ($deviceId) at $deviceIp")
         
         observationJobs[deviceId] = serviceScope.launch {
             var retryDelay = 5000L
             while (isActive) {
                 try {
-                    deviceClient.observeEvents(deviceId, device.port).collect { event ->
+                    deviceClient.observeEvents(deviceIp, device.port, deviceId).collect { event ->
                         handleEvent(device, event)
                         retryDelay = 5000L
                     }
-                } catch (e: java.net.ConnectException) {
-                    Log.d("NotificationService", "Connection failed to $deviceId: ${e.message}. Retrying...")
+                } catch (e: Exception) {
+                    if (!isActive) break
+                    Log.d("NotificationService", "Observation connection failed for $deviceId ($deviceIp). Retrying in ${retryDelay/1000}s...")
                     delay(retryDelay)
                     retryDelay = (retryDelay * 1.5).toLong().coerceAtMost(60000L)
-                } catch (e: Exception) {
-                    Log.e("NotificationService", "Error observing $deviceId", e)
-                    delay(5000)
                 }
             }
         }
@@ -117,14 +134,14 @@ class NotificationService : Service() {
 
     private fun handleEvent(device: ChildDevice, event: Packet.Event) {
         // Resolve the latest name from the repository if possible
-        val deviceIp = device.ip.hostAddress ?: ""
-        val customName = deviceRepository.getDeviceName(deviceIp, device.deviceId) ?: device.customName
+        val deviceId = device.deviceId
+        val customName = deviceRepository.getDeviceName(device.ip.hostAddress ?: "", deviceId) ?: device.customName
         
         Log.i("NotificationService", "Received event: ${event.eventType} from $customName")
         if (event.eventType == EventType.UNLOCK_REQUESTED) {
             NotificationHelper.showUnlockRequestNotification(
                 context = this,
-                deviceId = deviceIp,
+                deviceId = deviceId,
                 deviceName = customName, 
                 requestType = event.requestType ?: "DEVICE",
                 appPackageName = event.appPackageName,

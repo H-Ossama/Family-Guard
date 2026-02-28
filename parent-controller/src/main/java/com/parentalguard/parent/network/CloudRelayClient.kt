@@ -59,10 +59,21 @@ class CloudRelayClient(private val context: Context) {
 
     private var session: DefaultClientWebSocketSession? = null
     private var job: Job? = null
-    private val parentId = "parent_" + UUID.randomUUID().toString().take(8)
+    val parentId: String by lazy {
+        val prefs = context.getSharedPreferences("relay_prefs", Context.MODE_PRIVATE)
+        var id = prefs.getString("parent_id", null)
+        if (id == null) {
+            id = "parent_" + java.util.UUID.randomUUID().toString().take(8)
+            prefs.edit().putString("parent_id", id).apply()
+        }
+        id!!
+    }
 
     private val _responses = MutableSharedFlow<Packet.Response>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val responses: SharedFlow<Packet.Response> = _responses.asSharedFlow()
+
+    private val _events = MutableSharedFlow<Packet.Event>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val events: SharedFlow<Packet.Event> = _events.asSharedFlow()
 
     fun start() {
         if (job?.isActive == true) return
@@ -115,13 +126,35 @@ class CloudRelayClient(private val context: Context) {
         try {
             val relayWrapper = json.decodeFromString<RelayMessage>(text)
             if (relayWrapper.targetDeviceId == parentId || relayWrapper.targetDeviceId == null) {
-                if (relayWrapper.type == "RESPONSE" && relayWrapper.payload != null) {
-                    val packet = json.decodeFromString<Packet>(relayWrapper.payload)
-                    if (packet is Packet.Response) {
-                        _responses.emit(packet)
+                when (relayWrapper.type) {
+                    "RESPONSE" -> {
+                        if (relayWrapper.payload != null) {
+                            val packet = json.decodeFromString<Packet>(relayWrapper.payload)
+                            if (packet is Packet.Response) {
+                                _responses.emit(packet)
+                            }
+                        }
                     }
-                } else {
-                    Log.d("CloudRelayClient", "Received relay message: type=${relayWrapper.type}, hasPayload=${relayWrapper.payload != null}")
+                    "EVENT" -> {
+                        if (relayWrapper.payload != null) {
+                            val packet = json.decodeFromString<Packet>(relayWrapper.payload)
+                            if (packet is Packet.Event) {
+                                // Populate deviceId from the relay wrapper if it's missing in the packet
+                                val eventWithId = if (packet.deviceId == null) {
+                                    packet.copy(deviceId = relayWrapper.fromDeviceId)
+                                } else {
+                                    packet
+                                }
+                                _events.emit(eventWithId)
+                            }
+                        }
+                    }
+                    "ERROR" -> {
+                        Log.w("CloudRelayClient", "Relay ERROR: ${relayWrapper.payload}")
+                    }
+                    else -> {
+                        Log.d("CloudRelayClient", "Received relay message: type=${relayWrapper.type}, hasPayload=${relayWrapper.payload != null}")
+                    }
                 }
             }
         } catch (e: Exception) {

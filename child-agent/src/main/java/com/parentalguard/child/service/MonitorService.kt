@@ -61,6 +61,7 @@ class MonitorService : Service() {
                          val event = com.parentalguard.common.network.Packet.Event(
                              eventType = eventType,
                              payload = payload,
+                             deviceId = com.parentalguard.child.utils.DeviceUtils.getDeviceId(this@MonitorService),
                              deviceName = deviceName,
                              requestType = requestType,
                              appPackageName = appPackageName,
@@ -99,13 +100,13 @@ class MonitorService : Service() {
              registerReceiver(internalReceiver, filter)
         }
         
-        if (commandServer == null) {
+        if (!::commandServer.isInitialized) {
              commandServer = com.parentalguard.child.network.CommandServer(applicationContext)
              serviceRegistrar = com.parentalguard.child.network.ServiceRegistrar(applicationContext)
              
              serviceScope.launch(kotlinx.coroutines.Dispatchers.IO) {
                  try {
-                    commandServer?.start() // Starts on port 8080
+                    commandServer.start() // Starts on port 8080
                     serviceRegistrar?.registerService(8080)
                  } catch (e: Exception) {
                      Log.e("MonitorService", "Failed to start server/service", e)
@@ -230,9 +231,17 @@ class MonitorService : Service() {
                             } else {
                                 // Normal Rules
                                 val rules = ruleRepo.rules.value
-                                shouldBlock = rules.any { rule ->
-                                    rule.packageName == packageToEvaluate && 
-                                    (rule.isPermanentlyBlocked || rule.blockEndTime > System.currentTimeMillis())
+                                val rule = rules.find { it.packageName == packageToEvaluate }
+                                if (rule != null) {
+                                    val isTimedBlocked = rule.blockEndTime > System.currentTimeMillis()
+                                    val isPermanentlyBlocked = rule.isPermanentlyBlocked
+                                    
+                                    // Check daily limit
+                                    val dailyLimitMs = rule.maxDailyTimeMs
+                                    val currentUsageMs = monitor.getAppUsageToday(packageToEvaluate)
+                                    val isDailyLimitReached = dailyLimitMs > 0 && currentUsageMs >= dailyLimitMs
+                                    
+                                    shouldBlock = isTimedBlocked || isPermanentlyBlocked || isDailyLimitReached
                                 }
                             }
                         }

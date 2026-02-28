@@ -51,13 +51,35 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
     private val _breakDurationMs = MutableStateFlow<Long>(0)
     val breakDurationMs: StateFlow<Long> = _breakDurationMs.asStateFlow()
 
-    private val _appIcons = MutableStateFlow<Map<String, String>>(emptyMap())
+    private val _lockReason = MutableStateFlow<String?>(null)
+    val lockReason: StateFlow<String?> = _lockReason.asStateFlow()
 
-    fun fetchStats(device: ChildDevice) {
+    private val _breakWarningMs = MutableStateFlow<Long>(0)
+    val breakWarningMs: StateFlow<Long> = _breakWarningMs.asStateFlow()
+
+    private val _educationOnly = MutableStateFlow<Boolean>(false)
+    val educationOnly: StateFlow<Boolean> = _educationOnly.asStateFlow()
+
+    private val _allowExtensions = MutableStateFlow<Boolean>(false)
+    val allowExtensions: StateFlow<Boolean> = _allowExtensions.asStateFlow()
+
+    private val _appIcons = MutableStateFlow<Map<String, String>>(emptyMap())
+    
+    fun refresh(device: ChildDevice) {
+        fetchStats(device, forceRefresh = true)
+    }
+
+    fun fetchStats(device: ChildDevice, forceRefresh: Boolean = false) {
         viewModelScope.launch {
             // Check if we need to fetch icons (if map is empty)
             val includeIcons = _appIcons.value.isEmpty()
-            val deviceResponse = client.getStatsWithConnectionType(device.ip.hostAddress ?: "", device.port, device.deviceId, includeIcons)
+            val deviceResponse = client.getStatsWithConnectionType(
+                device.ip.hostAddress ?: "", 
+                device.port, 
+                device.deviceId, 
+                includeIcons,
+                skipDirect = if (forceRefresh) false else false // Default logic in client is local first
+            )
             val response = deviceResponse.response
             
             if (response != null && response.success) {
@@ -69,6 +91,10 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
                 _appTimers.value = response.stats?.appTimers ?: emptyMap()
                 _usageLimitMs.value = response.stats?.usageLimitMs ?: 0L
                 _breakDurationMs.value = response.stats?.breakDurationMs ?: 0L
+                _breakWarningMs.value = response.stats?.breakWarningMs ?: 0L
+                _educationOnly.value = response.stats?.educationOnly ?: false
+                _allowExtensions.value = response.stats?.allowExtensions ?: false
+                _lockReason.value = response.stats?.lockReason
                 
                 // Process icons if included
                 if (includeIcons) {
@@ -153,6 +179,28 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
         }
     }
 
+    fun toggleInternetBlock(device: ChildDevice, packageName: String, discoveryViewModel: DiscoveryViewModel? = null) {
+        viewModelScope.launch {
+            val rule = _activeRules.value.find { it.packageName == packageName }
+            val newRules = if (rule == null) {
+                _activeRules.value + BlockingRule(packageName = packageName, maxDailyTimeMs = 0, isInternetBlocked = true)
+            } else {
+                _activeRules.value.map { 
+                    if (it.packageName == packageName) it.copy(isInternetBlocked = !it.isInternetBlocked)
+                    else it
+                }
+            }
+            
+            val response = client.updateRules(device.ip.hostAddress ?: "", device.port, device.deviceId, newRules)
+            if (response != null && response.success) {
+                _statusMessage.value = "Internet status updated"
+                fetchStats(device)
+            } else {
+                _statusMessage.value = "Failed to update internet status"
+            }
+        }
+    }
+
     fun setAppIconVisibility(device: ChildDevice, visible: Boolean) {
         viewModelScope.launch {
             val response = client.setAppIconVisibility(device.ip.hostAddress ?: "", device.port, device.deviceId, visible)
@@ -160,6 +208,28 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
                 _statusMessage.value = if (visible) "App unhidden on child device" else "App hidden on child device"
             } else {
                 _statusMessage.value = if (visible) "Failed to unhide app" else "Failed to hide app"
+            }
+        }
+    }
+
+    fun setAppDailyLimit(device: ChildDevice, packageName: String, minutes: Int) {
+        viewModelScope.launch {
+            val rule = _activeRules.value.find { it.packageName == packageName }
+            val newRules = if (rule == null) {
+                _activeRules.value + BlockingRule(packageName = packageName, maxDailyTimeMs = minutes * 60 * 1000L)
+            } else {
+                _activeRules.value.map { 
+                    if (it.packageName == packageName) it.copy(maxDailyTimeMs = minutes * 60 * 1000L)
+                    else it
+                }
+            }
+            
+            val response = client.updateRules(device.ip.hostAddress ?: "", device.port, device.deviceId, newRules)
+            if (response != null && response.success) {
+                _statusMessage.value = "Daily limit updated"
+                fetchStats(device)
+            } else {
+                _statusMessage.value = "Failed to update daily limit"
             }
         }
     }
@@ -216,6 +286,30 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
                 fetchStats(device)
             } else {
                 _statusMessage.value = "Failed to deny unlock"
+            }
+        }
+    }
+    
+    fun approveExtension(device: ChildDevice) {
+        viewModelScope.launch {
+            val response = client.approveExtension(device.ip.hostAddress ?: "", device.port, device.deviceId)
+            if (response != null && response.success) {
+                _statusMessage.value = "Extension approved (+1 min)"
+                fetchStats(device)
+            } else {
+                _statusMessage.value = "Failed to approve extension"
+            }
+        }
+    }
+    
+    fun denyExtension(device: ChildDevice) {
+        viewModelScope.launch {
+            val response = client.denyExtension(device.ip.hostAddress ?: "", device.port, device.deviceId)
+            if (response != null && response.success) {
+                _statusMessage.value = "Extension denied"
+                fetchStats(device)
+            } else {
+                _statusMessage.value = "Failed to deny extension"
             }
         }
     }
@@ -313,7 +407,14 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
         }
     }
 
-    fun updateBreakRules(device: ChildDevice, usageLimitMs: Long, breakDurationMs: Long) {
+    fun updateBreakRules(
+        device: ChildDevice, 
+        usageLimitMs: Long, 
+        breakDurationMs: Long,
+        breakWarningMs: Long = 0,
+        educationOnly: Boolean = false,
+        allowExtensions: Boolean = false
+    ) {
         viewModelScope.launch {
             val response = client.setBreakRules(
                 device.ip.hostAddress ?: "", 
@@ -321,14 +422,33 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
                 device.deviceId, 
                 _activeRules.value,
                 usageLimitMs,
-                breakDurationMs
+                breakDurationMs,
+                breakWarningMs,
+                educationOnly,
+                allowExtensions
             )
             if (response != null && response.success) {
                 _usageLimitMs.value = usageLimitMs
                 _breakDurationMs.value = breakDurationMs
+                _breakWarningMs.value = breakWarningMs
+                _educationOnly.value = educationOnly
+                _allowExtensions.value = allowExtensions
                 _statusMessage.value = "Break rules updated"
             } else {
                 _statusMessage.value = "Failed to update break rules"
+            }
+        }
+    }
+
+    fun stopBreak(device: ChildDevice) {
+        viewModelScope.launch {
+            val response = client.stopBreak(device.ip.hostAddress ?: "", device.port, device.deviceId)
+            if (response != null && response.success) {
+                _statusMessage.value = "Break stopped"
+                // Refresh stats to update lock status
+                fetchStats(device)
+            } else {
+                _statusMessage.value = "Failed to stop break"
             }
         }
     }

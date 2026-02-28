@@ -2,72 +2,136 @@ package com.parentalguard.parent.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Premium Palette - Deep Blue & High Contrast
-val PremiumPrimary = Color(0xFF1E3A5F)      // Deep Trust Blue
-val PremiumPrimaryVariant = Color(0xFF2C5282)
-val PremiumPrimaryLight = Color(0xFF4A6FA5)
-val PremiumSecondary = Color(0xFFE67E22)    // Protective Orange
-val PremiumSecondaryVariant = Color(0xFFD35400)
+// ========================================================================
+// 🎨 ENHANCED GLASSMORPHISM PALETTE (2026 REFRESH)
+// ========================================================================
 
-// Premium Status Colors
-val PremiumSafe = Color(0xFF27AE60)
-val PremiumWarning = Color(0xFFF39C12)
-val PremiumDanger = Color(0xFFE74C3C)
+// Primary Brand Colors - Deep & Trustworthy but Modern
+val GlassPrimary = Color(0xFF4F46E5)      // Electric Indigo
+val GlassPrimaryVariant = Color(0xFF3730A3) // Deep Indigo
+val GlassPrimaryLight = Color(0xFF818CF8)   // Soft Indigo
 
-// Premium Surfaces
-val PremiumSurfaceLight = Color(0xFFF8FAFC)
-val PremiumSurfaceDark = Color(0xFF1A1A2E)
-val PremiumCardDark = Color(0xFF16213E)
+// Secondary Accent Colors - Vibrant & Energetic
+val GlassSecondary = Color(0xFF06B6D4)    // Cyan Neon
+val GlassSecondaryVariant = Color(0xFF0891B2)
+val GlassSecondaryLight = Color(0xFF67E8F9)
 
-// Glassmorphism
-val GlassPrimary = Color(0x331E3A5F)
-val GlassSurface = Color(0x80FFFFFF)
+// Tertiary/Accent Colors - Playful pops
+val GlassAccentPink = Color(0xFFEC4899)   // Hot Pink
+val GlassAccentPurple = Color(0xFF8B5CF6) // Violet
+val GlassAccentOrange = Color(0xFFF97316) // Bright Orange
 
-// Legacy compatibility or additional accents
-val PrimaryDark = Color(0xFF1D4ED8)
-val Primary = Color(0xFF2563EB)
-val PrimaryLight = Color(0xFF60A5FA)
-val SecondaryDark = Color(0xFF0891B2)
-val Secondary = Color(0xFF06B6D4)
-val SecondaryLight = Color(0xFF67E8F9)
-val AccentOrange = Color(0xFFF59E0B)
-val AccentPurple = Color(0xFFA855F7)
-val AccentPink = Color(0xFFEC4899)
-val AccentGreen = Color(0xFF10B981)
-val SurfaceLight = Color(0xFFFFFFFF)
-val SurfaceVariantLight = Color(0xFFF8FAFC)
-val BackgroundLight = Color(0xFFF1F5F9)
-val CardLight = Color(0xFFFFFFFF)
-val SurfaceDark = Color(0xFF1E293B)
-val SurfaceVariantDark = Color(0xFF334155)
-val BackgroundDark = Color(0xFF0F172A)
-val CardDark = Color(0xFF1E293B)
-val Success = Color(0xFF10B981)
-val SuccessLight = Color(0xFFD1FAE5)
-val Warning = Color(0xFFF59E0B)
-val WarningLight = Color(0xFFFEF3C7)
-val Error = Color(0xFFEF4444)
+// Backgrounds & Surfaces - Clean & Deep
+val GlassBackgroundLight = Color(0xFFF0FDF4) // Very subtle cool mint/white tint
+val GlassBackgroundDark = Color(0xFF0F172A)  // Deep Slate Navy (Premium Dark)
+val GlassSurfaceLight = Color(0xFFFFFFFF)
+val GlassSurfaceDark = Color(0xFF1E293B)     // Slate 800
+
+// Status Colors - Clear & Accessible
+val GlassSuccess = Color(0xFF10B981)      // Emerald
+val GlassWarning = Color(0xFFF59E0B)      // Amber
+val GlassError = Color(0xFFEF4444)        // Red 500
+val GlassInfo = Color(0xFF3B82F6)         // Blue 500
+
+// ========================================================================
+// 💧 LIQUID GLASS SPECIFIC TOKENS
+// ========================================================================
+
+// Updated Liquid colors to match new vibrant theme
+val LiquidBlue = GlassPrimary
+val LiquidPurple = GlassAccentPurple
+val LiquidPink = GlassAccentPink
+val LiquidTeal = GlassSecondary
+val LiquidIndigo = GlassPrimaryVariant
+val LiquidOrange = GlassAccentOrange
+
+// Glass Effect Tokens
+val LiquidGlassBackground = Color(0xFFFFFFFF).copy(alpha = 0.15f)
+val LiquidGlassBorder = Color(0xFFFFFFFF).copy(alpha = 0.25f)
+val LiquidGlassBorderDark = Color(0xFFFFFFFF).copy(alpha = 0.10f)
+
+val LiquidCardBackground = Color(0xFFFFFFFF).copy(alpha = 0.85f) // Frosted Light
+val LiquidCardBackgroundDark = Color(0xFF1E293B).copy(alpha = 0.75f) // Frosted Dark
+
+// ========================================================================
+// 🌈 GRADIENTS
+// ========================================================================
+
+// Premium Gradients
+val GradientPrimaryStart = GlassPrimary
+val GradientPrimaryEnd = GlassAccentPurple
+val LiquidGradientPrimary = listOf(GradientPrimaryStart, GradientPrimaryEnd)
+
+val GradientAccentStart = GlassSecondary
+val GradientAccentEnd = GlassSuccess
+val LiquidGradientAccent = listOf(GradientAccentStart, GradientAccentEnd)
+
+val GradientWarmStart = GlassAccentOrange
+val GradientWarmEnd = GlassAccentPink
+val LiquidGradientWarm = listOf(GradientWarmStart, GradientWarmEnd)
+
+val LiquidGradientGlass = listOf(
+    Color.White.copy(alpha = 0.3f),
+    Color.White.copy(alpha = 0.05f)
+)
+
+// ========================================================================
+// 🔄 LEGACY COMPATIBILITY MAPPING
+// ========================================================================
+// Mapping old names to new palette for backward compatibility
+
+val PremiumPrimary = GlassPrimary
+val PremiumPrimaryVariant = GlassPrimaryVariant
+val PremiumPrimaryLight = GlassPrimaryLight
+val PremiumSecondary = GlassSecondary
+val PremiumSecondaryVariant = GlassSecondaryVariant
+
+val Primary = GlassPrimary
+val PrimaryDark = GlassPrimaryVariant
+val PrimaryLight = GlassPrimaryLight
+val Secondary = GlassSecondary
+val SecondaryDark = GlassSecondaryVariant
+val SecondaryLight = GlassSecondaryLight
+
+val BackgroundLight = Color(0xFFF8FAFC) // Slate 50
+val BackgroundDark = GlassBackgroundDark
+val SurfaceLight = GlassSurfaceLight
+val SurfaceDark = GlassSurfaceDark
+
+val SurfaceVariantLight = Color(0xFFF1F5F9) // Slate 100
+val SurfaceVariantDark = Color(0xFF334155)  // Slate 700
+
+val CardLight = GlassSurfaceLight
+val CardDark = GlassSurfaceDark
+
+val Error = GlassError
 val ErrorLight = Color(0xFFFEE2E2)
-val Info = Color(0xFF3B82F6)
+val Success = GlassSuccess
+val SuccessLight = Color(0xFFD1FAE5)
+val Warning = GlassWarning
+val WarningLight = Color(0xFFFEF3C7)
+val Info = GlassInfo
 val InfoLight = Color(0xFFDBEAFE)
-val TextPrimaryLight = Color(0xFF0F172A)
-val TextSecondaryLight = Color(0xFF475569)
-val TextTertiaryLight = Color(0xFF94A3B8)
-val TextPrimaryDark = Color(0xFFF1F5F9)
-val TextSecondaryDark = Color(0xFFCBD5E1)
-val TextTertiaryDark = Color(0xFF94A3B8)
-val CategorySocial = Color(0xFF3B82F6)
-val CategoryGames = Color(0xFFEC4899)
-val CategoryEducation = Color(0xFF10B981)
-val CategoryProductivity = Color(0xFF8B5CF6)
-val CategoryEntertainment = Color(0xFFF59E0B)
-val CategoryOther = Color(0xFF6B7280)
-val GradientStart = Color(0xFF2563EB)
-val GradientMiddle = Color(0xFF3B82F6)
-val GradientEnd = Color(0xFF06B6D4)
-val GlassWhite = Color(0x50FFFFFF)
-val GlassDark = Color(0x501E293B)
-val OnlineGreen = Color(0xFF22C55E)
-val OfflineRed = Color(0xFFF87171)
-val WarningOrange = Color(0xFFfb923c)
 
+val TextPrimaryLight = Color(0xFF0F172A)   // Slate 900
+val TextSecondaryLight = Color(0xFF475569) // Slate 600
+val TextTertiaryLight = Color(0xFF94A3B8)  // Slate 400
+val TextPrimaryDark = Color(0xFFF8FAFC)    // Slate 50
+val TextSecondaryDark = Color(0xFFCBD5E1)  // Slate 300
+val TextTertiaryDark = Color(0xFF64748B)   // Slate 500
+
+// Categories
+val CategorySocial = GlassInfo
+val CategoryGames = GlassAccentPink
+val CategoryEducation = GlassSuccess
+val CategoryProductivity = GlassAccentPurple
+val CategoryEntertainment = GlassWarning
+val CategoryOther = Color(0xFF6B7280)
+
+val GradientStart = GradientPrimaryStart
+val GradientMiddle = Color(0xFF6366F1) // Indigo 500
+val GradientEnd = GradientAccentStart
+
+val OnlineGreen = GlassSuccess
+val OfflineRed = GlassError
+val WarningOrange = GlassWarning

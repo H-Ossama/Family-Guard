@@ -8,6 +8,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -16,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -24,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.parentalguard.parent.R
 import com.parentalguard.parent.ui.components.*
 import com.parentalguard.parent.ui.theme.*
@@ -44,40 +48,59 @@ fun DeviceDiscoveryScreen(
     modifier: Modifier = Modifier
 ) {
     val deviceStatuses by viewModel.deviceStatuses.collectAsState()
+    
     LaunchedEffect(Unit) {
         onStartScan()
     }
     
-    Column(modifier = modifier.fillMaxSize()) {
-        // Header
-        DiscoveryHeader(
-            isScanning = isScanning,
-            deviceCount = devices.size,
-            onScanQR = onScanQR,
-            onRefresh = { viewModel.refreshDevices() },
-            onResetAll = onResetAll
-        )
-        
-        // Content
-        if (devices.isEmpty()) {
-            EmptyDiscoveryState(
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(
+                brush = PremiumGradient
+            )
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            // Stylized Top Bar
+            DiscoveryTopBar(
                 isScanning = isScanning,
+                deviceCount = devices.size,
                 onScanQR = onScanQR,
-                onRetry = onStartScan
+                onRefresh = { viewModel.refreshDevices() },
+                onResetAll = onResetAll
             )
-        } else {
-            DeviceList(
-                devices = devices,
-                deviceStatuses = deviceStatuses,
-                onDeviceSelected = onDeviceSelected,
-                modifier = Modifier.weight(1f)
-            )
+            
+            // Content
+            if (devices.isEmpty() && !isScanning) {
+                EmptyDiscoveryState(
+                    isScanning = false,
+                    onScanQR = onScanQR,
+                    onRetry = onStartScan
+                )
+            } else if (devices.isEmpty() && isScanning) {
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    EmptyDiscoveryState(
+                        isScanning = true,
+                        onScanQR = onScanQR,
+                        onRetry = onStartScan
+                    )
+                }
+            } else {
+                DeviceList(
+                    devices = devices,
+                    deviceStatuses = deviceStatuses,
+                    onDeviceSelected = onDeviceSelected,
+                    isScanning = isScanning,
+                    modifier = Modifier.weight(1f)
+                )
+            }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DiscoveryHeader(
+private fun DiscoveryTopBar(
     isScanning: Boolean,
     deviceCount: Int,
     onScanQR: () -> Unit,
@@ -110,101 +133,52 @@ private fun DiscoveryHeader(
         )
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(PremiumPrimary, PremiumPrimaryVariant)
-                )
-            )
-            .padding(16.dp)
+    Surface(
+        color = LiquidCardBackground,
+        shadowElevation = 0.dp
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Info column
-            Column {
-                Text(
-                    text = stringResource(R.string.title_discovery),
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = Color.White,
-                    fontWeight = FontWeight.ExtraBold
-                )
-                Text(
-                    text = if (isScanning) stringResource(R.string.status_scanning) else stringResource(R.string.status_devices_saved, deviceCount),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.8f)
-                )
-            }
-            
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                // Reset button
-                if (deviceCount > 0) {
-                    IconButton(onClick = { showResetDialog = true }) {
-                        Icon(
-                            imageVector = Icons.Default.DeleteSweep,
-                            contentDescription = "Reset All",
-                            tint = Color.White.copy(alpha = 0.7f)
+        Column {
+            TopAppBar(
+                title = {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.title_discovery),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = (-0.5).sp
+                        )
+                        Text(
+                            text = if (isScanning) "Searching for devices..." else "$deviceCount devices linked",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = if (isScanning) LiquidBlue else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                }
-                
-                // Refresh button
-                IconButton(onClick = onRefresh) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = stringResource(R.string.refresh_stats),
-                        tint = Color.White
-                    )
-                }
-                
-                // QR Scan button
-                FilledTonalIconButton(
-                    onClick = onScanQR,
-                    colors = IconButtonDefaults.filledTonalIconButtonColors(
-                        containerColor = Color.White.copy(alpha = 0.2f),
-                        contentColor = Color.White
-                    )
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.QrCodeScanner,
-                        contentDescription = stringResource(R.string.scan_qr)
-                    )
-                }
-            }
-        }
-        
-        Spacer(Modifier.height(16.dp))
-        
-        // Scanning indicator
-        AnimatedVisibility(
-            visible = isScanning,
-            enter = fadeIn() + expandVertically(),
-            exit = fadeOut() + shrinkVertically()
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(MaterialTheme.shapes.small)
-                    .background(Color.White.copy(alpha = 0.15f))
-                    .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    color = Color.White,
-                    strokeWidth = 2.dp
+                },
+                actions = {
+                    if (deviceCount > 0) {
+                        IconButton(onClick = { showResetDialog = true }) {
+                            Icon(Icons.Default.DeleteSweep, null, tint = Error.copy(alpha = 0.7f))
+                        }
+                    }
+                    IconButton(onClick = onRefresh) {
+                        Icon(Icons.Default.Refresh, null, tint = LiquidBlue)
+                    }
+                    IconButton(onClick = onScanQR) {
+                        Icon(Icons.Default.QrCodeScanner, null, tint = LiquidBlue)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+            )
+            
+            // Linear progress when scanning
+            if (isScanning) {
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth().height(2.dp),
+                    color = LiquidBlue,
+                    trackColor = Color.Transparent
                 )
-                Spacer(Modifier.width(12.dp))
-                Text(
-                    text = stringResource(R.string.indicator_searching),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White
-                )
+            } else {
+                Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(Color.LightGray.copy(alpha = 0.1f)))
             }
         }
     }
@@ -215,14 +189,33 @@ private fun DeviceList(
     devices: List<ChildDevice>,
     deviceStatuses: Map<String, DeviceStatusSummary>,
     onDeviceSelected: (ChildDevice) -> Unit,
+    isScanning: Boolean,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        if (isScanning) {
+            item {
+                LiquidGlassCard(
+                    backgroundColor = LiquidBlue.copy(alpha = 0.05f),
+                    padding = 12.dp
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp, color = LiquidBlue)
+                        Spacer(Modifier.width(12.dp))
+                        Text(
+                            "Looking for more devices...",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = LiquidBlue
+                        )
+                    }
+                }
+            }
+        }
+
         items(
             items = devices,
             key = { it.deviceId }
@@ -243,31 +236,44 @@ private fun DiscoveredDeviceCard(
     status: DeviceStatusSummary,
     onClick: () -> Unit
 ) {
-    Card(
+    LiquidGlassCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() },
-        shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        padding = 16.dp
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Device icon with status
-            Box {
+            // Device Icon with animated glow if online
+            Box(contentAlignment = Alignment.Center) {
+                if (status.isOnline) {
+                    val infiniteTransition = rememberInfiniteTransition(label = "glow")
+                    val alpha by infiniteTransition.animateFloat(
+                        initialValue = 0.2f,
+                        targetValue = 0.5f,
+                        animationSpec = infiniteRepeatable(tween(1500), RepeatMode.Reverse),
+                        label = "alpha"
+                    )
+                    Box(
+                        modifier = Modifier
+                            .size(56.dp)
+                            .clip(CircleShape)
+                            .background(LiquidBlue.copy(alpha = alpha))
+                    )
+                }
+                
                 Box(
                     modifier = Modifier
-                        .size(56.dp)
-                        .clip(androidx.compose.foundation.shape.CircleShape)
+                        .size(48.dp)
+                        .clip(CircleShape)
                         .background(
                             brush = Brush.linearGradient(
-                                colors = listOf(Primary.copy(alpha = 0.1f), Secondary.copy(alpha = 0.1f))
+                                colors = if (status.isOnline) 
+                                    listOf(LiquidBlue, LiquidTeal) 
+                                else 
+                                    listOf(Color.Gray.copy(alpha = 0.2f), Color.LightGray.copy(alpha = 0.2f))
                             )
                         ),
                     contentAlignment = Alignment.Center
@@ -275,116 +281,96 @@ private fun DiscoveredDeviceCard(
                     Icon(
                         imageVector = Icons.Default.Smartphone,
                         contentDescription = null,
-                        tint = Primary,
-                        modifier = Modifier.size(28.dp)
+                        tint = if (status.isOnline) Color.White else Color.Gray,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
-                // Online indicator
-                StatusDot(
-                    isOnline = status.isOnline,
+                
+                // Status dot
+                Box(
                     modifier = Modifier
+                        .size(12.dp)
+                        .clip(CircleShape)
+                        .background(Color.White)
+                        .padding(2.dp)
                         .align(Alignment.BottomEnd)
-                        .offset(x = 2.dp, y = 2.dp)
-                )
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape)
+                            .background(if (status.isOnline) Success else Color.Gray)
+                    )
+                }
             }
             
             Spacer(Modifier.width(16.dp))
             
-            // Device info
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = device.customName,
+                    text = device.customName.ifBlank { "Mobile Device" },
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    fontWeight = FontWeight.Black
                 )
-                Spacer(Modifier.height(4.dp))
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Icon(
-                        imageVector = if (status.isOnline) Icons.Default.Wifi else Icons.Default.WifiOff,
-                        contentDescription = null,
-                        modifier = Modifier.size(14.dp),
-                        tint = if (status.isOnline) Success else MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        text = if (status.isOnline) stringResource(R.string.status_online) else stringResource(R.string.status_offline),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (status.isOnline) Success else MaterialTheme.colorScheme.onSurfaceVariant
+                        text = if (status.isOnline) "Connected" else "Disconnected",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = if (status.isOnline) Success else Color.Gray
                     )
                     
                     if (status.isOnline) {
-                        Surface(
-                            shape = MaterialTheme.shapes.extraSmall,
-                            color = MaterialTheme.colorScheme.surfaceVariant,
-                            modifier = Modifier.padding(start = 4.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                Icon(
-                                    imageVector = if (status.connectionType == com.parentalguard.parent.viewmodel.ConnectionType.LOCAL) 
-                                        Icons.Default.Wifi else Icons.Default.Cloud,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(10.dp),
-                                    tint = if (status.connectionType == com.parentalguard.parent.viewmodel.ConnectionType.LOCAL) Success else Info
-                                )
-                                Text(
-                                    text = if (status.connectionType == com.parentalguard.parent.viewmodel.ConnectionType.LOCAL) "Local" else "Server",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = if (status.connectionType == com.parentalguard.parent.viewmodel.ConnectionType.LOCAL) Success else Info
-                                )
-                                Box(
-                                    modifier = Modifier
-                                        .height(10.dp)
-                                        .width(1.dp)
-                                        .padding(horizontal = 2.dp)
-                                        .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
-                                )
-                                Icon(
-                                    imageVector = if (status.isLocked) Icons.Default.Lock else Icons.Default.LockOpen,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(10.dp),
-                                    tint = if (status.isLocked) Error else Success
-                                )
-                                Icon(
-                                    imageVector = Icons.Default.BatteryChargingFull,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(10.dp),
-                                    tint = if (status.batteryLevel < 20) Error else MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Text(
-                                    text = "${status.batteryLevel}%",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
+                        Icon(
+                            imageVector = if (status.connectionType == com.parentalguard.parent.viewmodel.ConnectionType.LOCAL) 
+                                Icons.Default.Wifi else Icons.Default.Cloud,
+                            contentDescription = null,
+                            modifier = Modifier.size(12.dp),
+                            tint = LiquidBlue
+                        )
+                        Text(
+                            text = if (status.connectionType == com.parentalguard.parent.viewmodel.ConnectionType.LOCAL) "Local" else "Remote",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = LiquidBlue
+                        )
                     }
                 }
             }
             
-            // Connect button
-            FilledTonalButton(
-                onClick = onClick,
-                colors = ButtonDefaults.filledTonalButtonColors(
-                    containerColor = Primary.copy(alpha = 0.1f),
-                    contentColor = Primary
-                )
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = null,
+                tint = Color.LightGray
+            )
+        }
+        
+        if (status.isOnline) {
+            Spacer(Modifier.height(12.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text(stringResource(R.string.connect))
-                Spacer(Modifier.width(4.dp))
-                Icon(
-                    imageVector = Icons.Default.ArrowForward,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp)
+                DeviceQuickStat(
+                    icon = Icons.Default.BatteryChargingFull,
+                    value = "${status.batteryLevel}%",
+                    color = if (status.batteryLevel < 20) Error else Success
+                )
+                DeviceQuickStat(
+                    icon = if (status.isLocked) Icons.Default.Lock else Icons.Default.LockOpen,
+                    value = if (status.isLocked) "Locked" else "Active",
+                    color = if (status.isLocked) Error else Success
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun DeviceQuickStat(icon: androidx.compose.ui.graphics.vector.ImageVector, value: String, color: Color) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(icon, null, modifier = Modifier.size(14.dp), tint = color)
+        Spacer(Modifier.width(4.dp))
+        Text(value, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = color)
     }
 }
 
@@ -401,47 +387,50 @@ private fun EmptyDiscoveryState(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Animated radar illustration
         RadarAnimation(
             isScanning = isScanning,
-            modifier = Modifier.size(200.dp)
+            modifier = Modifier.size(240.dp)
         )
         
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(40.dp))
         
         Text(
-            text = if (isScanning) stringResource(R.string.empty_searching_title) else stringResource(R.string.empty_no_devices_found),
+            text = if (isScanning) "Searching for Devices" else "No Devices Found",
             style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
+            fontWeight = FontWeight.Black,
+            textAlign = TextAlign.Center
         )
         
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(12.dp))
         
         Text(
             text = if (isScanning)
-                stringResource(R.string.empty_scanning_desc)
+                "Make sure your child's device is nearby and the app is open."
             else
-                stringResource(R.string.empty_no_devices_desc),
+                "We couldn't find any devices on your network. Try scanning the QR code on the child's app instead.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
         
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(40.dp))
         
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            GradientOutlinedButton(
-                text = stringResource(R.string.action_retry),
-                onClick = onRetry,
-                icon = Icons.Default.Refresh
-            )
-            GradientButton(
-                text = stringResource(R.string.scan_qr),
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            LiquidGlassButton(
+                text = "Scan QR Code",
                 onClick = onScanQR,
-                icon = Icons.Default.QrCodeScanner
+                icon = Icons.Default.QrCodeScanner,
+                gradient = LiquidGradientPrimary,
+                modifier = Modifier.fillMaxWidth()
+            )
+            
+            LiquidGlassButton(
+                text = if (isScanning) "Stop Search" else "Search Again",
+                onClick = onRetry,
+                icon = if (isScanning) Icons.Default.Stop else Icons.Default.Wifi,
+                backgroundColor = Color.White,
+                textColor = LiquidBlue,
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }
@@ -458,63 +447,63 @@ private fun RadarAnimation(
         initialValue = 0f,
         targetValue = 360f,
         animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = LinearEasing),
+            animation = tween(3000, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
         ),
         label = "sweep"
     )
     
-    val alpha1 by infiniteTransition.animateFloat(
-        initialValue = 0.5f,
-        targetValue = 0f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
+    val pulses = listOf(
+        infiniteTransition.animateFloat(
+            initialValue = 0f, targetValue = 1f,
+            animationSpec = infiniteRepeatable(tween(2000, delayMillis = 0), RepeatMode.Restart), label = "p1"
         ),
-        label = "alpha1"
-    )
-    
-    val scale1 by infiniteTransition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
+        infiniteTransition.animateFloat(
+            initialValue = 0f, targetValue = 1f,
+            animationSpec = infiniteRepeatable(tween(2000, delayMillis = 600), RepeatMode.Restart), label = "p2"
         ),
-        label = "scale1"
+        infiniteTransition.animateFloat(
+            initialValue = 0f, targetValue = 1f,
+            animationSpec = infiniteRepeatable(tween(2000, delayMillis = 1200), RepeatMode.Restart), label = "p3"
+        )
     )
     
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
-        // Radar circles
+        // Radar Pulses
         if (isScanning) {
-            Canvas(modifier = Modifier.fillMaxSize().scale(scale1)) {
-                drawCircle(
-                    color = Primary.copy(alpha = alpha1),
-                    radius = size.minDimension / 2,
-                    style = Stroke(width = 2.dp.toPx())
+            pulses.forEach { pulse ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .scale(pulse.value)
+                        .clip(CircleShape)
+                        .background(
+                            Brush.radialGradient(
+                                colors = listOf(LiquidBlue.copy(alpha = 0.2f * (1f - pulse.value)), Color.Transparent)
+                            )
+                        )
                 )
             }
         }
         
-        // Static circles
         Canvas(modifier = Modifier.fillMaxSize()) {
             val center = Offset(size.width / 2, size.height / 2)
             val maxRadius = size.minDimension / 2
             
-            // Draw concentric circles
-            for (i in 1..3) {
+            // Concentric circles (Glass style)
+            for (i in 1..4) {
                 drawCircle(
-                    color = Primary.copy(alpha = 0.1f),
-                    radius = maxRadius * i / 3,
+                    color = LiquidBlue.copy(alpha = 0.05f * i),
+                    radius = maxRadius * i / 4,
                     center = center,
                     style = Stroke(width = 1.dp.toPx())
                 )
             }
             
-            // Draw sweep line if scanning
+            // Sweep line
             if (isScanning) {
                 val sweepRadians = Math.toRadians(sweep.toDouble()).toFloat()
                 val endX = center.x + maxRadius * kotlin.math.cos(sweepRadians)
@@ -522,34 +511,35 @@ private fun RadarAnimation(
                 
                 drawLine(
                     brush = Brush.linearGradient(
-                        colors = listOf(Primary, Primary.copy(alpha = 0f)),
+                        colors = listOf(LiquidBlue, LiquidTeal.copy(alpha = 0f)),
                         start = center,
                         end = Offset(endX, endY)
                     ),
                     start = center,
                     end = Offset(endX, endY),
-                    strokeWidth = 2.dp.toPx()
+                    strokeWidth = 3.dp.toPx()
                 )
             }
         }
         
-        // Center icon
+        // Center Core
         Box(
             modifier = Modifier
-                .size(64.dp)
-                .clip(androidx.compose.foundation.shape.CircleShape)
+                .size(80.dp)
+                .clip(CircleShape)
                 .background(
                     brush = Brush.linearGradient(
-                        colors = listOf(Primary, Secondary)
+                        colors = listOf(LiquidBlue, LiquidTeal)
                     )
-                ),
+                )
+                .shadow(10.dp, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = if (isScanning) Icons.Default.Wifi else Icons.Default.WifiOff,
                 contentDescription = null,
                 tint = Color.White,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(36.dp)
             )
         }
     }

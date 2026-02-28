@@ -13,8 +13,9 @@ class ServiceRegistrar(private val context: Context) {
     var serviceName: String? = null
 
     fun registerService(port: Int) {
+        val deviceId = com.parentalguard.child.utils.DeviceUtils.getDeviceId(context)
         val serviceInfo = NsdServiceInfo().apply {
-            serviceName = "${DiscoveryUtils.SERVICE_NAME_PREFIX}${System.currentTimeMillis()}"
+            serviceName = "${DiscoveryUtils.SERVICE_NAME_PREFIX}${deviceId}"
             serviceType = DiscoveryUtils.SERVICE_TYPE
             setPort(port)
         }

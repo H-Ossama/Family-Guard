@@ -7,8 +7,27 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+
+import androidx.compose.ui.unit.dp
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -27,7 +46,7 @@ import com.parentalguard.parent.ui.screens.DeviceControlScreen
 import com.parentalguard.parent.ui.screens.DeviceDiscoveryScreen
 import com.parentalguard.parent.ui.screens.SettingsScreen
 import com.parentalguard.parent.ui.theme.ParentalGuardTheme
-import com.parentalguard.parent.ui.theme.Primary
+import com.parentalguard.parent.ui.theme.*
 import com.parentalguard.parent.viewmodel.ChildDevice
 import com.parentalguard.parent.viewmodel.DeviceControlViewModel
 import com.parentalguard.parent.viewmodel.DiscoveryViewModel
@@ -92,25 +111,32 @@ fun ParentalControlApp(
             Screen.Settings.route
         )
         
-        Scaffold(
-            bottomBar = {
-                if (showBottomBar) {
-                    PremiumBottomNavigation(
-                        items = bottomNavItems,
-                        currentRoute = currentRoute,
-                        onItemClick = { item ->
-                            navController.navigate(item.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+        // Wrap Scaffold in a gradient Box to ensure the floating nav bar looks good over a background
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(brush = PremiumGradient)
+        ) {
+            Scaffold(
+                containerColor = Color.Transparent,
+                bottomBar = {
+                    if (showBottomBar) {
+                        PremiumBottomNavigation(
+                            items = bottomNavItems,
+                            currentRoute = currentRoute,
+                            onItemClick = { item ->
+                                navController.navigate(item.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
-                                launchSingleTop = true
-                                restoreState = true
                             }
-                        }
-                    )
+                        )
+                    }
                 }
-            }
-        ) { paddingValues ->
+            ) { paddingValues ->
             NavHost(
                 navController = navController,
                 startDestination = Screen.Dashboard.route,
@@ -154,7 +180,8 @@ fun ParentalControlApp(
                             devices.forEach { device ->
                                 controlViewModel.lockDevice(device, true, discoveryViewModel)
                             }
-                        }
+                        },
+                        onRefresh = { discoveryViewModel.refreshDevices() }
                     )
                 }
                 
@@ -254,6 +281,8 @@ fun ParentalControlApp(
                         onBack = { navController.popBackStack() }
                     )
                 }
+
+
                 
                 // Settings
                 composable(Screen.Settings.route) {
@@ -271,7 +300,8 @@ fun ParentalControlApp(
                         onReportClick = { report ->
                             selectedReport = report
                             navController.navigate("report_detail")
-                        }
+                        },
+                        onBack = { navController.popBackStack() }
                     )
                 }
                 
@@ -284,6 +314,7 @@ fun ParentalControlApp(
                 }
             }
         }
+        }
     }
 }
 
@@ -293,37 +324,88 @@ private fun PremiumBottomNavigation(
     currentRoute: String?,
     onItemClick: (BottomNavItem) -> Unit
 ) {
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface,
-        tonalElevation = 8.dp
-    ) {
-        items.forEach { item ->
-            val selected = currentRoute == item.route
-            
-            NavigationBarItem(
-                icon = {
-                    Icon(
-                        imageVector = if (selected) item.selectedIcon else item.unselectedIcon,
-                        contentDescription = androidx.compose.ui.res.stringResource(item.titleResId)
-                    )
-                },
-                label = {
-                    Text(
-                        text = androidx.compose.ui.res.stringResource(item.titleResId),
-                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
-                    )
-                },
-                selected = selected,
-                onClick = { onItemClick(item) },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                    selectedTextColor = MaterialTheme.colorScheme.primary,
-                    indicatorColor = MaterialTheme.colorScheme.primary,
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 24.dp)
+            .shadow(
+                elevation = 16.dp,
+                shape = RoundedCornerShape(32.dp),
+                spotColor = LiquidBlue.copy(alpha = 0.5f)
             )
+            .clip(RoundedCornerShape(32.dp))
+            .background(LiquidCardBackground)
+            .border(
+                width = 1.dp,
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        Color.White.copy(alpha = 0.6f),
+                        Color.White.copy(alpha = 0.1f)
+                    )
+                ),
+                shape = RoundedCornerShape(32.dp)
+            )
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            items.forEach { item ->
+                val selected = currentRoute == item.route
+                
+                // Animated scale
+                val scale by animateFloatAsState(
+                    targetValue = if (selected) 1.2f else 1.0f,
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+                    label = "scale"
+                )
+                
+                // Animated color
+                val iconColor by animateColorAsState(
+                    targetValue = if (selected) LiquidBlue else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    label = "color"
+                )
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) { onItemClick(item) }
+                        .scale(scale)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (selected) LiquidBlue.copy(alpha = 0.1f) else Color.Transparent
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = if (selected) item.selectedIcon else item.unselectedIcon,
+                            contentDescription = stringResource(item.titleResId),
+                            tint = iconColor,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    
+                    if (selected) {
+                        Box(
+                            modifier = Modifier
+                                .padding(top = 4.dp)
+                                .size(4.dp)
+                                .clip(CircleShape)
+                                .background(LiquidBlue)
+                        )
+                    }
+                }
+            }
         }
     }
 }

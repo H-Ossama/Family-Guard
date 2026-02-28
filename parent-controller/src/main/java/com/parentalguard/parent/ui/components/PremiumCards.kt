@@ -26,7 +26,7 @@ fun GlassCard(
     modifier: Modifier = Modifier,
     cornerRadius: Dp = 16.dp,
     borderWidth: Dp = 1.dp,
-    backgroundColor: Color = GlassWhite,
+    backgroundColor: Color = LiquidGlassBackground,
     borderColor: Color = Color.White.copy(alpha = 0.3f),
     elevation: Dp = 8.dp,
     content: @Composable ColumnScope.() -> Unit

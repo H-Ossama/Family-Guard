@@ -16,6 +16,8 @@ object RuleRepository {
         if (persistentStateManager != null) return
         persistentStateManager = PersistentStateManager(context)
         loadPersistedState()
+        // Always ensure VPN is in sync on startup
+        notifyVpn(context)
     }
 
     private fun loadPersistedState() {
@@ -39,9 +41,12 @@ object RuleRepository {
             _categoryTimers.value = manager.loadCategoryTimers()
             _lastUnlockRequestTime.value = manager.loadLastUnlockRequestTime()
 
-            val (limit, duration) = manager.loadBreakRules()
-            _usageLimitMs.value = limit
-            _breakDurationMs.value = duration
+            val breakData = manager.loadBreakRules()
+            _usageLimitMs.value = breakData.usageLimit
+            _breakDurationMs.value = breakData.breakDuration
+            _breakWarningMs.value = breakData.warningMs
+            _educationOnly.value = breakData.educationOnly
+            _allowExtensions.value = breakData.allowExtensions
             _currentBreakUsageMs.value = manager.loadCurrentBreakUsage()
         }
     }
@@ -56,6 +61,25 @@ object RuleRepository {
     fun updateRules(newRules: List<BlockingRule>) {
         _rules.value = newRules
         persistentStateManager?.saveRules(newRules)
+        
+        // Trigger VPN update if any internet rules changed
+        notifyVpn(com.parentalguard.child.ChildApp.instance)
+    }
+
+    private fun notifyVpn(context: Context) {
+        val rules = _rules.value
+        val hasInternetBlock = rules.any { it.isInternetBlocked }
+        
+        if (hasInternetBlock) {
+            com.parentalguard.child.service.InternetBlockerService.start(context)
+            com.parentalguard.child.service.InternetBlockerService.update(context)
+        } else {
+            // Note: In a real app, you might want to stop the service IF it was running
+            // or just update it with empty list (which will effectively unblock all)
+            com.parentalguard.child.service.InternetBlockerService.update(context)
+            // Optional: stop if empty to save battery
+            // com.parentalguard.child.service.InternetBlockerService.stop(context)
+        }
     }
     
     fun updateCategoryLimits(limits: List<CategoryLimit>) {
@@ -72,10 +96,22 @@ object RuleRepository {
     private val _currentBreakUsageMs = MutableStateFlow<Long>(0)
     val currentBreakUsageMs: StateFlow<Long> = _currentBreakUsageMs.asStateFlow()
 
-    fun setBreakRules(limit: Long, duration: Long) {
+    private val _breakWarningMs = MutableStateFlow<Long>(0)
+    val breakWarningMs: StateFlow<Long> = _breakWarningMs.asStateFlow()
+
+    private val _educationOnly = MutableStateFlow<Boolean>(false)
+    val educationOnly: StateFlow<Boolean> = _educationOnly.asStateFlow()
+
+    private val _allowExtensions = MutableStateFlow<Boolean>(false)
+    val allowExtensions: StateFlow<Boolean> = _allowExtensions.asStateFlow()
+
+    fun setBreakRules(limit: Long, duration: Long, warningMs: Long = 0, educationOnly: Boolean = false, allowExtensions: Boolean = false) {
         _usageLimitMs.value = limit
         _breakDurationMs.value = duration
-        persistentStateManager?.saveBreakRules(limit, duration)
+        _breakWarningMs.value = warningMs
+        _educationOnly.value = educationOnly
+        _allowExtensions.value = allowExtensions
+        persistentStateManager?.saveBreakRules(limit, duration, warningMs, educationOnly, allowExtensions)
     }
 
     fun setCurrentBreakUsage(usage: Long) {

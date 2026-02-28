@@ -40,30 +40,33 @@ class MainActivity : AppCompatActivity() {
                     val isPinSet = remember { PinManager.isPinSet(context) }
                     var isUnlocked by remember { mutableStateOf(!isPinSet) }
                     
-                    // Request notification permission on Android 13+
-                    var hasNotificationPermission by remember {
-                        mutableStateOf(
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                ContextCompat.checkSelfPermission(
-                                    context,
-                                    Manifest.permission.POST_NOTIFICATIONS
-                                ) == PackageManager.PERMISSION_GRANTED
-                            } else {
-                                true // Permission not needed on older versions
-                            }
-                        )
+                    // Permissions management
+                    val permissionsToRequest = remember {
+                        val list = mutableListOf<String>()
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            list.add(Manifest.permission.POST_NOTIFICATIONS)
+                        }
+                        // Location is needed for NSD on many versions
+                        list.add(Manifest.permission.ACCESS_FINE_LOCATION)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            list.add(Manifest.permission.NEARBY_WIFI_DEVICES)
+                        }
+                        list
                     }
-                    
+
                     val permissionLauncher = rememberLauncherForActivityResult(
-                        contract = ActivityResultContracts.RequestPermission()
-                    ) { isGranted ->
-                        hasNotificationPermission = isGranted
+                        contract = ActivityResultContracts.RequestMultiplePermissions()
+                    ) { permissions ->
+                        // Handle results if needed
                     }
                     
-                    // Request permission on first launch if needed
+                    // Request permissions on first launch
                     LaunchedEffect(Unit) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !hasNotificationPermission) {
-                            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        val needed = permissionsToRequest.filter {
+                            ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
+                        }
+                        if (needed.isNotEmpty()) {
+                            permissionLauncher.launch(needed.toTypedArray())
                         }
                     }
 

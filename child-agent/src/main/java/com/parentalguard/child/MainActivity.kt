@@ -117,9 +117,21 @@ class MainActivity : AppCompatActivity() {
 
     private fun getLocalIpAddress(): String? {
         try {
-            val interfaces = java.net.NetworkInterface.getNetworkInterfaces()
-            while (interfaces.hasMoreElements()) {
-                val iface = interfaces.nextElement()
+            val interfaces = java.net.NetworkInterface.getNetworkInterfaces().toList()
+            
+            // Prioritize standard WiFi interface names (wlan0, eth0)
+            val sortedIfaces = interfaces.sortedByDescending { iface ->
+                val name = iface.name.lowercase()
+                when {
+                    name.contains("wlan") -> 3
+                    name.contains("eth") -> 2
+                    else -> 1
+                }
+            }
+
+            for (iface in sortedIfaces) {
+                if (iface.isLoopback || !iface.isUp) continue
+                
                 val addresses = iface.inetAddresses
                 while (addresses.hasMoreElements()) {
                     val addr = addresses.nextElement()

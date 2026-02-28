@@ -15,30 +15,30 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val LightColorScheme = lightColorScheme(
-    primary = Primary,
+    primary = GlassPrimary,
     onPrimary = Color.White,
-    primaryContainer = PrimaryLight,
-    onPrimaryContainer = PrimaryDark,
+    primaryContainer = GlassPrimaryLight.copy(alpha = 0.2f),
+    onPrimaryContainer = GlassPrimaryVariant,
     
-    secondary = Secondary,
+    secondary = GlassSecondary,
     onSecondary = Color.White,
-    secondaryContainer = SecondaryLight,
-    onSecondaryContainer = SecondaryDark,
+    secondaryContainer = GlassSecondaryLight.copy(alpha = 0.2f),
+    onSecondaryContainer = GlassSecondaryVariant,
     
-    tertiary = AccentPurple,
+    tertiary = GlassAccentPurple,
     onTertiary = Color.White,
-    tertiaryContainer = Color(0xFFF3E5F5),
-    onTertiaryContainer = Color(0xFF6B21A8),
+    tertiaryContainer = GlassAccentPurple.copy(alpha = 0.2f),
+    onTertiaryContainer = Color(0xFF581C87), // Deep purple
     
-    error = Error,
+    error = GlassError,
     onError = Color.White,
-    errorContainer = ErrorLight,
-    onErrorContainer = Error,
+    errorContainer = GlassError.copy(alpha = 0.1f),
+    onErrorContainer = GlassError,
     
-    background = BackgroundLight,
+    background = GlassBackgroundLight,
     onBackground = TextPrimaryLight,
     
-    surface = SurfaceLight,
+    surface = GlassSurfaceLight,
     onSurface = TextPrimaryLight,
     surfaceVariant = SurfaceVariantLight,
     onSurfaceVariant = TextSecondaryLight,
@@ -46,67 +46,71 @@ private val LightColorScheme = lightColorScheme(
     outline = TextTertiaryLight,
     outlineVariant = Color(0xFFE2E8F0),
     
-    inverseSurface = SurfaceDark,
+    inverseSurface = GlassSurfaceDark,
     inverseOnSurface = TextPrimaryDark,
-    inversePrimary = PrimaryLight,
+    inversePrimary = GlassPrimaryLight,
     
-    surfaceTint = Primary,
-    scrim = Color.Black
+    surfaceTint = GlassPrimary,
+    scrim = Color.Black.copy(alpha = 0.6f)
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = PrimaryLight,
-    onPrimary = PrimaryDark,
-    primaryContainer = Primary,
+    primary = GlassPrimaryLight,
+    onPrimary = GlassPrimaryVariant,
+    primaryContainer = GlassPrimary.copy(alpha = 0.3f),
     onPrimaryContainer = Color.White,
     
-    secondary = SecondaryLight,
-    onSecondary = SecondaryDark,
-    secondaryContainer = Secondary,
+    secondary = GlassSecondary,
+    onSecondary = GlassBackgroundDark,
+    secondaryContainer = GlassSecondary.copy(alpha = 0.3f),
     onSecondaryContainer = Color.White,
     
-    tertiary = AccentPurple,
+    tertiary = GlassAccentPurple,
     onTertiary = Color.White,
-    tertiaryContainer = Color(0xFF6B21A8),
-    onTertiaryContainer = Color(0xFFF3E5F5),
+    tertiaryContainer = GlassAccentPurple.copy(alpha = 0.3f),
+    onTertiaryContainer = Color.White,
     
-    error = Color(0xFFF87171),
-    onError = Color.Black,
-    errorContainer = Color(0xFF991B1B),
-    onErrorContainer = Color(0xFFFEE2E2),
+    error = GlassError,
+    onError = Color.White,
+    errorContainer = GlassError.copy(alpha = 0.2f),
+    onErrorContainer = Color(0xFFFECACA),
     
-    background = BackgroundDark,
+    background = GlassBackgroundDark,
     onBackground = TextPrimaryDark,
     
-    surface = SurfaceDark,
+    surface = GlassSurfaceDark,
     onSurface = TextPrimaryDark,
     surfaceVariant = SurfaceVariantDark,
     onSurfaceVariant = TextSecondaryDark,
     
     outline = TextTertiaryDark,
-    outlineVariant = Color(0xFF475569),
+    outlineVariant = Color(0xFF334155),
     
-    inverseSurface = SurfaceLight,
+    inverseSurface = GlassSurfaceLight,
     inverseOnSurface = TextPrimaryLight,
-    inversePrimary = Primary,
+    inversePrimary = GlassPrimary,
     
-    surfaceTint = PrimaryLight,
-    scrim = Color.Black
+    surfaceTint = GlassPrimaryLight,
+    scrim = Color.Black.copy(alpha = 0.8f)
 )
 
-// Premium gradient brush for backgrounds - Updated with brighter colors
+// Premium gradient brush for backgrounds
 val PremiumGradient = Brush.verticalGradient(
-    colors = listOf(GradientStart, GradientMiddle, GradientEnd)
+    colors = listOf(GradientPrimaryStart.copy(alpha = 0.15f), GlassBackgroundLight)
+)
+
+val PremiumDarkGradient = Brush.verticalGradient(
+    colors = listOf(GlassBackgroundDark, Color(0xFF1E1B4B)) // To deep indigo
 )
 
 val PremiumHorizontalGradient = Brush.horizontalGradient(
-    colors = listOf(GradientStart, GradientEnd)
+    colors = listOf(GradientPrimaryStart, GradientPrimaryEnd)
 )
 
 val CardGradient = Brush.linearGradient(
     colors = listOf(
-        Primary.copy(alpha = 0.9f),
-        Secondary.copy(alpha = 0.9f)
+        GlassPrimary.copy(alpha = 0.9f),
+        GlassAccentPurple.copy(alpha = 0.9f)
     )
 )
 
@@ -133,7 +137,8 @@ fun ParentalGuardTheme(
             val activityContext = view.context
             if (activityContext is Activity) {
                 val window = activityContext.window
-                window.statusBarColor = if (darkTheme) BackgroundDark.toArgb() else Primary.toArgb()
+                window.statusBarColor = Color.Transparent.toArgb() // Transparent for edge-to-edge
+                WindowCompat.setDecorFitsSystemWindows(window, false) // Enable edge-to-edge
                 WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
             }
         }

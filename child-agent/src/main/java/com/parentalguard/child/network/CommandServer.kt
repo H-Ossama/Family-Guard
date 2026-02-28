@@ -40,7 +40,7 @@ class CommandServer(private val context: Context) {
     fun start() {
         if (server != null) return
 
-        server = embeddedServer(Netty, port = 8080) {
+        server = embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
             install(WebSockets) {
                 pingPeriod = Duration.ofSeconds(15)
                 timeout = Duration.ofSeconds(15)
@@ -201,6 +201,11 @@ class CommandServer(private val context: Context) {
                             Log.i("CommandServer", "Language sync received: ${packet.languageCode}")
                             // We can use this to update localized strings if needed, or just ACK
                             call.respond(Packet.Response(true, "Language synced"))
+                        } else if (packet.commandType == CommandType.SET_RELAY_PARENT_ID && packet.relayParentId != null) {
+                            Log.i("CommandServer", "Relay Parent ID received: ${packet.relayParentId}")
+                            val prefs = this@CommandServer.context.getSharedPreferences("relay_prefs", Context.MODE_PRIVATE)
+                            prefs.edit().putString("parent_id", packet.relayParentId).apply()
+                            call.respond(Packet.Response(true, "Relay Parent ID updated"))
                         } else {
                              call.respond(Packet.Response(false, "Invalid command"))
                         }

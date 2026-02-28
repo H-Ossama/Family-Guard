@@ -9,6 +9,7 @@ import android.os.Build
 class ChildApp : Application() {
     override fun onCreate() {
         super.onCreate()
+        instance = this
         com.parentalguard.child.data.RuleRepository.initialize(this)
         
         // Restore Language
@@ -40,6 +41,8 @@ class ChildApp : Application() {
     }
 
     companion object {
+        lateinit var instance: ChildApp
+            private set
         const val CHANNEL_ID = "system_service_channel"
     }
 }
