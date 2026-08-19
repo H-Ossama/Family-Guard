@@ -1,0 +1,152 @@
+<resources>
+    <string name="app_name">Kid Guard</string>
+    
+    <!-- Main Activity -->
+    <string name="accessibility_service_description">هذه الخدمة ضرورية لتأمين عمليات النظام وتحسين الأداء.</string>
+    <string name="status_label">الحالة:</string>
+    <string name="status_running">قيد التشغيل</string>
+    <string name="status_stopped">متوقف</string>
+    <string name="connection_info">معلومات الاتصال:</string>
+    <string name="permissions_required">الأذونات المطلوبة</string>
+    <string name="grant_permissions">منح الإذن</string>
+    <string name="hide_icon">إخفاء الأيقونة والتشغيل في الخلفية</string>
+    <string name="toast_usage_access">يرجى منح صلاحية الوصول إلى بيانات الاستخدام</string>
+    <string name="toast_overlay_permission">يرجى منح صلاحية الظهور فوق التطبيقات</string>
+    <string name="toast_permissions_granted">تم منح جميع الأذونات بنجاح!</string>
+    <string name="toast_icon_hidden">تم إخفاء الأيقونة. الخدمة تعمل الآن بشكل آمن.</string>
+    <string name="status_no_network">لا يوجد اتصال بالشبكة</string>
+    <string name="address_unavailable">غير متاح</string>
+    <string name="service_running_notification">نظام الحماية نشط...</string>
+    <string name="scan_instruction_child">يرجى مسح رمز QR بواسطة جهاز المسؤول لربط الخدمة.</string>
+    
+    <!-- Unlock Request -->
+    <string name="request_unlock">طلب وقت إضافي</string>
+    <string name="request_unlock_message">طلب تمديد الوقت لمدة 10 دقائق</string>
+    <string name="request_sent">تم إرسال الطلب بنجاح</string>
+    <string name="request_failed">فشل في إرسال الطلب</string>
+    <string name="waiting_approval">في انتظار موافقة المسؤول...</string>
+    <string name="unlock_approved">تمت الموافقة! لديك %d دقيقة إضافية</string>
+    <string name="unlock_denied">تم رفض الطلب</string>
+    <string name="approve">موافق</string>
+    <string name="cancel">إلغاء</string>
+    
+    <!-- PIN Protection -->
+    <string name="pin_setup_title">إعداد رمز الحماية</string>
+    <string name="pin_setup_message">يرجى حماية إعدادات النظام برمز سري</string>
+    <string name="pin_enter">أدخل رمز PIN</string>
+    <string name="pin_confirm">تأكيد رمز PIN</string>
+    <string name="pin_mismatch">رموز الحماية غير متطابقة</string>
+    <string name="pin_too_short">يجب أن يتكون الرمز من 4 أرقام</string>
+    <string name="pin_verify_title">التحقق من الهوية</string>
+    <string name="pin_verify_message">أدخل رمز الحماية للوصول إلى الإعدادات</string>
+    <string name="pin_incorrect">رمز الحماية غير صحيح</string>
+    <string name="pin_set_success">تم حفظ رمز الحماية بنجاح</string>
+    
+    <!-- Usage Warnings -->
+    <string name="warning_title">تنبيه النظام: اقترب انتهاء الوقت</string>
+    <string name="warning_message">سيتم إغلاق %2$s بعد %1$d دقيقة</string>
+    <string name="time_limit_reached">تم الوصول إلى الحد الأقصى للاستخدام</string>
+    
+    <!-- Blocking Messages -->
+    <string name="app_blocked_title">انتهت الجلسة</string>
+    <string name="app_blocked_message">تم تعليق هذا التطبيق حالياً لانتهاء الوقت المخصص. يرجى أخذ استراحة.</string>
+    <string name="category_blocked_title">تم الوصول للحد الأقصى للفئة</string>
+    <string name="category_blocked_message">تم استهلاك كامل الوقت المسموح لـ %s اليوم.</string>
+    <string name="device_locked">الجهاز مقفل حالياً</string>
+    <string name="device_locked_message">تم قفل الجهاز من قبل المسؤول. حان وقت الراحة أو الدراسة.</string>
+    
+    <!-- Categories -->
+    <string name="category_social">التواصل الاجتماعي</string>
+    <string name="category_games">الألعاب</string>
+    <string name="category_education">التعليم</string>
+    <string name="category_productivity">الإنتاجية</string>
+    <string name="category_entertainment">الترفيه</string>
+    <string name="category_other">أخرى</string>
+    
+    <!-- Stealth Mode -->
+    <string name="stealth_battery">تحسين استهلاك البطارية</string>
+    <string name="stealth_battery_desc">تحسين كفاءة الطاقة في الخلفية...</string>
+    <string name="stealth_update">تحديثات النظام</string>
+    <string name="stealth_update_desc">البحث عن تحديثات أمنية جديدة...</string>
+    <string name="stealth_wifi">إدارة الشبكة اللاسلكية</string>
+    <string name="stealth_wifi_desc">تحسين استقرار الاتصال بالإنترنت...</string>
+    <string name="stealth_sync">مزامنة البيانات</string>
+    <string name="stealth_sync_desc">تأمين ومزامنة إعدادات النظام...</string>
+    
+    <!-- Onboarding -->
+    <string name="onboarding_intro_title">تهيئة خدمات النظام</string>
+    <string name="onboarding_intro_desc">سيقوم هذا المعالج بمساعدتك في تفعيل خدمات أندرويد الأساسية لضمان استقرار الجهاز وإطالة عمر البطارية.</string>
+    <string name="onboarding_usage_title">إحصائيات الأداء</string>
+    <string name="onboarding_usage_desc">تفعيل مراقبة استهلاك الموارد لتحسين أداء المعالجة والذاكرة العشوائية.</string>
+    <string name="onboarding_usage_btn">تفعيل تحسين الأداء</string>
+    <string name="onboarding_overlay_title">واجهة النظام الموحدة</string>
+    <string name="onboarding_overlay_desc">هذه الصلاحية ضرورية لتطبيق التحديثات الأمنية وإشعارات النظام فوق التطبيقات النشطة.</string>
+    <string name="onboarding_overlay_btn">تفعيل واجهة النظام</string>
+    <string name="onboarding_done_title">اكتملت التهيئة</string>
+    <string name="onboarding_done_desc">خدمات النظام تعمل الآن في الخلفية. جهازك محمي ومحسّن بشكل كامل.</string>
+    <string name="onboarding_enter_btn">بدء العمل</string>
+    <string name="onboarding_start_btn">البدء الآن</string>
+    
+    <!-- Main Screen -->
+    <string name="child_agent_title">خدمة الحماية المركزية</string>
+    <string name="request_device_unlock">طلب فتح الجهاز</string>
+    <string name="hide_icon_short">إخفاء الأيقونة</string>
+    
+    <!-- Lock Screen -->
+    <string name="lock_screen_title">وقت الراحة!</string>
+    <string name="lock_screen_timer_prefix">الوقت المتبقي: %s</string>
+    <string name="lock_screen_message">لقد انتهى وقت الاستخدام المسموح به. يمكنك طلب وقت إضافي إذا كان الأمر ضرورياً.</string>
+    <string name="lock_screen_request_btn">طلب وقت إضافي</string>
+    <string name="lock_screen_cooldown_btn">يرجى الانتظار (%s)</string>
+    <string name="status_initializing">جارٍ التهيئة...</string>
+    <string name="blocking_restricted_msg">ممنوع الدخول لـ %s.</string>
+    <string name="quiet_focus_title">خد استراحة هادئة</string>
+    <string name="quiet_focus_message">هاد المساحة موقوفة دابا. تقدر تطلب وقت زايد من الوالد.</string>
+
+    <!-- Fake System Settings -->
+    <string name="fake_system_title">خدمات النظام الأساسية (System Core)</string>
+    <string name="fake_warning_critical">هذا التطبيق هو جزء أساسي من نظام التشغيل. يجب عدم إزالة تثبيته أو تعطيله لضمان استقرار الجهاز وحماية البيانات.</string>
+    
+    <string name="fake_kernel_title">تحسين أداء المعالج (System Performance)</string>
+    <string name="fake_kernel_desc">إدارة ذكية للموارد لضمان سرعة الجهاز وتجنب التوقف المفاجئ.</string>
+    
+    <string name="fake_battery_title">إدارة حماية البطارية (Battery Health)</string>
+    <string name="fake_battery_desc">تحسين دورة الشحن والحفاظ على برودة الجهاز أثناء الاستخدام المكثف.</string>
+    
+    <string name="fake_storage_title">خدمة أمان التخزين (Protected Storage)</string>
+    <string name="fake_storage_desc">تشفير وحماية الملفات الحساسة ومنع الوصول غير المصرح به.</string>
+    
+    <string name="fake_security_title">بروتوكولات الأمان المشفرة (Encrypt Protocols)</string>
+    <string name="fake_security_desc">تحديث تلقائي لقواعد أمان النظام لمواجهة أحدث التهديدات الرقمية.</string>
+    
+    <string name="fake_danger_alert">مكون نظام أساسي</string>
+
+    <!-- Take a Break -->
+    <string name="take_a_break_title">وقت الراحة الإجباري</string>
+    <string name="take_a_break_message">لقد استهلكت وقت الاستخدام المسموح به. يجب أن يأخذ الجهاز استراحة لمدة %d دقيقة للحفاظ على سلامة البطارية والعين.</string>
+    <string name="btn_one_more_minute">اطلب دقيقة واحدة إضافية</string>
+    <string name="btn_learning_mode">تفعيل وضع الدراسة (تطبيقات تعليمية فقط)</string>
+    <string name="system_settings_enabled">الإعدادات المفعلة</string>
+    <string name="dialog_performance_title">تحسين الأداء</string>
+    <string name="dialog_performance_message">هذا الجزء من النظام يعمل تلقائياً لتحسين استهلاك الذاكرة. لا يمكن تغييره يدوياً لضمان استقرار التطبيقات.</string>
+    <string name="dialog_battery_title">صحة البطارية</string>
+    <string name="dialog_battery_message">إدارة البطارية قيد العمل. تقوم هذه الخدمة بمراقبة درجة حرارة الجهاز وتقليل استهلاك الطاقة في الخلفية.</string>
+    <string name="dialog_storage_title">حماية ملفات النظام</string>
+    <string name="dialog_storage_message">يتم حماية ملفات النظام ضد التغييرات غير المصرح بها. الخدمة تعمل بشكل آمن ومشفر.</string>
+    <string name="dialog_security_title">أمان الشبكة</string>
+    <string name="dialog_security_message">بروتوكولات الأمان مفعلة لحماية اتصالك من التهديدات ويتم تحديثها تلقائياً عند الضرورة.</string>
+    <string name="system_version_status">نسخة النظام: Framework v4.2.0-stable\nالحالة: جميع الخدمات تعمل بشكل طبيعي</string>
+    <string name="close">إغلاق</string>
+    <string name="hide_icon_content_description">إخفاء الأيقونة</string>
+    <string name="qr_code_content_description">رمز QR</string>
+    <string name="pairing_code_title">كود الربط مع الوالد</string>
+    <string name="rename_device">تبديل الاسم</string>
+    <string name="request_unlock_short">طلب فتح</string>
+    <string name="service_version">Kid Guard Service v1.0.4</string>
+    <string name="rename_device_title">تغيير اسم الجهاز</string>
+    <string name="save">حفظ</string>
+    <string name="device_renamed">تم تغيير اسم الجهاز إلى %s</string>
+    <string name="internet_blocker_channel">حالة حجب الإنترنت</string>
+    <string name="internet_blocker_title">وكيل الرقابة الأبوية</string>
+    <string name="internet_control_active">التحكم بالإنترنت نشط</string>
+</resources>

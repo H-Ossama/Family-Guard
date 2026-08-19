@@ -12,17 +12,6 @@ class ChildApp : Application() {
         instance = this
         com.parentalguard.child.data.RuleRepository.initialize(this)
         
-        // Restore Language
-        val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        val languageCode = prefs.getString("language_code", null)
-        if (languageCode != null) {
-            val locale = java.util.Locale(languageCode)
-            java.util.Locale.setDefault(locale)
-            val config = android.content.res.Configuration()
-            config.setLocale(locale)
-            resources.updateConfiguration(config, resources.displayMetrics)
-        }
-        
         createNotificationChannel()
     }
 

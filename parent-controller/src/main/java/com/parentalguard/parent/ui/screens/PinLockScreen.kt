@@ -1,8 +1,17 @@
 package com.parentalguard.parent.ui.screens
 
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -10,200 +19,130 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.parentalguard.parent.R
-import com.parentalguard.parent.ui.components.LiquidGlassButton
-import com.parentalguard.parent.ui.components.LiquidGlassCard
-import com.parentalguard.parent.ui.theme.*
+import com.parentalguard.parent.security.BiometricHelper
+import com.parentalguard.parent.security.PinManager
+import com.parentalguard.parent.ui.neumorphic.Nm
+import com.parentalguard.parent.ui.neumorphic.NeumorphicBackground
+import com.parentalguard.parent.ui.neumorphic.NeumorphicButton
+import com.parentalguard.parent.ui.neumorphic.NeumorphicCard
+import com.parentalguard.parent.ui.neumorphic.neumorphic
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PinLockScreen(
-    onUnlocked: () -> Unit
-) {
-    var pinInput by remember { mutableStateOf("") }
+fun PinLockScreen(onUnlocked: () -> Unit) {
+    var pin by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
-    
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
+    val activity = context as? androidx.fragment.app.FragmentActivity
+    val biometricAvailable = remember { activity?.let { BiometricHelper.isBiometricAvailable(it) } ?: false }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = PremiumGradient
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        // Background decorative circles
-        Box(
-            modifier = Modifier
-                .size(400.dp)
-                .offset(x = (-100).dp, y = (-200).dp)
-                .background(Color.White.copy(alpha = 0.05f), CircleShape)
-        )
-        Box(
-            modifier = Modifier
-                .size(300.dp)
-                .offset(x = 150.dp, y = 250.dp)
-                .background(Color.White.copy(alpha = 0.05f), CircleShape)
-        )
+    fun requestBiometric() {
+        activity?.let { BiometricHelper.showBiometricPrompt(it, onSuccess = onUnlocked, onError = { error = it }) }
+    }
+    LaunchedEffect(biometricAvailable) { if (biometricAvailable) requestBiometric() }
 
-        LiquidGlassCard(
+    NeumorphicBackground {
+        Column(
             modifier = Modifier
-                .fillMaxWidth(0.9f)
-                .padding(16.dp),
-            backgroundColor = Color.White.copy(alpha = 0.9f),
-            padding = 32.dp
+                .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+            Box(
+                modifier = Modifier
+                    .size(96.dp)
+                    .neumorphic(shape = CircleShape, backgroundColor = Nm.surface, elevation = 9.dp),
+                contentAlignment = Alignment.Center
             ) {
-                // Lock Icon with Pulse
-                Box(contentAlignment = Alignment.Center) {
-                    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
-                    val pulseScale by infiniteTransition.animateFloat(
-                        initialValue = 1f,
-                        targetValue = 1.2f,
-                        animationSpec = infiniteRepeatable(tween(2000), RepeatMode.Reverse),
-                        label = "scale"
-                    )
-                    
-                    Box(
-                        modifier = Modifier
-                            .size(72.dp)
-                            .scale(pulseScale)
-                            .clip(CircleShape)
-                            .background(LiquidBlue.copy(alpha = 0.1f))
-                    )
-                    
-                    Box(
-                        modifier = Modifier
-                            .size(64.dp)
-                            .clip(CircleShape)
-                            .background(Brush.linearGradient(listOf(LiquidBlue, LiquidTeal))),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Lock,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
-                }
-                
+                Icon(Icons.Default.Lock, null, tint = Nm.primary, modifier = Modifier.size(40.dp))
+            }
+            Spacer(Modifier.height(24.dp))
+            NeumorphicCard(modifier = Modifier.fillMaxWidth(), corner = 30.dp, padding = 24.dp) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "App Locked",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Black,
-                        color = LiquidBlue
-                    )
-                    Text(
-                        text = "Enter your security PIN to continue",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                OutlinedTextField(
-                    value = pinInput,
-                    onValueChange = { 
-                        if (it.length <= 6) {
-                            pinInput = it
-                            error = null
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("6-digit PIN", color = Color.Gray) },
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                    singleLine = true,
-                    shape = RoundedCornerShape(16.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = LiquidBlue,
-                        unfocusedBorderColor = Color.LightGray.copy(alpha = 0.3f),
-                        focusedContainerColor = Color.White.copy(alpha = 0.5f),
-                        unfocusedContainerColor = Color.White.copy(alpha = 0.3f)
-                    ),
-                    textStyle = MaterialTheme.typography.headlineSmall.copy(
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                        letterSpacing = 8.sp,
-                        fontWeight = FontWeight.Black
-                    )
-                )
-
-                if (error != null) {
-                    Text(
-                        text = error!!,
-                        color = Error,
-                        style = MaterialTheme.typography.labelSmall,
+                        text = stringResource(R.string.title_app_locked),
+                        color = Nm.onSurface,
+                        style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold
                     )
-                }
-
-                val activity = context as? androidx.fragment.app.FragmentActivity
-                val biometricsAvailable = remember { activity?.let { com.parentalguard.parent.security.BiometricHelper.isBiometricAvailable(it) } ?: false }
-
-                LaunchedEffect(Unit) {
-                    if (biometricsAvailable && activity != null) {
-                        com.parentalguard.parent.security.BiometricHelper.showBiometricPrompt(
-                            activity = activity,
-                            onSuccess = { onUnlocked() },
-                            onError = { /* Keep using PIN as fallback */ }
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        text = stringResource(R.string.desc_enter_pin),
+                        textAlign = TextAlign.Center,
+                        color = Nm.onSurfaceMuted,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(Modifier.height(24.dp))
+                    OutlinedTextField(
+                        value = pin,
+                        onValueChange = { if (it.length <= 6) { pin = it; error = null } },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text(stringResource(R.string.label_pin)) },
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                        singleLine = true,
+                        shape = RoundedCornerShape(18.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Nm.onSurface,
+                            unfocusedTextColor = Nm.onSurface,
+                            focusedBorderColor = Nm.primary,
+                            unfocusedBorderColor = Nm.darkShadow.copy(alpha = 0.5f),
+                            focusedContainerColor = Nm.inset,
+                            unfocusedContainerColor = Nm.inset,
+                            focusedLabelColor = Nm.primary,
+                            unfocusedLabelColor = Nm.onSurfaceMuted,
+                            cursorColor = Nm.primary
+                        )
+                    )
+                    if (error != null) {
+                        Text(
+                            text = error!!,
+                            color = Nm.danger,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(top = 8.dp)
                         )
                     }
-                }
-
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    LiquidGlassButton(
-                        text = "Unlock",
+                    Spacer(Modifier.height(16.dp))
+                    NeumorphicButton(
+                        text = stringResource(R.string.action_unlock),
                         onClick = {
-                            val isValid = com.parentalguard.parent.security.PinManager.verifyPin(context, pinInput)
-                            if (isValid) {
-                                onUnlocked()
-                            } else {
-                                error = "Invalid PIN, please try again."
-                                pinInput = ""
-                            }
+                            if (PinManager.verifyPin(context, pin)) onUnlocked()
+                            else { error = context.getString(R.string.error_invalid_pin); pin = "" }
                         },
-                        modifier = Modifier.fillMaxWidth().height(56.dp),
                         icon = Icons.Default.LockOpen,
-                        gradient = LiquidGradientPrimary
+                        modifier = Modifier.fillMaxWidth()
                     )
-
-                    if (biometricsAvailable) {
-                        LiquidGlassButton(
-                            text = "Use Biometrics",
-                            onClick = {
-                                activity?.let {
-                                    com.parentalguard.parent.security.BiometricHelper.showBiometricPrompt(
-                                        activity = it,
-                                        onSuccess = { onUnlocked() },
-                                        onError = { msg -> error = msg }
-                                    )
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                    if (biometricAvailable) {
+                        Spacer(Modifier.height(10.dp))
+                        NeumorphicButton(
+                            text = stringResource(R.string.action_unlock_biometric),
+                            onClick = ::requestBiometric,
                             icon = Icons.Default.Fingerprint,
-                            backgroundColor = Color.White,
-                            textColor = LiquidBlue
+                            inset = true,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }

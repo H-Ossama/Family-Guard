@@ -9,6 +9,7 @@ enum class AppCategory {
     EDUCATION,   // Educational apps
     PRODUCTIVITY,// Productivity apps (Office, Notes, etc.)
     ENTERTAINMENT, // Entertainment (YouTube, Netflix, etc.)
+    SYSTEM,      // Built-in Android/system apps, hidden from the normal app list
     OTHER        // Uncategorized apps
 }
 

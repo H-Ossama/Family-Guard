@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,6 +25,7 @@ import com.parentalguard.child.R
 fun FakeSystemSettings(
     onTitleClick: () -> Unit
 ) {
+    val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
     var dialogTitle by remember { mutableStateOf("") }
     var dialogMessage by remember { mutableStateOf("") }
@@ -38,8 +40,8 @@ fun FakeSystemSettings(
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF1976D2), // Professional Blue
-                    titleContentColor = Color.White
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface
                 )
             )
         },
@@ -55,7 +57,7 @@ fun FakeSystemSettings(
             // Professional System Info Card
             Card(
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFE3F2FD) // Light Blue background
+                    containerColor = MaterialTheme.colorScheme.primary
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -68,13 +70,13 @@ fun FakeSystemSettings(
                     Icon(
                         imageVector = Icons.Default.Info,
                         contentDescription = null,
-                        tint = Color(0xFF1976D2),
+                        tint = Color.White,
                         modifier = Modifier.size(32.dp)
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(
                         text = stringResource(R.string.fake_warning_critical),
-                        color = Color.Black,
+                        color = Color.White,
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium
                     )
@@ -82,7 +84,7 @@ fun FakeSystemSettings(
             }
 
             Text(
-                text = "الإعدادات المفعلة",
+                text = stringResource(R.string.system_settings_enabled),
                 color = MaterialTheme.colorScheme.primary,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
@@ -94,8 +96,8 @@ fun FakeSystemSettings(
                 description = stringResource(R.string.fake_kernel_desc),
                 icon = Icons.Default.SettingsSuggest,
                 onClick = {
-                    dialogTitle = "تحسين الأداء"
-                    dialogMessage = "هذا الجزء من النظام يعمل تلقائياً لتحسين استهلاك الذاكرة. لا يمكن تغييره يدوياً لضمان استقرار التطبيقات."
+                    dialogTitle = context.getString(R.string.dialog_performance_title)
+                    dialogMessage = context.getString(R.string.dialog_performance_message)
                     showDialog = true
                 }
             )
@@ -105,8 +107,8 @@ fun FakeSystemSettings(
                 description = stringResource(R.string.fake_battery_desc),
                 icon = Icons.Default.BatteryChargingFull,
                 onClick = {
-                    dialogTitle = "صحة البطارية"
-                    dialogMessage = "إدارة البطارية قيد العمل. تقوم هذه الخدمة بمراقبة درجة حرارة الجهاز وتقليل استهلاك الطاقة في الخلفية."
+                    dialogTitle = context.getString(R.string.dialog_battery_title)
+                    dialogMessage = context.getString(R.string.dialog_battery_message)
                     showDialog = true
                 }
             )
@@ -116,8 +118,8 @@ fun FakeSystemSettings(
                 description = stringResource(R.string.fake_storage_desc),
                 icon = Icons.Default.VerifiedUser,
                 onClick = {
-                    dialogTitle = "حماية ملفات النظام"
-                    dialogMessage = "يتم حماية ملفات النظام ضد التغييرات غير المصرح بها. الخدمة تعمل بشكل آمن ومشفر."
+                    dialogTitle = context.getString(R.string.dialog_storage_title)
+                    dialogMessage = context.getString(R.string.dialog_storage_message)
                     showDialog = true
                 }
             )
@@ -127,8 +129,8 @@ fun FakeSystemSettings(
                 description = stringResource(R.string.fake_security_desc),
                 icon = Icons.Default.Shield,
                 onClick = {
-                    dialogTitle = "أمان الشبكة"
-                    dialogMessage = "بروتوكولات الأمان مفعلة لحماية اتصالك من التهديدات. يتم التحديث تلقائياً عند الضرورة."
+                    dialogTitle = context.getString(R.string.dialog_security_title)
+                    dialogMessage = context.getString(R.string.dialog_security_message)
                     showDialog = true
                 }
             )
@@ -136,8 +138,8 @@ fun FakeSystemSettings(
             Spacer(modifier = Modifier.height(32.dp))
             
             Text(
-                text = "نسخة النظام: Framework v4.2.0-stable\nالحالة: جميع الخدمات تعمل بشكل طبيعي",
-                color = Color.Gray.copy(alpha = 0.6f),
+                text = stringResource(R.string.system_version_status),
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                 fontSize = 11.sp,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
@@ -148,11 +150,31 @@ fun FakeSystemSettings(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text(text = dialogTitle, color = Color(0xFF1976D2), fontWeight = FontWeight.Bold) },
-            text = { Text(text = dialogMessage) },
+            shape = MaterialTheme.shapes.large,
+            containerColor = MaterialTheme.colorScheme.surface,
+            tonalElevation = 6.dp,
+            title = {
+                Text(
+                    text = dialogTitle,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(
+                    text = dialogMessage,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
             confirmButton = {
                 TextButton(onClick = { showDialog = false }) {
-                    Text("إغلاق", color = Color(0xFF1976D2))
+                    Text(
+                        stringResource(R.string.close),
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
             }
         )
@@ -196,7 +218,7 @@ fun SettingItem(
         Icon(
             imageVector = Icons.Default.ChevronRight,
             contentDescription = null,
-            tint = Color.Gray.copy(alpha = 0.4f)
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
         )
     }
     Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))

@@ -41,11 +41,25 @@ class DeviceClient(context: Context? = null) {
 
     private val cloudRelay = context?.let { CloudRelayClient(it).apply { start() } }
 
+    private val bluetoothClient = BluetoothClient(context)
+    private val bluetoothMacs = java.util.concurrent.ConcurrentHashMap<String, String>() // deviceId -> BT MAC
+
+    fun registerBluetoothMac(deviceId: String, mac: String) {
+        bluetoothMacs[deviceId] = mac
+    }
+
+    private val pairTokens = java.util.concurrent.ConcurrentHashMap<String, String>() // deviceId -> pairing token
+
+    fun registerPairToken(deviceId: String, token: String) {
+        pairTokens[deviceId] = token
+    }
+
     fun observeEvents(ip: String, port: Int, deviceId: String? = null): Flow<Packet.Event> {
+        val wsPath = deviceId?.let { pairTokens[it] }?.let { "/events?token=$it" } ?: "/events"
         val localFlow = flow {
             while (currentCoroutineContext().isActive) {
                 try {
-                    client.webSocket(method = HttpMethod.Get, host = ip, port = port, path = "/events") {
+                    client.webSocket(method = HttpMethod.Get, host = ip, port = port, path = wsPath) {
                         for (frame in incoming) {
                             if (frame is Frame.Text) {
                                 val text = frame.readText()
@@ -85,9 +99,15 @@ class DeviceClient(context: Context? = null) {
         isGet: Boolean = false,
         skipDirect: Boolean = false
     ): DeviceResponse<Packet.Response> = withContext(Dispatchers.IO) {
+        // Devices paired purely over Bluetooth use a placeholder IP (0.0.0.0);
+        // the direct HTTP tier can never reach them, so go straight to RFCOMM.
+        val btMac = deviceId?.let { bluetoothMacs[it] }
+        val bluetoothOnly = btMac != null && (ip.isBlank() || ip == "0.0.0.0")
+
         // 1. Try Direct Connection
-        if (!skipDirect) {
+        if (!skipDirect && !bluetoothOnly) {
             try {
+                val token = deviceId?.let { pairTokens[it] }
                 val response: Packet.Response? = withTimeoutOrNull(5000) { // Increased to 5s
                     client.request {
                         method = if (isGet) HttpMethod.Get else HttpMethod.Post
@@ -97,6 +117,7 @@ class DeviceClient(context: Context? = null) {
                             this.port = port
                             path(endpoint.trimStart('/'))
                         }
+                        if (token != null) header("X-Pair-Token", token)
                         if (isGet) {
                             if (command.includeIcons == true) parameter("includeIcons", "true")
                         } else {
@@ -116,7 +137,24 @@ class DeviceClient(context: Context? = null) {
             }
         }
 
-        // 2. Try Cloud Relay Fallback
+        // 2. Try Bluetooth Fallback (same WiFi not required)
+        if (btMac != null) {
+            try {
+                val btResponse = withTimeoutOrNull(6000) {
+                    bluetoothClient.executeCommand(btMac, command, deviceId?.let { pairTokens[it] })
+                }
+                if (btResponse != null) {
+                    Log.i("DeviceClient", "Bluetooth connection success for $deviceId")
+                    return@withContext DeviceResponse(btResponse, com.parentalguard.parent.viewmodel.ConnectionType.BLUETOOTH)
+                } else {
+                    Log.w("DeviceClient", "Bluetooth connection failed for $deviceId")
+                }
+            } catch (e: Exception) {
+                Log.w("DeviceClient", "Bluetooth connection error for $deviceId: ${e.message}")
+            }
+        }
+
+        // 3. Try Cloud Relay Fallback
         if (deviceId != null && cloudRelay != null) {
             val relayResponse = cloudRelay.sendCommand(deviceId, command)
             if (relayResponse != null) {
@@ -135,7 +173,19 @@ class DeviceClient(context: Context? = null) {
         skipDirect: Boolean = false
     ): DeviceResponse<Packet.Response> {
         val command = Packet.Command(CommandType.GET_STATS, includeIcons = includeIcons)
-        return executeCommand(ip, port, deviceId, "/stats", command, isGet = true, skipDirect = skipDirect)
+        val first = executeCommand(ip, port, deviceId, "/stats", command, isGet = true, skipDirect = skipDirect)
+        // App-icon payloads can exceed the Bluetooth framing limit (64 KB), which
+        // fails the whole frame. Retry once without icons so usage and settings
+        // still load over an RFCOMM-only link.
+        if (includeIcons && first.response == null) {
+            val retry = executeCommand(
+                ip, port, deviceId, "/stats",
+                Packet.Command(CommandType.GET_STATS, includeIcons = false),
+                isGet = true, skipDirect = skipDirect
+            )
+            if (retry.response != null) return retry
+        }
+        return first
     }
 
     suspend fun getStats(ip: String, port: Int, deviceId: String?, includeIcons: Boolean = false): Packet.Response? {
@@ -144,6 +194,19 @@ class DeviceClient(context: Context? = null) {
 
     suspend fun updateRules(ip: String, port: Int, deviceId: String? = null, rules: List<BlockingRule>): Packet.Response? {
         val command = Packet.Command(CommandType.UPDATE_RULES, ruleSet = RuleSet(rules))
+        return executeCommand(ip, port, deviceId, "/rules", command).response
+    }
+
+    suspend fun setBlockingScreenStyle(
+        ip: String,
+        port: Int,
+        deviceId: String? = null,
+        style: BlockingScreenStyle
+    ): Packet.Response? {
+        val command = Packet.Command(
+            commandType = CommandType.SET_BLOCKING_SCREEN_STYLE,
+            blockingScreenStyle = style
+        )
         return executeCommand(ip, port, deviceId, "/rules", command).response
     }
     
@@ -180,11 +243,11 @@ class DeviceClient(context: Context? = null) {
     suspend fun syncRelayParentId(ip: String, port: Int): Packet.Response? {
         val parentId = cloudRelay?.parentId ?: return null
         val command = Packet.Command(CommandType.SET_RELAY_PARENT_ID, relayParentId = parentId)
-        return executeCommand(ip, port, null, "/lock", command).response
+        return executeCommand(ip, port, null, "/device-name", command).response
     }
     
     suspend fun getDailyReport(ip: String, port: Int, deviceId: String? = null): Packet.Response? {
-        val command = Packet.Command(CommandType.GET_STATS) // Wrapper for report if needed, but CommandServer has /daily-report
+        val command = Packet.Command(CommandType.SEND_DAILY_REPORT)
         // For now, let's keep it simple. If we need purely cloud, we might need a GET_DAILY_REPORT command type.
         return executeCommand(ip, port, deviceId, "/daily-report", command, isGet = true).response
     }
@@ -255,6 +318,15 @@ class DeviceClient(context: Context? = null) {
     suspend fun setLanguage(ip: String, port: Int, deviceId: String? = null, languageCode: String): Packet.Response? {
         val command = Packet.Command(CommandType.SET_LANGUAGE, languageCode = languageCode)
         return executeCommand(ip, port, deviceId, "/device-name", command).response
+    }
+
+    suspend fun sendDeviceOwnerCommand(
+        ip: String,
+        port: Int,
+        deviceId: String? = null,
+        command: Packet.Command
+    ): Packet.Response? {
+        return executeCommand(ip, port, deviceId, "/device-owner", command).response
     }
 }
 

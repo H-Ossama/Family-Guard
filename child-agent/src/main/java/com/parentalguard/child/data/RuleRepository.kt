@@ -4,6 +4,7 @@ import android.content.Context
 import com.parentalguard.common.model.BlockingRule
 import com.parentalguard.common.model.CategoryLimit
 import com.parentalguard.common.model.AppCategory
+import com.parentalguard.common.model.BlockingScreenStyle
 import com.parentalguard.common.utils.CategoryMapper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,10 +31,12 @@ object RuleRepository {
             if (isLocked && lockUntil > 0 && lockUntil <= System.currentTimeMillis()) {
                 _globalLock.value = false
                 _globalLockUntil.value = 0
-                manager.saveGlobalLock(false, 0)
+                _lockReason.value = null
+                manager.saveGlobalLock(false, 0, null)
             } else {
                 _globalLock.value = isLocked
                 _globalLockUntil.value = lockUntil
+                _lockReason.value = manager.loadLockReason()
             }
             
             _temporaryUnlockUntil.value = manager.loadTemporaryUnlockUntil()
@@ -48,6 +51,12 @@ object RuleRepository {
             _educationOnly.value = breakData.educationOnly
             _allowExtensions.value = breakData.allowExtensions
             _currentBreakUsageMs.value = manager.loadCurrentBreakUsage()
+            _customCategories.value = manager.loadCustomCategories()
+            _warningsShown.value = manager.loadWarningsShown()
+            _blockingScreenStyle.value = manager.loadBlockingScreenStyle()
+            _deviceOwnerDeviceUsageLimitMs.value = manager.loadOwnerDeviceUsageLimit()
+            _deviceOwnerAppUsageLimits.value = manager.loadOwnerAppUsageLimits()
+            _deviceOwnerUsageSuspended.value = manager.loadOwnerUsageSuspended()
         }
     }
 
@@ -57,6 +66,14 @@ object RuleRepository {
     
     private val _categoryLimits = MutableStateFlow<List<CategoryLimit>>(emptyList())
     val categoryLimits: StateFlow<List<CategoryLimit>> = _categoryLimits.asStateFlow()
+
+    private val _blockingScreenStyle = MutableStateFlow(BlockingScreenStyle.CURRENT)
+    val blockingScreenStyle: StateFlow<BlockingScreenStyle> = _blockingScreenStyle.asStateFlow()
+
+    fun setBlockingScreenStyle(style: BlockingScreenStyle) {
+        _blockingScreenStyle.value = style
+        persistentStateManager?.saveBlockingScreenStyle(style)
+    }
 
     fun updateRules(newRules: List<BlockingRule>) {
         _rules.value = newRules
@@ -105,6 +122,43 @@ object RuleRepository {
     private val _allowExtensions = MutableStateFlow<Boolean>(false)
     val allowExtensions: StateFlow<Boolean> = _allowExtensions.asStateFlow()
 
+    private val _deviceOwnerDeviceUsageLimitMs = MutableStateFlow(0L)
+    val deviceOwnerDeviceUsageLimitMs: StateFlow<Long> = _deviceOwnerDeviceUsageLimitMs.asStateFlow()
+
+    private val _deviceOwnerAppUsageLimits = MutableStateFlow<Map<String, Long>>(emptyMap())
+    val deviceOwnerAppUsageLimits: StateFlow<Map<String, Long>> = _deviceOwnerAppUsageLimits.asStateFlow()
+
+    private val _deviceOwnerUsageSuspended = MutableStateFlow<Set<String>>(emptySet())
+    val deviceOwnerUsageSuspended: StateFlow<Set<String>> = _deviceOwnerUsageSuspended.asStateFlow()
+
+    fun setDeviceOwnerDeviceUsageLimit(limitMs: Long) {
+        _deviceOwnerDeviceUsageLimitMs.value = limitMs.coerceAtLeast(0L)
+        persistentStateManager?.saveOwnerDeviceUsageLimit(_deviceOwnerDeviceUsageLimitMs.value)
+    }
+
+    fun setDeviceOwnerAppUsageLimit(packageName: String, limitMs: Long) {
+        val limits = _deviceOwnerAppUsageLimits.value.toMutableMap()
+        if (limitMs > 0) limits[packageName] = limitMs else limits.remove(packageName)
+        _deviceOwnerAppUsageLimits.value = limits
+        persistentStateManager?.saveOwnerAppUsageLimits(limits)
+    }
+
+    fun markDeviceOwnerUsageSuspended(packageName: String, suspended: Boolean) {
+        val packages = _deviceOwnerUsageSuspended.value.toMutableSet()
+        if (suspended) packages.add(packageName) else packages.remove(packageName)
+        _deviceOwnerUsageSuspended.value = packages
+        persistentStateManager?.saveOwnerUsageSuspended(packages)
+    }
+
+    fun clearDeviceOwnerPolicies() {
+        _deviceOwnerDeviceUsageLimitMs.value = 0L
+        _deviceOwnerAppUsageLimits.value = emptyMap()
+        _deviceOwnerUsageSuspended.value = emptySet()
+        persistentStateManager?.saveOwnerDeviceUsageLimit(0L)
+        persistentStateManager?.saveOwnerAppUsageLimits(emptyMap())
+        persistentStateManager?.saveOwnerUsageSuspended(emptySet())
+    }
+
     fun setBreakRules(limit: Long, duration: Long, warningMs: Long = 0, educationOnly: Boolean = false, allowExtensions: Boolean = false) {
         _usageLimitMs.value = limit
         _breakDurationMs.value = duration
@@ -131,11 +185,13 @@ object RuleRepository {
     fun setGlobalLock(locked: Boolean, reason: String? = null) {
         _globalLock.value = locked
         _lockReason.value = reason
+        // A permanent lock must never retain a stale timed lockUntil, otherwise the
+        // expiry loops in MonitorService/loadPersistedState would auto-unlock it.
+        _globalLockUntil.value = 0
         if (!locked) {
-            _globalLockUntil.value = 0
             _lockReason.value = null
         }
-        persistentStateManager?.saveGlobalLock(locked, _globalLockUntil.value)
+        persistentStateManager?.saveGlobalLock(locked, _globalLockUntil.value, _lockReason.value)
     }
 
     fun setGlobalLockUntil(timestamp: Long, reason: String? = null) {
@@ -148,7 +204,7 @@ object RuleRepository {
              _globalLockUntil.value = 0
              _lockReason.value = null
         }
-        persistentStateManager?.saveGlobalLock(_globalLock.value, _globalLockUntil.value)
+        persistentStateManager?.saveGlobalLock(_globalLock.value, _globalLockUntil.value, _lockReason.value)
     }
     
     // Temporary unlock management
@@ -193,6 +249,7 @@ object RuleRepository {
         val today = android.text.format.DateFormat.format("yyyy-MM-dd", System.currentTimeMillis()).toString()
         current[identifier] = today
         _warningsShown.value = current
+        persistentStateManager?.saveWarningsShown(current)
     }
     
     fun hasWarningBeenShown(identifier: String): Boolean {
@@ -203,6 +260,7 @@ object RuleRepository {
     
     fun clearWarnings() {
         _warningsShown.value = emptyMap()
+        persistentStateManager?.saveWarningsShown(emptyMap())
     }
     
     // Custom Categories Override
@@ -212,11 +270,12 @@ object RuleRepository {
         val current = _customCategories.value.toMutableMap()
         current[packageName] = category
         _customCategories.value = current
+        persistentStateManager?.saveCustomCategories(current)
     }
 
-    fun getCategory(packageName: String): AppCategory {
+    fun getCategory(packageName: String, appLabel: String? = null): AppCategory {
         return _customCategories.value[packageName] 
-            ?: CategoryMapper.getCategoryForPackage(packageName)
+            ?: CategoryMapper.getCategoryForPackage(packageName, appLabel)
     }
 
     // App Timers (One-time allowance)

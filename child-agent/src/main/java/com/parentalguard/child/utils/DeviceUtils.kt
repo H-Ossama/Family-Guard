@@ -26,8 +26,17 @@ object DeviceUtils {
         val apps = pm.getInstalledPackages(0)
         return apps.map { packageInfo ->
             val label = packageInfo.applicationInfo?.loadLabel(pm)?.toString() ?: packageInfo.packageName
-            val isSystem = (packageInfo.applicationInfo?.flags?.and(android.content.pm.ApplicationInfo.FLAG_SYSTEM)) != 0
-            val category = com.parentalguard.common.utils.CategoryMapper.getCategoryForPackage(packageInfo.packageName)
+            val isSystem = packageInfo.applicationInfo?.let {
+                (it.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
+            } == true
+            val category = if (isSystem) {
+                com.parentalguard.common.model.AppCategory.SYSTEM
+            } else {
+                com.parentalguard.common.utils.CategoryMapper.getCategoryForPackage(
+                    packageInfo.packageName,
+                    label
+                )
+            }
             
             var iconBase64: String? = null
             if (includeIcons) {
@@ -86,7 +95,22 @@ object DeviceUtils {
     private const val KEY_CUSTOM_NAME = "custom_device_name"
 
     fun getDeviceName(context: Context): String {
-        return getCustomDeviceName(context) ?: android.os.Build.MODEL
+        return getCustomDeviceName(context)
+            ?: getSystemDeviceName(context)
+            ?: android.os.Build.MODEL
+    }
+
+    /**
+     * This is the human-facing name shown by Android in About device and
+     * nearby-device flows. It is different from Build.MODEL on many tablets.
+     */
+    private fun getSystemDeviceName(context: Context): String? {
+        return runCatching {
+            android.provider.Settings.Global.getString(
+                context.contentResolver,
+                "device_name"
+            )?.trim()?.takeIf { it.isNotEmpty() }
+        }.getOrNull()
     }
 
     fun getCustomDeviceName(context: Context): String? {

@@ -1,26 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:background="#000000">
+    android:background="@color/neu_background">
 
-    <TextView
-        android:id="@+id/tv_blocked_msg"
-        android:layout_width="wrap_content"
+    <androidx.cardview.widget.CardView
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:text="This app is temporarily unavailable."
-        android:textColor="#FFFFFF"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="16dp"/>
-        
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Ask your parent for access."
-        android:textColor="#AAAAAA"
-        android:textSize="16sp"/>
+        android:layout_gravity="center"
+        app:cardBackgroundColor="@color/neu_surface"
+        app:cardCornerRadius="28dp"
+        app:cardElevation="16dp"
+        app:useCompatPadding="true">
 
-</LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="36dp">
+
+            <TextView
+                android:id="@+id/tv_blocked_msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="This app is temporarily unavailable."
+                android:textColor="@color/neu_on_surface"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ask your parent for access."
+                android:textColor="@color/neu_on_surface_muted"
+                android:textSize="16sp"
+                android:gravity="center"/>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</FrameLayout>

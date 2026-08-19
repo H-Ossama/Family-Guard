@@ -1,6 +1,7 @@
 package com.parentalguard.child.service
 
 import android.app.Service
+import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -8,9 +9,12 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.parentalguard.child.ChildApp
 import com.parentalguard.child.network.CommandServer
+import com.parentalguard.child.policy.DeviceOwnerManager
 import com.parentalguard.child.R
 import android.content.pm.ServiceInfo
 import android.os.Build
+import android.os.PowerManager
+import android.os.SystemClock
 import android.util.Log
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -27,15 +31,40 @@ class MonitorService : Service() {
     private lateinit var cloudRelayClient: com.parentalguard.child.network.CloudRelayClient
     private var serviceRegistrar: com.parentalguard.child.network.ServiceRegistrar? = null
     private var lockManager: com.parentalguard.child.ui.LockManager? = null
+    private var bluetoothServer: com.parentalguard.child.network.BluetoothCommandServer? = null
+    private val bluetoothServerLock = Any()
+
+    private val bluetoothStateReceiver = object : android.content.BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            when (intent.action) {
+                BluetoothAdapter.ACTION_STATE_CHANGED -> when (
+                    intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
+                ) {
+                    BluetoothAdapter.STATE_ON -> serviceScope.launch {
+                        ensureBluetoothServer()
+                    }
+                    BluetoothAdapter.STATE_OFF -> bluetoothServer?.stop()
+                }
+            }
+        }
+    }
 
     override fun onCreate() {
         super.onCreate()
         commandServer = CommandServer(this)
         cloudRelayClient = com.parentalguard.child.network.CloudRelayClient(this)
+        val bluetoothFilter = android.content.IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(bluetoothStateReceiver, bluetoothFilter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            @Suppress("DEPRECATION")
+            registerReceiver(bluetoothStateReceiver, bluetoothFilter)
+        }
         
         serviceScope.launch(kotlinx.coroutines.Dispatchers.IO) {
             try {
                 commandServer.start() // Starts on port 8080
+                ensureBluetoothServer()
                 cloudRelayClient.start()
                 serviceRegistrar = com.parentalguard.child.network.ServiceRegistrar(applicationContext)
                 serviceRegistrar?.registerService(8080)
@@ -100,21 +129,38 @@ class MonitorService : Service() {
              registerReceiver(internalReceiver, filter)
         }
         
-        if (!::commandServer.isInitialized) {
+if (!::commandServer.isInitialized) {
              commandServer = com.parentalguard.child.network.CommandServer(applicationContext)
              serviceRegistrar = com.parentalguard.child.network.ServiceRegistrar(applicationContext)
-             
+              
              serviceScope.launch(kotlinx.coroutines.Dispatchers.IO) {
                  try {
-                    commandServer.start() // Starts on port 8080
-                    serviceRegistrar?.registerService(8080)
+                     commandServer.start() // Starts on port 8080
+                     serviceRegistrar?.registerService(8080)
                  } catch (e: Exception) {
                      Log.e("MonitorService", "Failed to start server/service", e)
                  }
              }
+         }
+
+         // Permission grants do not emit a Bluetooth state change. Retry here
+         // when the service receives a new start command after permissions finish.
+         ensureBluetoothServer()
+         
+         return START_STICKY
+     }
+
+    private fun ensureBluetoothServer() {
+        serviceScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            synchronized(bluetoothServerLock) {
+                if (bluetoothServer == null) {
+                    bluetoothServer = com.parentalguard.child.network.BluetoothCommandServer(applicationContext)
+                }
+                if (bluetoothServer?.isRunning?.value != true) {
+                    bluetoothServer?.start()
+                }
+            }
         }
-        
-        return START_STICKY
     }
 
     private fun startLockMonitoring() {
@@ -151,9 +197,11 @@ class MonitorService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        runCatching { unregisterReceiver(bluetoothStateReceiver) }
         unregisterReceiver(internalReceiver)
         serviceRegistrar?.unregisterService()
         commandServer?.stop()
+        bluetoothServer?.stop()
         lockManager?.hideLockScreen()
         serviceScope.cancel()
     }
@@ -162,9 +210,14 @@ class MonitorService : Service() {
         serviceScope.launch {
             val monitor = com.parentalguard.child.monitor.UsageMonitor(applicationContext)
             var lastMonitoredPackage: String? = null
+            var lastTick = SystemClock.elapsedRealtime()
 
             while (isActive) {
                 try {
+                    val now = SystemClock.elapsedRealtime()
+                    val tickDelta = now - lastTick
+                    lastTick = now
+
                     val topPackage = getForegroundPackage()
                     
                     // If we see ourselves, it might be the lock screen or the main app.
@@ -181,12 +234,47 @@ class MonitorService : Service() {
                     }
 
                     val ruleRepo = com.parentalguard.child.data.RuleRepository
+                    val isDeviceOwner = DeviceOwnerManager.isDeviceOwner(applicationContext)
+                    val usagePolicyActive = isDeviceOwner && DeviceOwnerManager.hasUsageAccess(applicationContext)
+
+                    if (!usagePolicyActive && (
+                            ruleRepo.deviceOwnerDeviceUsageLimitMs.value > 0 ||
+                                ruleRepo.deviceOwnerAppUsageLimits.value.isNotEmpty() ||
+                                ruleRepo.deviceOwnerUsageSuspended.value.isNotEmpty()
+                        )) {
+                        if (isDeviceOwner) {
+                            ruleRepo.deviceOwnerUsageSuspended.value.forEach { packageName ->
+                                DeviceOwnerManager.setAppSuspended(applicationContext, packageName, false)
+                            }
+                        }
+                        ruleRepo.clearDeviceOwnerPolicies()
+                        if (ruleRepo.lockReason.value == "DEVICE_OWNER_USAGE") {
+                            ruleRepo.setGlobalLock(false)
+                        }
+                    }
+
+                    // Device Owner limits are daily UsageStats policies. They are
+                    // reconciled here so they survive service restarts and day rollover.
+                    val ownerDeviceLimit = ruleRepo.deviceOwnerDeviceUsageLimitMs.value
+                    if (usagePolicyActive && ownerDeviceLimit > 0) {
+                        val totalTodayUsage = monitor.getTodayUsage().sumOf { it.totalTimeInForeground }
+                        if (totalTodayUsage >= ownerDeviceLimit && !ruleRepo.globalLock.value) {
+                            Log.i("MonitorService", "Device Owner usage limit reached")
+                            ruleRepo.setGlobalLock(true, "DEVICE_OWNER_USAGE")
+                            if (isDeviceOwner) {
+                                DeviceOwnerManager.lockNow(applicationContext)
+                            }
+                        }
+                    } else if (ruleRepo.globalLock.value && ruleRepo.lockReason.value == "DEVICE_OWNER_USAGE") {
+                        ruleRepo.setGlobalLock(false)
+                    }
 
                     // Update "Take a Break" usage tracking
-                    if (topPackage != null && topPackage != packageName && !lockManager!!.isShowing) {
+                    // Only count real foreground time while the screen is on and no lock is showing.
+                    if (topPackage != null && topPackage != packageName && !lockManager!!.isShowing && tickDelta > 0) {
                         val limit = ruleRepo.usageLimitMs.value
                         if (limit > 0) {
-                            val currentUsage = ruleRepo.currentBreakUsageMs.value + 1000 // 1 second
+                            val currentUsage = ruleRepo.currentBreakUsageMs.value + tickDelta
                             ruleRepo.setCurrentBreakUsage(currentUsage)
                             
                             if (currentUsage >= limit) {
@@ -205,7 +293,24 @@ class MonitorService : Service() {
                         
                         // Check for temporary global unlock
                         val isTemporarilyUnlocked = ruleRepo.isTemporarilyUnlocked()
-                        
+                        val ownerAppLimit = ruleRepo.deviceOwnerAppUsageLimits.value[packageToEvaluate] ?: 0L
+                        val currentUsageMs = monitor.getAppUsageToday(packageToEvaluate)
+                        val ownerLimitReached = ownerAppLimit > 0 && currentUsageMs >= ownerAppLimit
+                        val isOwner = usagePolicyActive
+                        val category = ruleRepo.getCategory(packageToEvaluate)
+                        val categoryTimerActive = ruleRepo.isCategoryTimerActive(category)
+                        val categoryTimerSet = ruleRepo.categoryTimers.value.containsKey(category)
+                        val allowanceActive = isTemporarilyUnlocked ||
+                            (timerSet && timerActive) ||
+                            (categoryTimerSet && categoryTimerActive)
+
+                        if (isOwner && packageToEvaluate in ruleRepo.deviceOwnerUsageSuspended.value &&
+                            (!ownerLimitReached || allowanceActive)
+                        ) {
+                            val result = DeviceOwnerManager.setAppSuspended(applicationContext, packageToEvaluate, false)
+                            if (result.success) ruleRepo.markDeviceOwnerUsageSuspended(packageToEvaluate, false)
+                        }
+
                         var shouldBlock = false
                         
                         if (isTemporarilyUnlocked) {
@@ -218,10 +323,6 @@ class MonitorService : Service() {
                             }
                         } else {
                             // Check for Category Timer
-                            val category = ruleRepo.getCategory(packageToEvaluate)
-                            val categoryTimerActive = ruleRepo.isCategoryTimerActive(category)
-                            val categoryTimerSet = ruleRepo.categoryTimers.value.containsKey(category)
-                            
                             if (categoryTimerSet) {
                                 if (categoryTimerActive) {
                                     shouldBlock = false // Explicitly allowed by category timer
@@ -232,15 +333,20 @@ class MonitorService : Service() {
                                 // Normal Rules
                                 val rules = ruleRepo.rules.value
                                 val rule = rules.find { it.packageName == packageToEvaluate }
-                                if (rule != null) {
+                                if (ownerLimitReached) {
+                                    if (isOwner && packageToEvaluate !in ruleRepo.deviceOwnerUsageSuspended.value) {
+                                        val result = DeviceOwnerManager.setAppSuspended(applicationContext, packageToEvaluate, true)
+                                        if (result.success) ruleRepo.markDeviceOwnerUsageSuspended(packageToEvaluate, true)
+                                    }
+                                    shouldBlock = true
+                                } else if (rule != null) {
                                     val isTimedBlocked = rule.blockEndTime > System.currentTimeMillis()
                                     val isPermanentlyBlocked = rule.isPermanentlyBlocked
-                                    
+
                                     // Check daily limit
                                     val dailyLimitMs = rule.maxDailyTimeMs
-                                    val currentUsageMs = monitor.getAppUsageToday(packageToEvaluate)
                                     val isDailyLimitReached = dailyLimitMs > 0 && currentUsageMs >= dailyLimitMs
-                                    
+
                                     shouldBlock = isTimedBlocked || isPermanentlyBlocked || isDailyLimitReached
                                 }
                             }
@@ -276,6 +382,11 @@ class MonitorService : Service() {
     }
 
     private fun getForegroundPackage(): String? {
+        // When the screen is off the last foreground package is stale; treating it as
+        // "in use" would count sleep time toward usage limits and could trigger locks.
+        val powerManager = getSystemService(Context.POWER_SERVICE) as? PowerManager ?: return null
+        if (!powerManager.isInteractive) return null
+
         val usm = getSystemService(Context.USAGE_STATS_SERVICE) as? android.app.usage.UsageStatsManager ?: return null
         val time = System.currentTimeMillis()
         // Query events for the last 2 minutes to capture recent activity

@@ -21,7 +21,12 @@ sealed class Packet {
         val category: com.parentalguard.common.model.AppCategory? = null,
         val timerDurationMs: Long? = null,
         val languageCode: String? = null,
-        val relayParentId: String? = null
+        val relayParentId: String? = null,
+        val enabled: Boolean? = null,
+        val restrictionKey: String? = null,
+        val blockingScreenStyle: com.parentalguard.common.model.BlockingScreenStyle? = null,
+        val authToken: String? = null,
+        val requestId: String? = null // Correlates relay responses to their originating command
     ) : Packet()
 
     @Serializable
@@ -29,7 +34,8 @@ sealed class Packet {
         val success: Boolean,
         val message: String? = null,
         val stats: DeviceStats? = null,
-        val dailyReport: DailyUsageReport? = null
+        val dailyReport: DailyUsageReport? = null,
+        val requestId: String? = null // Echoed back from the originating command
     ) : Packet()
 
     @Serializable
@@ -78,5 +84,13 @@ enum class CommandType {
     SET_RELAY_PARENT_ID, // Parent informs child of its Relay ID
     APPROVE_EXTENSION,   // Parent approves "One More Minute"
     DENY_EXTENSION,      // Parent denies extension request
-    STOP_BREAK           // Parent manually stops a break session
+    STOP_BREAK,           // Parent manually stops a break session
+    DEVICE_OWNER_SET_APP_SUSPENDED,
+    DEVICE_OWNER_SET_UNINSTALL_PROTECTION,
+    DEVICE_OWNER_SET_USER_RESTRICTION,
+    DEVICE_OWNER_SET_DEVICE_LOCKED,
+    DEVICE_OWNER_SET_DEVICE_USAGE_LIMIT,
+    DEVICE_OWNER_SET_APP_USAGE_LIMIT,
+    DEVICE_OWNER_SET_WIFI_ENABLED,
+    SET_BLOCKING_SCREEN_STYLE
 }

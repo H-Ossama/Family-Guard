@@ -1,0 +1,27 @@
+# Gradle
+.gradle/
+**/build/
+build/
+
+# Local / IDE
+local.properties
+.idea/
+*.iml
+.kotlin/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Signing (never commit keys)
+*.keystore
+*.jks
+
+# Agent tooling
+.opencode/
+.agents/
+skills-lock.json
+
+# Build leftovers
+META-INF/

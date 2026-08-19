@@ -1,24 +1,30 @@
 package com.parentalguard.parent.ui.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.rounded.Groups
+import androidx.compose.material.icons.rounded.Insights
+import androidx.compose.material.icons.rounded.MonitorHeart
+import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.parentalguard.parent.R
 
 /**
- * Navigation routes for the app
+ * AURA routes — new names, new structure. Logic (VMs, intents) unchanged.
  */
 sealed class Screen(val route: String) {
-    object Dashboard : Screen("dashboard")
-    object Devices : Screen("devices")
-    object DeviceControl : Screen("device/{deviceId}") {
-        fun createRoute(deviceId: String) = "device/$deviceId"
+    object Pulse : Screen("pulse")
+    object Circle : Screen("circle")
+    object Console : Screen("console/{deviceId}") {
+        fun createRoute(deviceId: String) = "console/$deviceId"
     }
-    object Settings : Screen("settings")
-    object Reports : Screen("reports")
-    object QRScanner : Screen("qr_scanner")
-    object UnlockRequest : Screen("unlock_request/{deviceId}/{deviceName}/{requestType}?appPackageName={appPackageName}&appName={appName}") {
+    object Insights : Screen("insights")
+    object ReportDetail : Screen("report_detail")
+    object Control : Screen("control")
+    object DeviceOwnerGuide : Screen("device_owner_guide")
+    object About : Screen("about")
+    object HelpSupport : Screen("help_support")
+    object Pair : Screen("pair")
+    object Request : Screen("request/{deviceId}/{deviceName}/{requestType}?appPackageName={appPackageName}&appName={appName}") {
         fun createRoute(
             deviceId: String,
             deviceName: String,
@@ -26,78 +32,43 @@ sealed class Screen(val route: String) {
             appPackageName: String? = null,
             appName: String? = null
         ): String {
-            var route = "unlock_request/$deviceId/$deviceName/$requestType"
+            var route = "request/$deviceId/$deviceName/$requestType"
             val params = mutableListOf<String>()
             if (appPackageName != null) params.add("appPackageName=$appPackageName")
             if (appName != null) params.add("appName=$appName")
-            
-            if (params.isNotEmpty()) {
-                route += "?" + params.joinToString("&")
-            }
+            if (params.isNotEmpty()) route += "?" + params.joinToString("&")
             return route
         }
     }
 }
 
 /**
- * Bottom navigation items
+ * Floating dock destinations.
  */
-sealed class BottomNavItem(
+sealed class DockItem(
     val route: String,
     val titleResId: Int,
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector
 ) {
-    object Dashboard : BottomNavItem(
-        route = Screen.Dashboard.route,
-        titleResId = R.string.nav_dashboard,
-        selectedIcon = Icons.Filled.Dashboard,
-        unselectedIcon = Icons.Outlined.Dashboard
-    )
-    
-    object Devices : BottomNavItem(
-        route = Screen.Devices.route,
-        titleResId = R.string.nav_devices,
-        selectedIcon = Icons.Filled.Devices,
-        unselectedIcon = Icons.Outlined.Devices
-    )
-    
-    object Settings : BottomNavItem(
-        route = Screen.Settings.route,
-        titleResId = R.string.nav_settings,
-        selectedIcon = Icons.Filled.Settings,
-        unselectedIcon = Icons.Outlined.Settings
-    )
-
-    object Reports : BottomNavItem(
-        route = Screen.Reports.route,
-        titleResId = R.string.nav_reports,
-        selectedIcon = Icons.Filled.BarChart,
-        unselectedIcon = Icons.Outlined.BarChart
-    )
+    object Pulse : DockItem(Screen.Pulse.route, R.string.nav_dashboard, Icons.Rounded.MonitorHeart, Icons.Rounded.MonitorHeart)
+    object Circle : DockItem(Screen.Circle.route, R.string.nav_devices, Icons.Rounded.Groups, Icons.Rounded.Groups)
+    object Insights : DockItem(Screen.Insights.route, R.string.nav_reports, Icons.Rounded.Insights, Icons.Rounded.Insights)
+    object Control : DockItem(Screen.Control.route, R.string.nav_settings, Icons.Rounded.Tune, Icons.Rounded.Tune)
 }
 
-val bottomNavItems = listOf(
-    BottomNavItem.Dashboard,
-    BottomNavItem.Devices,
-    BottomNavItem.Settings
-)
+val dockItems = listOf(DockItem.Pulse, DockItem.Circle, DockItem.Insights, DockItem.Control)
 
 /**
- * Device control tabs
+ * Console segments (Now · Apps · Boundaries · Rhythm · Activity).
  */
-sealed class DeviceTab(val titleResId: Int, val icon: ImageVector) {
-    object Overview : DeviceTab(R.string.tab_overview, Icons.Default.Info)
-    object Apps : DeviceTab(R.string.tab_apps, Icons.Default.Apps)
-    object Limits : DeviceTab(R.string.tab_limits, Icons.Default.Timer)
-    object Break : DeviceTab(R.string.title_take_a_break, Icons.Default.Coffee) // Using Coffee icon for "Break"
-    object Reports : DeviceTab(R.string.tab_reports, Icons.Default.BarChart)
+enum class ConsoleSegment(val titleResId: Int) {
+    Now(R.string.console_now),
+    Apps(R.string.console_apps),
+    Boundaries(R.string.console_boundaries),
+    Rhythm(R.string.console_rhythm),
+    Activity(R.string.console_activity),
+    DeviceOwner(R.string.console_device_owner)
 }
 
-val deviceTabs = listOf(
-    DeviceTab.Overview,
-    DeviceTab.Apps,
-    DeviceTab.Limits,
-    DeviceTab.Break,
-    DeviceTab.Reports
-)
+val consoleSegments = ConsoleSegment.values().toList()

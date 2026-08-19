@@ -69,7 +69,7 @@ class CloudRelayClient(private val context: Context) {
         id!!
     }
 
-    private val _responses = MutableSharedFlow<Packet.Response>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val _responses = MutableSharedFlow<Packet.Response>(replay = 0, extraBufferCapacity = 16, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val responses: SharedFlow<Packet.Response> = _responses.asSharedFlow()
 
     private val _events = MutableSharedFlow<Packet.Event>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
@@ -168,7 +168,8 @@ class CloudRelayClient(private val context: Context) {
             return@withContext null
         }
 
-        val payload = json.encodeToString<Packet>(command)
+        val requestId = java.util.UUID.randomUUID().toString()
+        val payload = json.encodeToString<Packet>(command.copy(requestId = requestId))
         val message = RelayMessage(
             targetDeviceId = targetDeviceId,
             type = "COMMAND",
@@ -176,11 +177,11 @@ class CloudRelayClient(private val context: Context) {
         )
 
         try {
-            session?.send(Frame.Text(json.encodeToString(message)))
-            
-            // Wait for response with timeout
+            // Subscribe before sending so we never miss a fast relayed response.
             return@withContext withTimeoutOrNull(10000) {
-                responses.first { it.success || !it.message.isNullOrEmpty() }
+                val responseDeferred = async { responses.first { it.requestId == requestId } }
+                session?.send(Frame.Text(json.encodeToString(message)))
+                responseDeferred.await()
             }
         } catch (e: Exception) {
             Log.e("CloudRelayClient", "Error sending command", e)

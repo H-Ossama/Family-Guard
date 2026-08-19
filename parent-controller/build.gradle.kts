@@ -1,7 +1,38 @@
+import org.gradle.api.tasks.Copy
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization")
+}
+
+val childApkAssetsDir = layout.buildDirectory.dir("generated/child-apk-assets")
+
+val copyChildDebugApk by tasks.registering(Copy::class) {
+    dependsOn(":child-agent:assembleDebug")
+    from(project(":child-agent").layout.buildDirectory.dir("outputs/apk/debug")) {
+        include("child-agent-debug.apk")
+        rename { "kidguard-child.apk" }
+    }
+    into(childApkAssetsDir)
+}
+
+val copyChildReleaseApk by tasks.registering(Copy::class) {
+    // The repository does not define a release signing key for the child yet.
+    // Bundle the signed debug artifact rather than an unusable unsigned APK.
+    dependsOn(":child-agent:assembleDebug")
+    from(project(":child-agent").layout.buildDirectory.dir("outputs/apk/debug")) {
+        include("child-agent-debug.apk")
+        rename { "kidguard-child.apk" }
+    }
+    into(childApkAssetsDir)
+}
+
+tasks.configureEach {
+    when (name) {
+        "preDebugBuild" -> dependsOn(copyChildDebugApk)
+        "preReleaseBuild" -> dependsOn(copyChildReleaseApk)
+    }
 }
 
 android {
@@ -13,7 +44,7 @@ android {
         minSdk = 26
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0"
+        versionName = "2.4.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -49,6 +80,8 @@ android {
         }
     }
 }
+
+android.sourceSets.getByName("main").assets.srcDir(childApkAssetsDir)
 
 dependencies {
     implementation(project(":common"))
@@ -86,7 +119,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
-    val cameraVersion = "1.3.1"
+    val cameraVersion = "1.4.2"
     implementation("androidx.camera:camera-camera2:$cameraVersion")
     implementation("androidx.camera:camera-lifecycle:$cameraVersion")
     implementation("androidx.camera:camera-view:$cameraVersion")

@@ -3,7 +3,10 @@ package com.parentalguard.parent.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.parentalguard.common.model.*
+import com.parentalguard.common.network.CommandType
+import com.parentalguard.common.network.Packet
 import com.parentalguard.parent.network.DeviceClient
+import com.parentalguard.parent.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,8 +24,19 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
     private val _usageLogs = MutableStateFlow<List<AppUsageLog>>(emptyList())
     val usageLogs: StateFlow<List<AppUsageLog>> = _usageLogs.asStateFlow()
 
+    private val _usageLogsByDevice = MutableStateFlow<Map<String, List<AppUsageLog>>>(emptyMap())
+    val usageLogsByDevice: StateFlow<Map<String, List<AppUsageLog>>> = _usageLogsByDevice.asStateFlow()
+
     private val _activeRules = MutableStateFlow<List<BlockingRule>>(emptyList())
     val activeRules: StateFlow<List<BlockingRule>> = _activeRules.asStateFlow()
+
+    private val _blockingScreenStyles =
+        MutableStateFlow<Map<String, BlockingScreenStyle>>(emptyMap())
+    val blockingScreenStyles: StateFlow<Map<String, BlockingScreenStyle>> =
+        _blockingScreenStyles.asStateFlow()
+
+    private val _blockingScreenStyleSaves = MutableStateFlow<Set<String>>(emptySet())
+    val blockingScreenStyleSaves: StateFlow<Set<String>> = _blockingScreenStyleSaves.asStateFlow()
 
     private val _statusMessage = MutableStateFlow<String?>(null)
     val statusMessage: StateFlow<String?> = _statusMessage.asStateFlow()
@@ -64,6 +78,16 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
     val allowExtensions: StateFlow<Boolean> = _allowExtensions.asStateFlow()
 
     private val _appIcons = MutableStateFlow<Map<String, String>>(emptyMap())
+
+    private val _isRefreshingApps = MutableStateFlow(false)
+    val isRefreshingApps: StateFlow<Boolean> = _isRefreshingApps.asStateFlow()
+
+    private val _deviceOwnerCapabilities =
+        MutableStateFlow<Map<String, DeviceOwnerCapabilities>>(emptyMap())
+    val deviceOwnerCapabilities: StateFlow<Map<String, DeviceOwnerCapabilities>> =
+        _deviceOwnerCapabilities.asStateFlow()
+
+    private val statsGenerations = mutableMapOf<String, Long>()
     
     fun refresh(device: ChildDevice) {
         fetchStats(device, forceRefresh = true)
@@ -71,6 +95,14 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
 
     fun fetchStats(device: ChildDevice, forceRefresh: Boolean = false) {
         viewModelScope.launch {
+            registerDeviceCredentials(device)
+            val generation = synchronized(statsGenerations) {
+                val next = (statsGenerations[device.deviceId] ?: 0L) + 1L
+                statsGenerations[device.deviceId] = next
+                next
+            }
+            _deviceOwnerCapabilities.value = _deviceOwnerCapabilities.value +
+                (device.deviceId to DeviceOwnerCapabilities())
             // Check if we need to fetch icons (if map is empty)
             val includeIcons = _appIcons.value.isEmpty()
             val deviceResponse = client.getStatsWithConnectionType(
@@ -83,8 +115,18 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
             val response = deviceResponse.response
             
             if (response != null && response.success) {
+                val isLatest = synchronized(statsGenerations) {
+                    statsGenerations[device.deviceId] == generation
+                }
+                if (!isLatest) return@launch
                 _connectionType.value = deviceResponse.connectionType
-                _usageLogs.value = response.stats?.usageLogs ?: emptyList()
+                val usageLogs = mergeInstalledApps(
+                    response.stats?.usageLogs.orEmpty(),
+                    response.stats?.installedApps.orEmpty()
+                )
+                _usageLogs.value = usageLogs
+                _usageLogsByDevice.value = _usageLogsByDevice.value +
+                    (device.deviceId to usageLogs)
                 _activeRules.value = response.stats?.activeRules ?: emptyList()
                 _isDeviceLocked.value = response.stats?.isLocked ?: false
                 _isAppIconHidden.value = response.stats?.isIconHidden ?: false
@@ -95,6 +137,10 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
                 _educationOnly.value = response.stats?.educationOnly ?: false
                 _allowExtensions.value = response.stats?.allowExtensions ?: false
                 _lockReason.value = response.stats?.lockReason
+                _deviceOwnerCapabilities.value = _deviceOwnerCapabilities.value +
+                    (device.deviceId to (response.stats?.deviceOwnerCapabilities ?: DeviceOwnerCapabilities()))
+                _blockingScreenStyles.value = _blockingScreenStyles.value +
+                    (device.deviceId to (response.stats?.blockingScreenStyle ?: BlockingScreenStyle.CURRENT))
                 
                 // Process icons if included
                 if (includeIcons) {
@@ -109,6 +155,12 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
                 
                 _statusMessage.value = "Stats updated"
             } else {
+                val isLatest = synchronized(statsGenerations) {
+                    statsGenerations[device.deviceId] == generation
+                }
+                if (!isLatest) return@launch
+                _deviceOwnerCapabilities.value = _deviceOwnerCapabilities.value +
+                    (device.deviceId to DeviceOwnerCapabilities())
                 _statusMessage.value = "Failed to fetch stats"
             }
         }
@@ -116,18 +168,74 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
     
     // Helper to request icons explicitly (e.g. on pull to refresh if needed)
     fun refreshIcons(device: ChildDevice) {
+        if (_isRefreshingApps.value) return
         viewModelScope.launch {
-            val response = client.getStats(device.ip.hostAddress ?: "", device.port, device.deviceId, true)
-            if (response != null && response.success) {
-                val newIcons = response.stats?.installedApps?.mapNotNull { app ->
-                    if (app.iconBase64 != null) app.packageName to app.iconBase64!! else null
-                }?.toMap() ?: emptyMap()
-                
-                if (newIcons.isNotEmpty()) {
-                    _appIcons.value = _appIcons.value + newIcons
+            _isRefreshingApps.value = true
+            registerDeviceCredentials(device)
+            try {
+                val response = client.getStatsWithConnectionType(
+                    device.ip.hostAddress ?: "",
+                    device.port,
+                    device.deviceId,
+                    includeIcons = true
+                ).response
+                if (response != null && response.success) {
+                    val stats = response.stats
+                    val usageLogs = mergeInstalledApps(
+                        stats?.usageLogs.orEmpty(),
+                        stats?.installedApps.orEmpty()
+                    )
+                    _usageLogs.value = usageLogs
+                    _usageLogsByDevice.value = _usageLogsByDevice.value +
+                        (device.deviceId to usageLogs)
+
+                    val newIcons = stats?.installedApps?.mapNotNull { app ->
+                        if (app.iconBase64 != null) app.packageName to app.iconBase64!! else null
+                    }?.toMap().orEmpty()
+                    if (newIcons.isNotEmpty()) {
+                        _appIcons.value = _appIcons.value + newIcons
+                    }
+                    _statusMessage.value = text(R.string.apps_refresh_success)
+                } else {
+                    _statusMessage.value = text(R.string.apps_refresh_failed)
                 }
+            } finally {
+                _isRefreshingApps.value = false
             }
         }
+    }
+
+    private fun mergeInstalledApps(
+        usageLogs: List<AppUsageLog>,
+        installedApps: List<AppInfo>
+    ): List<AppUsageLog> {
+        val usageByPackage = usageLogs.mergedByPackage().associateBy { it.packageName }
+        val installedByPackage = installedApps.associateBy { it.packageName }
+        val today = android.text.format.DateFormat
+            .format("yyyy-MM-dd", System.currentTimeMillis())
+            .toString()
+
+        return (usageByPackage.keys + installedByPackage.keys).map { packageName ->
+            val usage = usageByPackage[packageName]
+            val installed = installedByPackage[packageName]
+            usage?.copy(
+                category = if (installed?.category == AppCategory.SYSTEM) {
+                    AppCategory.SYSTEM
+                } else if (usage.category == AppCategory.OTHER && installed != null) {
+                    installed.category
+                } else {
+                    usage.category
+                },
+                appLabel = usage.appLabel ?: installed?.label
+            ) ?: AppUsageLog(
+                packageName = packageName,
+                totalTimeInForeground = 0L,
+                lastTimeUsed = 0L,
+                date = today,
+                category = installed?.category ?: AppCategory.OTHER,
+                appLabel = installed?.label
+            )
+        }.sortedByDescending { it.totalTimeInForeground }
     }
 
     fun getAppIcon(packageName: String): String? {
@@ -136,6 +244,7 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
 
     fun fetchDailyReport(device: ChildDevice) {
         viewModelScope.launch {
+            registerDeviceCredentials(device)
             val response = client.getDailyReport(device.ip.hostAddress ?: "", device.port, device.deviceId)
             if (response != null && response.success && response.dailyReport != null) {
                 _dailyReport.value = response.dailyReport
@@ -155,11 +264,29 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
             val isBlocked = currentRule != null && (currentRule.blockEndTime > System.currentTimeMillis() || currentRule.isPermanentlyBlocked)
             
             val newRules = if (isBlocked) {
-                // Unblock: remove the rule
-                _activeRules.value.filter { it.packageName != packageName }
+                // Unblock the app without removing an independent internet block,
+                // category, or daily-limit rule.
+                if (currentRule != null && (currentRule.isInternetBlocked ||
+                            currentRule.maxDailyTimeMs > 0 ||
+                            currentRule.category != AppCategory.OTHER ||
+                            currentRule.schedule.isNotEmpty())) {
+                    _activeRules.value.map {
+                        if (it.packageName == packageName) it.copy(
+                            blockEndTime = 0L,
+                            isPermanentlyBlocked = false
+                        ) else it
+                    }
+                } else {
+                    _activeRules.value.filter { it.packageName != packageName }
+                }
             } else {
-                // Block: Add new rule (default 1 hour for now, or permanent)
-                _activeRules.value + BlockingRule(packageName, 0, System.currentTimeMillis() + 3600000)
+                // The App switch is a quick one-hour block.
+                val rule = currentRule?.copy(
+                    blockEndTime = System.currentTimeMillis() + 3600000,
+                    isPermanentlyBlocked = false
+                ) ?: BlockingRule(packageName, 0, System.currentTimeMillis() + 3600000)
+                if (currentRule == null) _activeRules.value + rule
+                else _activeRules.value.map { if (it.packageName == packageName) rule else it }
             }
             
             val response = client.updateRules(device.ip.hostAddress ?: "", device.port, device.deviceId, newRules)
@@ -451,6 +578,236 @@ class DeviceControlViewModel(application: Application) : AndroidViewModel(applic
                 _statusMessage.value = "Failed to stop break"
             }
         }
+    }
+
+    fun blockAppNow(device: ChildDevice, packageName: String) {
+        viewModelScope.launch {
+            val currentRule = _activeRules.value.find { it.packageName == packageName }
+            val rule = currentRule?.copy(
+                blockEndTime = 0L,
+                isPermanentlyBlocked = true
+            ) ?: BlockingRule(
+                packageName = packageName,
+                maxDailyTimeMs = 0L,
+                isPermanentlyBlocked = true
+            )
+            val newRules = if (currentRule == null) {
+                _activeRules.value + rule
+            } else {
+                _activeRules.value.map { if (it.packageName == packageName) rule else it }
+            }
+            val response = client.updateRules(device.ip.hostAddress ?: "", device.port, device.deviceId, newRules)
+            if (response != null && response.success) {
+                _activeRules.value = newRules
+                _statusMessage.value = text(R.string.apps_blocked_now)
+                fetchStats(device)
+            } else {
+                _statusMessage.value = text(R.string.apps_block_failed)
+            }
+        }
+    }
+
+    fun setAppBlockDuration(device: ChildDevice, packageName: String, durationMinutes: Int) {
+        if (durationMinutes <= 0) return
+        viewModelScope.launch {
+            val currentRule = _activeRules.value.find { it.packageName == packageName }
+            val rule = currentRule?.copy(
+                blockEndTime = System.currentTimeMillis() + durationMinutes * 60_000L,
+                isPermanentlyBlocked = false
+            ) ?: BlockingRule(
+                packageName = packageName,
+                maxDailyTimeMs = 0L,
+                blockEndTime = System.currentTimeMillis() + durationMinutes * 60_000L
+            )
+            val newRules = if (currentRule == null) {
+                _activeRules.value + rule
+            } else {
+                _activeRules.value.map { if (it.packageName == packageName) rule else it }
+            }
+            val response = client.updateRules(device.ip.hostAddress ?: "", device.port, device.deviceId, newRules)
+            if (response != null && response.success) {
+                _activeRules.value = newRules
+                _statusMessage.value = text(R.string.apps_block_duration_set, durationMinutes)
+                fetchStats(device)
+            } else {
+                _statusMessage.value = text(R.string.apps_block_failed)
+            }
+        }
+    }
+
+    fun setBlockingScreenStyle(device: ChildDevice, style: BlockingScreenStyle) {
+        if (device.deviceId in _blockingScreenStyleSaves.value) return
+
+        val generation = synchronized(statsGenerations) {
+            val next = (statsGenerations["style:${device.deviceId}"] ?: 0L) + 1L
+            statsGenerations["style:${device.deviceId}"] = next
+            next
+        }
+        _blockingScreenStyleSaves.value = _blockingScreenStyleSaves.value + device.deviceId
+
+        viewModelScope.launch {
+            try {
+                registerDeviceCredentials(device)
+                val response = client.setBlockingScreenStyle(
+                    ip = device.ip.hostAddress ?: "",
+                    port = device.port,
+                    deviceId = device.deviceId,
+                    style = style
+                )
+                val isLatest = synchronized(statsGenerations) {
+                    statsGenerations["style:${device.deviceId}"] == generation
+                }
+                if (isLatest && response != null && response.success) {
+                    _blockingScreenStyles.value = _blockingScreenStyles.value +
+                        (device.deviceId to style)
+                    _statusMessage.value = text(R.string.blocking_style_saved)
+                    fetchStats(device, forceRefresh = true)
+                } else if (isLatest) {
+                    _statusMessage.value = text(R.string.blocking_style_save_failed)
+                }
+            } finally {
+                val isLatest = synchronized(statsGenerations) {
+                    statsGenerations["style:${device.deviceId}"] == generation
+                }
+                if (isLatest) {
+                    _blockingScreenStyleSaves.value = _blockingScreenStyleSaves.value - device.deviceId
+                }
+            }
+        }
+    }
+
+    fun setAppSuspended(device: ChildDevice, packageName: String, suspended: Boolean) {
+        sendDeviceOwnerCommand(
+            device = device,
+            capability = DeviceOwnerCapability.APP_SUSPENSION,
+            command = Packet.Command(
+                commandType = CommandType.DEVICE_OWNER_SET_APP_SUSPENDED,
+                packageName = packageName,
+                enabled = suspended
+            ),
+            successMessage = text(if (suspended) R.string.device_owner_app_suspended else R.string.device_owner_app_resumed)
+        )
+    }
+
+    fun setUninstallProtection(device: ChildDevice, packageName: String, enabled: Boolean) {
+        sendDeviceOwnerCommand(
+            device = device,
+            capability = DeviceOwnerCapability.UNINSTALL_PROTECTION,
+            command = Packet.Command(
+                commandType = CommandType.DEVICE_OWNER_SET_UNINSTALL_PROTECTION,
+                packageName = packageName,
+                enabled = enabled
+            ),
+            successMessage = text(if (enabled) R.string.device_owner_uninstall_enabled else R.string.device_owner_uninstall_disabled)
+        )
+    }
+
+    fun setUserRestriction(device: ChildDevice, restrictionKey: String, enabled: Boolean) {
+        sendDeviceOwnerCommand(
+            device = device,
+            capability = DeviceOwnerCapability.USER_RESTRICTIONS,
+            command = Packet.Command(
+                commandType = CommandType.DEVICE_OWNER_SET_USER_RESTRICTION,
+                restrictionKey = restrictionKey,
+                enabled = enabled
+            ),
+            successMessage = text(R.string.device_owner_restriction_updated)
+        )
+    }
+
+    fun setDeviceOwnerLocked(device: ChildDevice, locked: Boolean) {
+        sendDeviceOwnerCommand(
+            device = device,
+            capability = DeviceOwnerCapability.DEVICE_LOCK,
+            command = Packet.Command(
+                commandType = CommandType.DEVICE_OWNER_SET_DEVICE_LOCKED,
+                enabled = locked
+            ),
+            successMessage = text(if (locked) R.string.device_owner_device_locked else R.string.device_owner_device_unlocked)
+        )
+    }
+
+    fun setDeviceUsageLimit(device: ChildDevice, durationMs: Long) {
+        sendDeviceOwnerCommand(
+            device = device,
+            capability = DeviceOwnerCapability.DEVICE_USAGE_LIMITS,
+            command = Packet.Command(
+                commandType = CommandType.DEVICE_OWNER_SET_DEVICE_USAGE_LIMIT,
+                timerDurationMs = durationMs
+            ),
+            successMessage = text(R.string.device_owner_device_limit_updated)
+        )
+    }
+
+    fun setAppUsageLimit(device: ChildDevice, packageName: String, durationMs: Long) {
+        sendDeviceOwnerCommand(
+            device = device,
+            capability = DeviceOwnerCapability.APP_USAGE_LIMITS,
+            command = Packet.Command(
+                commandType = CommandType.DEVICE_OWNER_SET_APP_USAGE_LIMIT,
+                packageName = packageName,
+                timerDurationMs = durationMs
+            ),
+            successMessage = text(R.string.device_owner_app_limit_updated)
+        )
+    }
+
+    fun setWifiEnabled(device: ChildDevice, enabled: Boolean) {
+        sendDeviceOwnerCommand(
+            device = device,
+            capability = DeviceOwnerCapability.WIFI_TOGGLE,
+            command = Packet.Command(
+                commandType = CommandType.DEVICE_OWNER_SET_WIFI_ENABLED,
+                enabled = enabled
+            ),
+            successMessage = text(if (enabled) R.string.device_owner_wifi_enabled else R.string.device_owner_wifi_disabled)
+        )
+    }
+
+    private fun sendDeviceOwnerCommand(
+        device: ChildDevice,
+        capability: DeviceOwnerCapability,
+        command: Packet.Command,
+        successMessage: String
+    ) {
+        val state = _deviceOwnerCapabilities.value[device.deviceId]
+            ?.stateFor(capability)
+            ?: CapabilityState.UNKNOWN
+
+        if (state != CapabilityState.AVAILABLE) {
+            _statusMessage.value = if (state == CapabilityState.UNAVAILABLE) {
+                text(R.string.device_owner_unavailable_desc)
+            } else {
+                text(R.string.device_owner_unknown_desc)
+            }
+            return
+        }
+
+        viewModelScope.launch {
+            registerDeviceCredentials(device)
+            val response = client.sendDeviceOwnerCommand(
+                device.ip.hostAddress ?: "",
+                device.port,
+                device.deviceId,
+                command
+            )
+            if (response != null && response.success) {
+                _statusMessage.value = successMessage
+                fetchStats(device, forceRefresh = true)
+            } else {
+                _statusMessage.value = text(R.string.device_owner_command_failed)
+            }
+        }
+    }
+
+    private fun text(
+        @androidx.annotation.StringRes resourceId: Int,
+        vararg formatArgs: Any
+    ): String = getApplication<Application>().getString(resourceId, *formatArgs)
+
+    private fun registerDeviceCredentials(device: ChildDevice) {
+        device.pairToken?.let { client.registerPairToken(device.deviceId, it) }
+        device.bluetoothMac?.let { client.registerBluetoothMac(device.deviceId, it) }
     }
 }
 

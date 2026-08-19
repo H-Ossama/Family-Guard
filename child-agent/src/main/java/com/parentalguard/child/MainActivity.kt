@@ -1,6 +1,7 @@
 package com.parentalguard.child
 
 import android.app.AppOpsManager
+import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -35,6 +36,8 @@ class MainActivity : AppCompatActivity() {
             return
         }
         
+        requestBluetoothPermissions()
+        
         status.value = getString(R.string.status_initializing)
 
         setContent {
@@ -62,6 +65,11 @@ class MainActivity : AppCompatActivity() {
         updateConnectionInfo()
     }
 
+    override fun onResume() {
+        super.onResume()
+        requestBluetoothDiscoverable()
+    }
+
     private fun updateConnectionInfo() {
         val ip = getLocalIpAddress()
         val port = 8080
@@ -71,8 +79,10 @@ class MainActivity : AppCompatActivity() {
         deviceName.value = name
         
         if (ip != null) {
-            // New pairing format: deviceId|ip:port|deviceName
-            val connStr = "$deviceId|$ip:$port|$name"
+            // New pairing format: deviceId|ip:port|deviceName|bluetoothName|pairToken
+            val btName = com.parentalguard.common.network.BluetoothConfig.bluetoothNameFor(deviceId)
+            val pairToken = com.parentalguard.child.network.PairingManager.getOrCreateToken(this)
+            val connStr = "$deviceId|$ip:$port|$name|$btName|$pairToken"
             connectionString.value = "$ip:$port" // Display only IP:Port for simplicity
             status.value = getString(R.string.status_running)
             
@@ -101,17 +111,17 @@ class MainActivity : AppCompatActivity() {
         container.addView(input)
 
         android.app.AlertDialog.Builder(this)
-            .setTitle("Rename Device")
+            .setTitle(getString(R.string.rename_device_title))
             .setView(container)
-            .setPositiveButton("Save") { _, _ ->
+            .setPositiveButton(getString(R.string.save)) { _, _ ->
                 val newName = input.text.toString().trim()
                 if (newName.isNotEmpty()) {
                     com.parentalguard.child.utils.DeviceUtils.setCustomDeviceName(this, newName)
-                    Toast.makeText(this, "Device renamed to $newName", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.device_renamed, newName), Toast.LENGTH_SHORT).show()
                     updateConnectionInfo() // Refresh UI
                 }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .show()
     }
 
@@ -163,6 +173,71 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    private fun requestBluetoothPermissions() {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.S) {
+            requestBluetoothDiscoverable()
+            return
+        }
+        val needed = listOf(
+            android.Manifest.permission.BLUETOOTH_CONNECT,
+            android.Manifest.permission.BLUETOOTH_SCAN,
+            android.Manifest.permission.BLUETOOTH_ADVERTISE
+        ).filter {
+            androidx.core.content.ContextCompat.checkSelfPermission(this, it) != android.content.pm.PackageManager.PERMISSION_GRANTED
+        }
+        if (needed.isNotEmpty()) {
+            requestPermissions(needed.toTypedArray(), REQUEST_BLUETOOTH_PERMISSIONS)
+        } else {
+            requestBluetoothDiscoverable()
+        }
+    }
+
+    private fun requestBluetoothDiscoverable() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            val hasConnect = androidx.core.content.ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.BLUETOOTH_CONNECT
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            val hasAdvertise = androidx.core.content.ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.BLUETOOTH_ADVERTISE
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            if (!hasConnect || !hasAdvertise) return
+        }
+        val adapter = runCatching { BluetoothAdapter.getDefaultAdapter() }.getOrNull() ?: return
+        if (!adapter.isEnabled) return
+        val discoverable = runCatching {
+            adapter.scanMode == BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE
+        }.getOrDefault(false)
+        if (!discoverable) {
+            startActivity(
+                Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
+                    putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 600)
+                }
+            )
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_BLUETOOTH_PERMISSIONS &&
+            grantResults.isNotEmpty() &&
+            grantResults.all { it == android.content.pm.PackageManager.PERMISSION_GRANTED }
+        ) {
+            requestBluetoothDiscoverable()
+            val serviceIntent = Intent(this, MonitorService::class.java)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                startForegroundService(serviceIntent)
+            } else {
+                startService(serviceIntent)
+            }
+        }
+    }
+
     private fun hideLauncherIcon() {
         val p = packageManager
         val componentName = android.content.ComponentName(this, MainActivity::class.java)
@@ -191,5 +266,9 @@ class MainActivity : AppCompatActivity() {
             }
             .setNegativeButton(getString(R.string.cancel), null)
             .show()
+    }
+
+    companion object {
+        private const val REQUEST_BLUETOOTH_PERMISSIONS = 1001
     }
 }

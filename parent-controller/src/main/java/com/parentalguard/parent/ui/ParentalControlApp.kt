@@ -1,35 +1,52 @@
 package com.parentalguard.parent.ui
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-
-import androidx.compose.ui.unit.dp
-import androidx.compose.animation.core.Spring
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.foundation.clickable
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -39,24 +56,38 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.parentalguard.parent.ui.navigation.*
-import com.parentalguard.parent.ui.screens.UnlockRequestScreen
-import com.parentalguard.parent.ui.screens.DashboardScreen
-import com.parentalguard.parent.ui.screens.DeviceControlScreen
-import com.parentalguard.parent.ui.screens.DeviceDiscoveryScreen
-import com.parentalguard.parent.ui.screens.SettingsScreen
+import com.parentalguard.common.model.DailyUsageReport
+import com.parentalguard.parent.UnlockRequestData
+import com.parentalguard.parent.data.ReportsRepository
+import com.parentalguard.parent.ui.aura.Aura
+import com.parentalguard.parent.ui.aura.AuraBackground
+import com.parentalguard.parent.ui.components.SplashScreen
+import com.parentalguard.parent.ui.navigation.DockItem
+import com.parentalguard.parent.ui.navigation.Screen
+import com.parentalguard.parent.ui.navigation.dockItems
+import com.parentalguard.parent.ui.neumorphic.Nm
+import com.parentalguard.parent.ui.neumorphic.neumorphic
+import com.parentalguard.parent.ui.neumorphic.rememberNmPress
+import com.parentalguard.parent.ui.screens.AboutScreen
+import com.parentalguard.parent.ui.screens.CircleScreen
+import com.parentalguard.parent.ui.screens.ControlScreen
+import com.parentalguard.parent.ui.screens.DeviceConsoleScreen
+import com.parentalguard.parent.ui.screens.DeviceOwnerGuideScreen
+import com.parentalguard.parent.ui.screens.HelpSupportScreen
+import com.parentalguard.parent.ui.screens.InsightsScreen
+import com.parentalguard.parent.ui.screens.PinLockScreen
+import com.parentalguard.parent.ui.screens.PulseScreen
+import com.parentalguard.parent.ui.screens.ReportDetailScreen
+import com.parentalguard.parent.ui.screens.RequestScreen
+import com.parentalguard.parent.share.ChildApkSharer
+import com.parentalguard.parent.ui.onboarding.OnboardingManager
+import com.parentalguard.parent.ui.onboarding.OnboardingScreen
 import com.parentalguard.parent.ui.theme.ParentalGuardTheme
-import com.parentalguard.parent.ui.theme.*
+import com.parentalguard.parent.ui.theme.DisplayFontFamily
 import com.parentalguard.parent.viewmodel.ChildDevice
 import com.parentalguard.parent.viewmodel.DeviceControlViewModel
 import com.parentalguard.parent.viewmodel.DiscoveryViewModel
-import com.parentalguard.parent.UnlockRequestData
-import com.parentalguard.parent.data.ReportsRepository
-import com.parentalguard.parent.ui.screens.ReportsHistoryScreen
-import com.parentalguard.parent.ui.DailyReportScreen
-import com.parentalguard.common.model.DailyUsageReport
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ParentalControlApp(
     discoveryViewModel: DiscoveryViewModel = viewModel(),
@@ -65,345 +96,351 @@ fun ParentalControlApp(
     initialUnlockRequest: UnlockRequestData? = null
 ) {
     ParentalGuardTheme {
+        val context = LocalContext.current
+        var splashDone by remember { mutableStateOf(false) }
+        if (!splashDone) {
+            SplashScreen(onFinished = { splashDone = true })
+            return@ParentalGuardTheme
+        }
+
+        var onboardingDone by remember { mutableStateOf(OnboardingManager.isCompleted(context)) }
+        if (!onboardingDone) {
+            OnboardingScreen(
+                onFinish = {
+                    OnboardingManager.markCompleted(context)
+                    onboardingDone = true
+                }
+            )
+            return@ParentalGuardTheme
+        }
+
         val navController = rememberNavController()
         val devices by discoveryViewModel.devices.collectAsState()
         val isScanning by discoveryViewModel.isScanning.collectAsState()
-        
-        // Track selected device for navigation
+
         var selectedDevice by remember { mutableStateOf<ChildDevice?>(null) }
         var selectedReport by remember { mutableStateOf<DailyUsageReport?>(null) }
         val reportsRepository = remember { ReportsRepository(discoveryViewModel.getApplication()) }
-        
-        // Handle initial navigation from notification
+
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
 
+        // Deep links from notifications
         LaunchedEffect(initialDeviceId, initialUnlockRequest) {
             if (initialUnlockRequest != null) {
                 navController.navigate(
-                    Screen.UnlockRequest.createRoute(
+                    Screen.Request.createRoute(
                         deviceId = initialUnlockRequest.deviceId,
                         deviceName = initialUnlockRequest.deviceName,
                         requestType = initialUnlockRequest.requestType,
                         appPackageName = initialUnlockRequest.appPackageName,
                         appName = initialUnlockRequest.appName
                     )
-                ) {
-                    // Pop up to dashboard to avoid back stack mess
-                    popUpTo(Screen.Dashboard.route)
-                }
+                ) { popUpTo(Screen.Pulse.route) }
             } else if (initialDeviceId != null) {
-                navController.navigate(Screen.DeviceControl.createRoute(initialDeviceId)) {
-                    popUpTo(Screen.Dashboard.route)
+                navController.navigate(Screen.Console.createRoute(initialDeviceId)) {
+                    popUpTo(Screen.Pulse.route)
                 }
             }
         }
-        
-        // Explicit back handling to ensure system back button works with NavHost
+
         androidx.activity.compose.BackHandler(enabled = navController.previousBackStackEntry != null) {
             navController.popBackStack()
         }
-        
-        // Determine if bottom bar should be visible
-        val showBottomBar = currentRoute in listOf(
-            Screen.Dashboard.route,
-            Screen.Devices.route,
-            Screen.Settings.route
-        )
-        
-        // Wrap Scaffold in a gradient Box to ensure the floating nav bar looks good over a background
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(brush = PremiumGradient)
-        ) {
-            Scaffold(
-                containerColor = Color.Transparent,
-                bottomBar = {
-                    if (showBottomBar) {
-                        PremiumBottomNavigation(
-                            items = bottomNavItems,
-                            currentRoute = currentRoute,
-                            onItemClick = { item ->
-                                navController.navigate(item.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
+
+        val showDock = currentRoute in dockItems.map { it.route }
+
+        AuraBackground {
+            Box(modifier = Modifier.fillMaxSize()) {
+                NavHost(
+                    navController = navController,
+                    startDestination = Screen.Pulse.route,
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    enterTransition = {
+                        fadeIn(Aura.tweenSlow()) + scaleIn(
+                            initialScale = 0.94f,
+                            animationSpec = Aura.tweenSlow()
+                        )
+                    },
+                    exitTransition = { fadeOut(Aura.tweenFast()) },
+                    popEnterTransition = { fadeIn(Aura.tweenMed()) },
+                    popExitTransition = {
+                        fadeOut(Aura.tweenMed()) + androidx.compose.animation.scaleOut(
+                            targetScale = 1.04f,
+                            animationSpec = Aura.tweenMed()
+                        )
+                    }
+                ) {
+                    composable(Screen.Pulse.route) {
+                        val deviceStatuses by discoveryViewModel.deviceStatuses.collectAsState()
+                        PulseScreen(
+                            devices = devices,
+                            deviceStatuses = deviceStatuses,
+                            onDeviceClick = { device ->
+                                selectedDevice = device
+                                navController.navigate(Screen.Console.createRoute(device.deviceId))
+                            },
+                            onViewAllDevices = { navController.navigate(Screen.Circle.route) },
+                            onScanQR = { navController.navigate(Screen.Pair.route) },
+                            onLockAll = {
+                                devices.forEach { device ->
+                                    controlViewModel.lockDevice(device, true, discoveryViewModel)
                                 }
+                            },
+                            onRefresh = { discoveryViewModel.refreshDevices() },
+                            onOpenInsights = { navController.navigate(Screen.Insights.route) },
+                            onOpenDeviceOwnerGuide = { navController.navigate(Screen.DeviceOwnerGuide.route) },
+                            onToggleDeviceLock = { device ->
+                                val locked = discoveryViewModel.deviceStatuses.value[device.deviceId]?.isLocked == true
+                                controlViewModel.lockDevice(device, !locked, discoveryViewModel)
                             }
                         )
                     }
-                }
-            ) { paddingValues ->
-            NavHost(
-                navController = navController,
-                startDestination = Screen.Dashboard.route,
-                modifier = Modifier.padding(paddingValues),
-                enterTransition = {
-                    fadeIn(animationSpec = tween(300)) + slideInHorizontally(
-                        initialOffsetX = { it / 4 },
-                        animationSpec = tween(300)
-                    )
-                },
-                exitTransition = {
-                    fadeOut(animationSpec = tween(300))
-                },
-                popEnterTransition = {
-                    fadeIn(animationSpec = tween(300))
-                },
-                popExitTransition = {
-                    fadeOut(animationSpec = tween(300)) + slideOutHorizontally(
-                        targetOffsetX = { it / 4 },
-                        animationSpec = tween(300)
-                    )
-                }
-            ) {
-                // Dashboard
-                composable(Screen.Dashboard.route) {
-                    val deviceStatuses by discoveryViewModel.deviceStatuses.collectAsState()
-                    DashboardScreen(
-                        devices = devices,
-                        deviceStatuses = deviceStatuses,
-                        onDeviceClick = { device ->
-                            selectedDevice = device
-                            navController.navigate(Screen.DeviceControl.createRoute(device.ip.hostAddress ?: "unknown"))
-                        },
-                        onViewAllDevices = {
-                            navController.navigate(Screen.Devices.route)
-                        },
-                        onScanQR = {
-                            navController.navigate(Screen.QRScanner.route)
-                        },
-                        onLockAll = {
-                            devices.forEach { device ->
-                                controlViewModel.lockDevice(device, true, discoveryViewModel)
+
+                    composable(Screen.Circle.route) {
+                        val bluetoothCandidates by discoveryViewModel.bluetoothCandidates.collectAsState()
+                        val isBluetoothScanning by discoveryViewModel.isBluetoothScanning.collectAsState()
+                        val deviceStatuses by discoveryViewModel.deviceStatuses.collectAsState()
+                        CircleScreen(
+                            devices = devices,
+                            isScanning = isScanning,
+                            bluetoothCandidates = bluetoothCandidates,
+                            isBluetoothScanning = isBluetoothScanning,
+                            deviceStatuses = deviceStatuses,
+                            onStartScan = { discoveryViewModel.startDiscovery() },
+                            onStartBluetoothScan = { discoveryViewModel.startBluetoothScan() },
+                            onStopBluetoothScan = { discoveryViewModel.stopBluetoothScan() },
+                            onConnectBluetooth = { candidate -> discoveryViewModel.connectBluetoothDevice(candidate) },
+                            onDeviceSelected = { device ->
+                                selectedDevice = device
+                                navController.navigate(Screen.Console.createRoute(device.deviceId))
+                            },
+                            onScanQR = { navController.navigate(Screen.Pair.route) },
+                            onResetAll = { discoveryViewModel.resetAllDevices() },
+                            onRemoveDevice = { device -> discoveryViewModel.removeDevice(device) }
+                        )
+                    }
+
+                    composable(
+                        route = Screen.Console.route,
+                        arguments = listOf(navArgument("deviceId") { type = NavType.StringType })
+                    ) { backStackEntry ->
+                        val deviceId = backStackEntry.arguments?.getString("deviceId")
+                        val device = devices.find { it.deviceId == deviceId }
+                            ?: devices.find { it.ip.hostAddress == deviceId }
+                            ?: selectedDevice?.takeIf { it.deviceId == deviceId }
+
+                        if (device != null) {
+                            DeviceConsoleScreen(
+                                device = device,
+                                viewModel = controlViewModel,
+                                discoveryViewModel = discoveryViewModel,
+                                onBack = { navController.popBackStack() },
+                                onViewHistory = { navController.navigate(Screen.Insights.route) },
+                                onOpenDeviceOwnerGuide = { navController.navigate(Screen.DeviceOwnerGuide.route) },
+                                onDeviceRemoved = {
+                                    discoveryViewModel.removeDevice(device)
+                                    navController.popBackStack()
+                                }
+                            )
+                        } else {
+                            LaunchedEffect(Unit) { navController.popBackStack() }
+                        }
+                    }
+
+                    composable(Screen.Pair.route) {
+                        QRScannerScreen(
+                            onQrScanned = { code ->
+                                discoveryViewModel.addManualDevice(code, 8080) { device ->
+                                    selectedDevice = device
+                                     navController.navigate(Screen.Console.createRoute(device.deviceId)) {
+                                        popUpTo(Screen.Pulse.route)
+                                    }
+                                }
+                            },
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+
+                    composable(
+                        route = Screen.Request.route,
+                        arguments = listOf(
+                            navArgument("deviceId") { type = NavType.StringType },
+                            navArgument("deviceName") { type = NavType.StringType },
+                            navArgument("requestType") { type = NavType.StringType },
+                            navArgument("appPackageName") {
+                                type = NavType.StringType
+                                nullable = true
+                                defaultValue = null
+                            },
+                            navArgument("appName") {
+                                type = NavType.StringType
+                                nullable = true
+                                defaultValue = null
                             }
-                        },
-                        onRefresh = { discoveryViewModel.refreshDevices() }
-                    )
-                }
-                
-                // Devices / Discovery
-                composable(Screen.Devices.route) {
-                    DeviceDiscoveryScreen(
-                        devices = devices,
-                        isScanning = isScanning,
-                        onStartScan = { discoveryViewModel.startDiscovery() },
-                        onDeviceSelected = { device ->
-                            selectedDevice = device
-                            navController.navigate(Screen.DeviceControl.createRoute(device.ip.hostAddress ?: "unknown"))
-                        },
-                        onScanQR = {
-                            navController.navigate(Screen.QRScanner.route)
-                        },
-                        onResetAll = { discoveryViewModel.resetAllDevices() },
-                        viewModel = discoveryViewModel
-                    )
-                }
-                
-                // Device Control
-                composable(
-                    route = Screen.DeviceControl.route,
-                    arguments = listOf(navArgument("deviceId") { type = NavType.StringType })
-                ) { backStackEntry ->
-                    val deviceId = backStackEntry.arguments?.getString("deviceId")
-                    val device = selectedDevice ?: devices.find { it.ip.hostAddress == deviceId }
-                    
-                    if (device != null) {
-                        DeviceControlScreen(
-                            device = device,
+                        )
+                    ) { backStackEntry ->
+                        val deviceId = backStackEntry.arguments?.getString("deviceId") ?: ""
+                        val intentDeviceName = backStackEntry.arguments?.getString("deviceName") ?: ""
+                        val requestType = backStackEntry.arguments?.getString("requestType") ?: "DEVICE"
+                        val appPackageName = backStackEntry.arguments?.getString("appPackageName")
+                        val appName = backStackEntry.arguments?.getString("appName")
+
+                        val resolvedDeviceName = remember(deviceId, devices) {
+                            devices.find { it.ip.hostAddress == deviceId }?.customName ?: intentDeviceName
+                        }
+
+                        RequestScreen(
+                            deviceId = deviceId,
+                            deviceName = resolvedDeviceName,
+                            requestType = requestType,
+                            appPackageName = appPackageName,
+                            appName = appName,
                             viewModel = controlViewModel,
                             discoveryViewModel = discoveryViewModel,
                             onBack = { navController.popBackStack() }
                         )
-                    } else {
-                        // Device not found, go back
-                        LaunchedEffect(Unit) {
-                            navController.popBackStack()
-                        }
+                    }
+
+                    composable(Screen.Insights.route) {
+                        InsightsScreen(
+                            reportsRepository = reportsRepository,
+                            onReportClick = { report ->
+                                selectedReport = report
+                                navController.navigate(Screen.ReportDetail.route)
+                            }
+                        )
+                    }
+
+                    composable(Screen.ReportDetail.route) {
+                        ReportDetailScreen(
+                            report = selectedReport,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+
+                    composable(Screen.Control.route) {
+                        ControlScreen(
+                            onLanguageChanged = { languageCode ->
+                                discoveryViewModel.syncLanguage(languageCode)
+                            },
+                            onOpenDeviceOwnerGuide = { navController.navigate(Screen.DeviceOwnerGuide.route) },
+                            onShareChildApk = { ChildApkSharer.share(context) },
+                            onOpenAbout = { navController.navigate(Screen.About.route) },
+                            onOpenHelpSupport = { navController.navigate(Screen.HelpSupport.route) }
+                        )
+                    }
+
+                    composable(Screen.DeviceOwnerGuide.route) {
+                        DeviceOwnerGuideScreen(onBack = { navController.popBackStack() })
+                    }
+
+                    composable(Screen.About.route) {
+                        AboutScreen(onBack = { navController.popBackStack() })
+                    }
+
+                    composable(Screen.HelpSupport.route) {
+                        HelpSupportScreen(onBack = { navController.popBackStack() })
                     }
                 }
-                
-                // QR Scanner
-                composable(Screen.QRScanner.route) {
-                    QRScannerScreen(
-                        onQrScanned = { code ->
-                            discoveryViewModel.addManualDevice(code, 8080) { device ->
-                                navController.navigate(Screen.DeviceControl.createRoute(device.ip.hostAddress ?: "unknown")) {
-                                    popUpTo(Screen.Dashboard.route)
+
+                if (showDock) {
+                    AuraDock(
+                        currentRoute = currentRoute,
+                        onSelect = { item ->
+                            if (item.route == Screen.Pulse.route) {
+                                // Pulse is the graph start destination. Pop back to the
+                                // existing entry instead of navigating to a second copy.
+                                navController.popBackStack(Screen.Pulse.route, inclusive = false)
+                            } else if (currentRoute != item.route) {
+                                navController.navigate(item.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
                             }
                         },
-                        onBack = { navController.popBackStack() }
-                    )
-                }
-
-                // Unlock Request
-                composable(
-                    route = Screen.UnlockRequest.route,
-                    arguments = listOf(
-                        navArgument("deviceId") { type = NavType.StringType },
-                        navArgument("deviceName") { type = NavType.StringType },
-                        navArgument("requestType") { type = NavType.StringType },
-                        navArgument("appPackageName") { 
-                            type = NavType.StringType
-                            nullable = true
-                            defaultValue = null
-                        },
-                        navArgument("appName") { 
-                            type = NavType.StringType
-                            nullable = true
-                            defaultValue = null
-                        }
-                    )
-                ) { backStackEntry ->
-                    val deviceId = backStackEntry.arguments?.getString("deviceId") ?: ""
-                    val intentDeviceName = backStackEntry.arguments?.getString("deviceName") ?: ""
-                    val requestType = backStackEntry.arguments?.getString("requestType") ?: "DEVICE"
-                    val appPackageName = backStackEntry.arguments?.getString("appPackageName")
-                    val appName = backStackEntry.arguments?.getString("appName")
-                    
-                    // Resolve the latest custom name from our devices list, or fallback to intent name
-                    val resolvedDeviceName = remember(deviceId, devices) {
-                        devices.find { it.ip.hostAddress == deviceId }?.customName ?: intentDeviceName
-                    }
-                    
-                    UnlockRequestScreen(
-                        deviceId = deviceId,
-                        deviceName = resolvedDeviceName,
-                        requestType = requestType,
-                        appPackageName = appPackageName,
-                        appName = appName,
-                        viewModel = controlViewModel,
-                        discoveryViewModel = discoveryViewModel,
-                        onBack = { navController.popBackStack() }
-                    )
-                }
-
-
-                
-                // Settings
-                composable(Screen.Settings.route) {
-                    SettingsScreen(
-                        onLanguageChanged = { languageCode ->
-                            discoveryViewModel.syncLanguage(languageCode)
-                        }
-                    )
-                }
-                
-                // Reports History
-                composable(Screen.Reports.route) {
-                    ReportsHistoryScreen(
-                        reportsRepository = reportsRepository,
-                        onReportClick = { report ->
-                            selectedReport = report
-                            navController.navigate("report_detail")
-                        },
-                        onBack = { navController.popBackStack() }
-                    )
-                }
-                
-                // Individual Report Detail (Reuse DailyReportScreen)
-                composable("report_detail") {
-                    DailyReportScreen(
-                        report = selectedReport,
-                        onBack = { navController.popBackStack() }
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .navigationBarsPadding()
+                            .padding(start = 20.dp, end = 20.dp, bottom = 18.dp)
                     )
                 }
             }
         }
-        }
     }
 }
 
-@Composable
-private fun PremiumBottomNavigation(
-    items: List<BottomNavItem>,
-    currentRoute: String?,
-    onItemClick: (BottomNavItem) -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 24.dp)
-            .shadow(
-                elevation = 16.dp,
-                shape = RoundedCornerShape(32.dp),
-                spotColor = LiquidBlue.copy(alpha = 0.5f)
-            )
-            .clip(RoundedCornerShape(32.dp))
-            .background(LiquidCardBackground)
-            .border(
-                width = 1.dp,
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        Color.White.copy(alpha = 0.6f),
-                        Color.White.copy(alpha = 0.1f)
-                    )
-                ),
-                shape = RoundedCornerShape(32.dp)
-            )
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            items.forEach { item ->
-                val selected = currentRoute == item.route
-                
-                // Animated scale
-                val scale by animateFloatAsState(
-                    targetValue = if (selected) 1.2f else 1.0f,
-                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-                    label = "scale"
-                )
-                
-                // Animated color
-                val iconColor by animateColorAsState(
-                    targetValue = if (selected) LiquidBlue else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                    label = "color"
-                )
+// ============================================================================
+// Floating dock — neumorphic island, concave selected seat.
+// ============================================================================
 
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null
-                        ) { onItemClick(item) }
-                        .scale(scale)
-                ) {
+@Composable
+private fun AuraDock(
+    currentRoute: String?,
+    onSelect: (DockItem) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .neumorphic(shape = RoundedCornerShape(32.dp), backgroundColor = Nm.surface, elevation = 10.dp)
+            .border(1.dp, Nm.primary.copy(alpha = 0.08f), RoundedCornerShape(32.dp))
+            .padding(horizontal = 8.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        dockItems.forEach { item ->
+            val selected = currentRoute == item.route
+            val (interactionSource, scale) = rememberNmPress(0.88f)
+            val iconTint by animateColorAsState(
+                targetValue = if (selected) Nm.primary else Nm.onSurfaceMuted,
+                animationSpec = tween(220, easing = Nm.EaseOutSoft),
+                label = "dock-tint"
+            )
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .graphicsLayer { scaleX = scale; scaleY = scale }
+                    .clip(RoundedCornerShape(22.dp))
+                    .then(
+                        if (selected) {
+                            Modifier.neumorphic(
+                                shape = RoundedCornerShape(22.dp),
+                                backgroundColor = Nm.inset,
+                                elevation = 4.dp,
+                                pressed = true
+                            )
+                        } else Modifier
+                    )
+                    .clickable(interactionSource = interactionSource, indication = null) { onSelect(item) }
+                    .padding(horizontal = 6.dp, vertical = 7.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(
                         modifier = Modifier
-                            .size(48.dp)
-                            .clip(CircleShape)
-                            .background(
-                                if (selected) LiquidBlue.copy(alpha = 0.1f) else Color.Transparent
-                            ),
+                            .size(30.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = if (selected) item.selectedIcon else item.unselectedIcon,
                             contentDescription = stringResource(item.titleResId),
-                            tint = iconColor,
-                            modifier = Modifier.size(24.dp)
+                            tint = iconTint,
+                            modifier = Modifier.size(if (selected) 24.dp else 21.dp)
                         )
                     }
-                    
-                    if (selected) {
-                        Box(
-                            modifier = Modifier
-                                .padding(top = 4.dp)
-                                .size(4.dp)
-                                .clip(CircleShape)
-                                .background(LiquidBlue)
-                        )
-                    }
+                    Spacer(Modifier.height(1.dp))
+                    Text(
+                        text = stringResource(item.titleResId),
+                        color = iconTint,
+                        fontFamily = DisplayFontFamily,
+                        fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+                        fontSize = 10.sp,
+                        letterSpacing = 0.1.sp,
+                        maxLines = 1
+                    )
                 }
             }
         }

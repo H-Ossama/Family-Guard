@@ -8,8 +8,25 @@ data class AppUsageLog(
     val totalTimeInForeground: Long, // milliseconds
     val lastTimeUsed: Long, // timestamp
     val date: String, // YYYY-MM-DD for easy aggregation
-    val category: AppCategory = AppCategory.OTHER
+    val category: AppCategory = AppCategory.OTHER,
+    val appLabel: String? = null
 )
+
+/**
+ * UsageStatsManager can return more than one record for a package. The UI and
+ * command layer treat a package as one app, so merge those records first.
+ */
+fun List<AppUsageLog>.mergedByPackage(): List<AppUsageLog> =
+    groupBy { it.packageName }
+        .values
+        .map { entries ->
+            val latest = entries.maxByOrNull { it.lastTimeUsed } ?: return@map null
+            latest.copy(
+                totalTimeInForeground = entries.sumOf { it.totalTimeInForeground }
+            )
+        }
+        .filterNotNull()
+        .sortedByDescending { it.totalTimeInForeground }
 
 @Serializable
 data class CategoryUsage(
@@ -54,7 +71,9 @@ data class DeviceStats(
     val breakWarningMs: Long = 0,
     val educationOnly: Boolean = false,
     val allowExtensions: Boolean = false,
-    val lockReason: String? = null
+    val lockReason: String? = null,
+    val deviceOwnerCapabilities: DeviceOwnerCapabilities = DeviceOwnerCapabilities(),
+    val blockingScreenStyle: BlockingScreenStyle? = null
 )
 
 @Serializable

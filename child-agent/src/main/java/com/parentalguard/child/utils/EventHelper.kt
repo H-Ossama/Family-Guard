@@ -32,8 +32,7 @@ object EventHelper {
         appPackageName: String? = null,
         appName: String? = null
     ) {
-        val prefs = context.getSharedPreferences("child_prefs", Context.MODE_PRIVATE)
-        val deviceName = prefs.getString("device_name", null) ?: android.os.Build.MODEL
+        val deviceName = DeviceUtils.getDeviceName(context)
         
         sendInternalEvent(
             context = context,
@@ -47,8 +46,7 @@ object EventHelper {
     }
 
     fun sendExtensionRequest(context: Context) {
-        val prefs = context.getSharedPreferences("child_prefs", Context.MODE_PRIVATE)
-        val deviceName = prefs.getString("device_name", null) ?: android.os.Build.MODEL
+        val deviceName = DeviceUtils.getDeviceName(context)
         
         sendInternalEvent(
             context = context,

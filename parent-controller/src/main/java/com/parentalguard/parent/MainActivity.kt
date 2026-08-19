@@ -46,10 +46,18 @@ class MainActivity : AppCompatActivity() {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             list.add(Manifest.permission.POST_NOTIFICATIONS)
                         }
-                        // Location is needed for NSD on many versions
-                        list.add(Manifest.permission.ACCESS_FINE_LOCATION)
+                        // NSD discovery needs location on older releases; on 13+ the
+                        // neverForLocation NEARBY_WIFI_DEVICES permission replaces it.
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                            list.add(Manifest.permission.ACCESS_FINE_LOCATION)
+                        }
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             list.add(Manifest.permission.NEARBY_WIFI_DEVICES)
+                        }
+                        // Bluetooth (RFCOMM transport fallback)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            list.add(Manifest.permission.BLUETOOTH_CONNECT)
+                            list.add(Manifest.permission.BLUETOOTH_SCAN)
                         }
                         list
                     }

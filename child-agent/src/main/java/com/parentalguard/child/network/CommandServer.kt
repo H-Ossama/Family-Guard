@@ -3,6 +3,7 @@ package com.parentalguard.child.network
 import com.parentalguard.child.data.RuleRepository
 import com.parentalguard.child.monitor.UsageMonitor
 import com.parentalguard.child.service.MonitorService
+import com.parentalguard.child.policy.DeviceOwnerManager
 import com.parentalguard.common.model.DeviceStats
 import com.parentalguard.common.network.CommandType
 import com.parentalguard.common.network.Packet
@@ -24,6 +25,7 @@ import android.util.Log
 import java.time.Duration
 import java.util.Collections
 import kotlinx.coroutines.launch
+import java.security.MessageDigest
 
 class CommandServer(private val context: Context) {
     
@@ -37,6 +39,21 @@ class CommandServer(private val context: Context) {
     // Store parent IP for sending unlock requests
     var parentIp: String? = null
 
+    /**
+     * Validates the pairing token carried by an inbound call. Compares
+     * constant-time to avoid trivial timing side-channels.
+     */
+    private fun isAuthorized(call: io.ktor.server.application.ApplicationCall): Boolean {
+        val expected = PairingManager.getToken(context) ?: return false
+        val provided = call.request.headers["X-Pair-Token"]
+            ?: call.request.queryParameters["token"]
+            ?: return false
+        return MessageDigest.isEqual(
+            expected.toByteArray(Charsets.UTF_8),
+            provided.toByteArray(Charsets.UTF_8)
+        )
+    }
+
     fun start() {
         if (server != null) return
 
@@ -44,11 +61,21 @@ class CommandServer(private val context: Context) {
             install(WebSockets) {
                 pingPeriod = Duration.ofSeconds(15)
                 timeout = Duration.ofSeconds(15)
-                maxFrameSize = Long.MAX_VALUE
+                maxFrameSize = 64 * 1024 // Bound frame size (was Long.MAX_VALUE = memory-exhaustion risk)
                 masking = false
             }
             install(ContentNegotiation) {
                 json(json)
+            }
+
+            // C3: require the pairing token on every route except /ping.
+            // Token is sent as the X-Pair-Token header (HTTP) or ?token= query param (WebSocket).
+            intercept(ApplicationCallPipeline.Call) {
+                val path = call.request.path()
+                if (path != "/ping" && !isAuthorized(call)) {
+                    call.respond(Packet.Response(false, "Unauthorized"))
+                    finish()
+                }
             }
 
             routing {
@@ -102,8 +129,11 @@ class CommandServer(private val context: Context) {
                         isIconHidden = isIconHidden,
                         appTimers = appTimers,
                         categoryTimers = RuleRepository.categoryTimers.value,
+                        deviceName = com.parentalguard.child.utils.DeviceUtils.getDeviceName(this@CommandServer.context),
                         usageLimitMs = RuleRepository.usageLimitMs.value,
-                        breakDurationMs = RuleRepository.breakDurationMs.value
+                        breakDurationMs = RuleRepository.breakDurationMs.value,
+                        deviceOwnerCapabilities = DeviceOwnerManager.capabilities(this@CommandServer.context),
+                        blockingScreenStyle = RuleRepository.blockingScreenStyle.value
                     )
                     call.respond(Packet.Response(true, stats = stats))
                 }
@@ -155,19 +185,32 @@ class CommandServer(private val context: Context) {
                 post("/rules") {
                     try {
                         val packet = call.receive<Packet.Command>()
-                        if (packet.commandType == CommandType.UPDATE_RULES && packet.ruleSet != null) {
+                        if (packet.commandType == CommandType.SET_BLOCKING_SCREEN_STYLE && packet.blockingScreenStyle != null) {
+                            RuleRepository.setBlockingScreenStyle(packet.blockingScreenStyle!!)
+                            call.respond(Packet.Response(true, "Blocked-screen style updated", requestId = packet.requestId))
+                        } else if (packet.commandType == CommandType.UPDATE_RULES && packet.ruleSet != null) {
                             RuleRepository.updateRules(packet.ruleSet!!.rules)
                             RuleRepository.updateCategoryLimits(packet.ruleSet!!.categoryLimits)
                             RuleRepository.setTemporaryUnlock(packet.ruleSet!!.temporaryUnlockUntil)
                             RuleRepository.setGlobalLockUntil(packet.ruleSet!!.globalLockUntil)
                             RuleRepository.setBreakRules(packet.ruleSet!!.usageLimitMs, packet.ruleSet!!.breakDurationMs)
                             Log.i("CommandServer", "Rules updated: ${packet.ruleSet!!.rules.size} rules, Break: ${packet.ruleSet!!.usageLimitMs}/${packet.ruleSet!!.breakDurationMs}")
-                            call.respond(Packet.Response(true, "Rules updated"))
+                            call.respond(Packet.Response(true, "Rules updated", requestId = packet.requestId))
                         } else {
-                            call.respond(Packet.Response(false, "Invalid command"))
+                            call.respond(Packet.Response(false, "Invalid command", requestId = packet.requestId))
                         }
                     } catch (e: Exception) {
                         Log.e("CommandServer", "Error updating rules", e)
+                        call.respond(Packet.Response(false, e.message))
+                    }
+                }
+
+                post("/device-owner") {
+                    try {
+                        val packet = call.receive<Packet.Command>()
+                        call.respond(CommandDispatcher.dispatch(this@CommandServer.context, packet))
+                    } catch (e: Exception) {
+                        Log.e("CommandServer", "Error handling Device Owner command", e)
                         call.respond(Packet.Response(false, e.message))
                     }
                 }
@@ -177,8 +220,8 @@ class CommandServer(private val context: Context) {
                         val packet = call.receive<Packet.Command>()
                         if (packet.commandType == CommandType.UPDATE_DEVICE_NAME && packet.deviceName != null) {
                             Log.i("CommandServer", "Renaming device to: ${packet.deviceName}")
-                            // In a real implementation, we would persist this name.
-                             call.respond(Packet.Response(true, "Device renamed"))
+                            com.parentalguard.child.utils.DeviceUtils.setCustomDeviceName(this@CommandServer.context, packet.deviceName!!)
+                            call.respond(Packet.Response(true, "Device renamed"))
                         } else if (packet.commandType == CommandType.SET_APP_CATEGORY && packet.packageName != null && packet.category != null) {
                             val pkgName = packet.packageName!!
                             val cat = packet.category!!
@@ -198,9 +241,8 @@ class CommandServer(private val context: Context) {
                             Log.i("CommandServer", "Set category timer for $cat to ${duration}ms")
                             call.respond(Packet.Response(true, "Category timer set"))
                         } else if (packet.commandType == CommandType.SET_LANGUAGE && packet.languageCode != null) {
-                            Log.i("CommandServer", "Language sync received: ${packet.languageCode}")
-                            // We can use this to update localized strings if needed, or just ACK
-                            call.respond(Packet.Response(true, "Language synced"))
+                            Log.i("CommandServer", "Ignoring language command; child follows device locale")
+                            call.respond(Packet.Response(true, "Child follows device language"))
                         } else if (packet.commandType == CommandType.SET_RELAY_PARENT_ID && packet.relayParentId != null) {
                             Log.i("CommandServer", "Relay Parent ID received: ${packet.relayParentId}")
                             val prefs = this@CommandServer.context.getSharedPreferences("relay_prefs", Context.MODE_PRIVATE)
@@ -225,30 +267,8 @@ class CommandServer(private val context: Context) {
                              RuleRepository.setGlobalLock(false)
                              call.respond(Packet.Response(true, "Device Unlocked"))
                          } else if (packet.commandType == CommandType.SET_LANGUAGE && packet.languageCode != null) {
-                             // Handle Language Set
-                             val languageCode = packet.languageCode!!
-                             Log.i("CommandServer", "Setting language to $languageCode")
-                             
-                             // Persist language
-                             val prefs = this@CommandServer.context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-                             prefs.edit().putString("language_code", languageCode).apply()
-                             
-                             // Update Locale
-                             val locale = java.util.Locale(languageCode)
-                             java.util.Locale.setDefault(locale)
-                             val config = android.content.res.Configuration()
-                             config.setLocale(locale)
-                             this@CommandServer.context.resources.updateConfiguration(config, this@CommandServer.context.resources.displayMetrics)
-                             
-                             // Restart App to apply changes
-                             val i = this@CommandServer.context.packageManager.getLaunchIntentForPackage(this@CommandServer.context.packageName)
-                             if (i != null) {
-                                 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                 this@CommandServer.context.startActivity(i)
-                             }
-                             
-                             call.respond(Packet.Response(true, "Language updated"))
+                              Log.i("CommandServer", "Ignoring language command; child follows device locale")
+                              call.respond(Packet.Response(true, "Child follows device language"))
                          } else {
                              call.respond(Packet.Response(false, "Invalid lock/command"))
                          }
@@ -278,6 +298,24 @@ class CommandServer(private val context: Context) {
                             CommandType.DENY_UNLOCK -> {
                                 Log.i("CommandServer", "Unlock request denied")
                                 call.respond(Packet.Response(true, "Unlock denied"))
+                            }
+                            CommandType.APPROVE_EXTENSION -> {
+                                // "One more minute": extend the active break (global lock) by 60s
+                                Log.i("CommandServer", "Extension approved (+1 min)")
+                                if (RuleRepository.globalLock.value) {
+                                    val newUntil = RuleRepository.globalLockUntil.value + 60_000
+                                    RuleRepository.setGlobalLockUntil(newUntil, RuleRepository.lockReason.value)
+                                }
+                                call.respond(Packet.Response(true, "Extension approved (+1 min)"))
+                            }
+                            CommandType.DENY_EXTENSION -> {
+                                Log.i("CommandServer", "Extension denied")
+                                call.respond(Packet.Response(true, "Extension denied"))
+                            }
+                            CommandType.STOP_BREAK -> {
+                                Log.i("CommandServer", "Break stopped by parent")
+                                RuleRepository.setGlobalLock(false)
+                                call.respond(Packet.Response(true, "Break stopped"))
                             }
                             else -> {
                                 call.respond(Packet.Response(false, "Invalid unlock response"))
@@ -328,25 +366,8 @@ class CommandServer(private val context: Context) {
     }
     
     /**
-     * Send unlock request to parent app
-     * This would be called from MainActivity when child taps "Request Unlock"
+     * Broadcast an event to all connected parents (WebSocket clients).
      */
-    suspend fun sendUnlockRequest(message: String): Boolean {
-        // This is a simplified version. In production, you'd want to:
-        // 1. Queue the request if parent is not currently connected
-        // 2. Use a proper HTTP client like Ktor client
-        // 3. Handle retries and timeouts
-        return try {
-            // Parent app would need to be listening for incoming requests
-            // For now, this is a placeholder
-            Log.i("CommandServer", "Unlock request: $message")
-            true
-        } catch (e: Exception) {
-            Log.e("CommandServer", "Failed to send unlock request", e)
-            false
-        }
-    }
-
     fun broadcast(event: Packet.Event) {
         val message = json.encodeToString<Packet>(event)
         server?.application?.launch {

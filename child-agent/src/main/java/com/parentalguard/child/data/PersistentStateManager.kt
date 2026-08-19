@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import com.parentalguard.common.model.BlockingRule
 import com.parentalguard.common.model.CategoryLimit
 import com.parentalguard.common.model.AppCategory
+import com.parentalguard.common.model.BlockingScreenStyle
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
@@ -22,6 +23,7 @@ class PersistentStateManager(context: Context) {
     companion object {
         private const val KEY_GLOBAL_LOCK = "global_lock"
         private const val KEY_GLOBAL_LOCK_UNTIL = "global_lock_until"
+        private const val KEY_GLOBAL_LOCK_REASON = "global_lock_reason"
         private const val KEY_RULES = "blocking_rules"
         private const val KEY_CATEGORY_LIMITS = "category_limits"
         private const val KEY_TEMP_UNLOCK_UNTIL = "temp_unlock_until"
@@ -34,6 +36,12 @@ class PersistentStateManager(context: Context) {
         private const val KEY_EDUCATION_ONLY = "education_only"
         private const val KEY_ALLOW_EXTENSIONS = "allow_extensions"
         private const val KEY_CURRENT_BREAK_USAGE = "current_break_usage"
+        private const val KEY_CUSTOM_CATEGORIES = "custom_categories"
+        private const val KEY_WARNINGS_SHOWN = "warnings_shown"
+        private const val KEY_BLOCKING_SCREEN_STYLE = "blocking_screen_style"
+        private const val KEY_OWNER_DEVICE_USAGE_LIMIT = "owner_device_usage_limit"
+        private const val KEY_OWNER_APP_USAGE_LIMITS = "owner_app_usage_limits"
+        private const val KEY_OWNER_USAGE_SUSPENDED = "owner_usage_suspended"
     }
     
     fun saveBreakRules(usageLimit: Long, breakDuration: Long, warningMs: Long, educationOnly: Boolean, allowExtensions: Boolean) {
@@ -72,10 +80,11 @@ class PersistentStateManager(context: Context) {
         return prefs.getLong(KEY_CURRENT_BREAK_USAGE, 0L)
     }
     
-    fun saveGlobalLock(isLocked: Boolean, lockUntil: Long) {
+    fun saveGlobalLock(isLocked: Boolean, lockUntil: Long, reason: String? = null) {
         prefs.edit()
             .putBoolean(KEY_GLOBAL_LOCK, isLocked)
             .putLong(KEY_GLOBAL_LOCK_UNTIL, lockUntil)
+            .putString(KEY_GLOBAL_LOCK_REASON, reason)
             .apply()
     }
     
@@ -171,5 +180,86 @@ class PersistentStateManager(context: Context) {
 
     fun loadLastUnlockRequestTime(): Long {
         return prefs.getLong(KEY_LAST_UNLOCK_REQUEST, 0L)
+    }
+
+    fun saveCustomCategories(categories: Map<String, AppCategory>) {
+        try {
+            val jsonString = json.encodeToString(categories)
+            prefs.edit().putString(KEY_CUSTOM_CATEGORIES, jsonString).apply()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun loadCustomCategories(): Map<String, AppCategory> {
+        val jsonString = prefs.getString(KEY_CUSTOM_CATEGORIES, null) ?: return emptyMap()
+        return try {
+            json.decodeFromString<Map<String, AppCategory>>(jsonString)
+        } catch (e: Exception) {
+            emptyMap()
+        }
+    }
+
+    fun saveWarningsShown(warnings: Map<String, String>) {
+        try {
+            val jsonString = json.encodeToString(warnings)
+            prefs.edit().putString(KEY_WARNINGS_SHOWN, jsonString).apply()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun loadWarningsShown(): Map<String, String> {
+        val jsonString = prefs.getString(KEY_WARNINGS_SHOWN, null) ?: return emptyMap()
+        return try {
+            json.decodeFromString<Map<String, String>>(jsonString)
+        } catch (e: Exception) {
+            emptyMap()
+        }
+    }
+
+    fun loadLockReason(): String? = prefs.getString(KEY_GLOBAL_LOCK_REASON, null)
+
+    fun saveBlockingScreenStyle(style: BlockingScreenStyle) {
+        prefs.edit().putString(KEY_BLOCKING_SCREEN_STYLE, style.name).apply()
+    }
+
+    fun loadBlockingScreenStyle(): BlockingScreenStyle {
+        return prefs.getString(KEY_BLOCKING_SCREEN_STYLE, null)
+            ?.let { runCatching { BlockingScreenStyle.valueOf(it) }.getOrNull() }
+            ?: BlockingScreenStyle.CURRENT
+    }
+
+    fun saveOwnerDeviceUsageLimit(limitMs: Long) {
+        prefs.edit().putLong(KEY_OWNER_DEVICE_USAGE_LIMIT, limitMs).apply()
+    }
+
+    fun loadOwnerDeviceUsageLimit(): Long =
+        prefs.getLong(KEY_OWNER_DEVICE_USAGE_LIMIT, 0L)
+
+    fun saveOwnerAppUsageLimits(limits: Map<String, Long>) {
+        try {
+            prefs.edit().putString(KEY_OWNER_APP_USAGE_LIMITS, json.encodeToString(limits)).apply()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun loadOwnerAppUsageLimits(): Map<String, Long> {
+        val value = prefs.getString(KEY_OWNER_APP_USAGE_LIMITS, null) ?: return emptyMap()
+        return runCatching { json.decodeFromString<Map<String, Long>>(value) }.getOrDefault(emptyMap())
+    }
+
+    fun saveOwnerUsageSuspended(packages: Set<String>) {
+        try {
+            prefs.edit().putString(KEY_OWNER_USAGE_SUSPENDED, json.encodeToString(packages.toList())).apply()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun loadOwnerUsageSuspended(): Set<String> {
+        val value = prefs.getString(KEY_OWNER_USAGE_SUSPENDED, null) ?: return emptySet()
+        return runCatching { json.decodeFromString<List<String>>(value).toSet() }.getOrDefault(emptySet())
     }
 }

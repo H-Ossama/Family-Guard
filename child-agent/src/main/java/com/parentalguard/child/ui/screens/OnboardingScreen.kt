@@ -3,15 +3,15 @@ package com.parentalguard.child.ui.screens
 import androidx.compose.ui.res.stringResource
 import com.parentalguard.child.R
 import androidx.compose.animation.*
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -26,16 +26,18 @@ fun OnboardingScreen(
     onRequestOverlayAccess: () -> Unit,
     onFinish: () -> Unit
 ) {
-    GradientBackground {
+    NeumorphicBackground {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding()
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            
-            // Progress Indicators (Dots)
+
+            // Progress Indicators (Neumorphic pills)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -44,23 +46,24 @@ fun OnboardingScreen(
             ) {
                 repeat(4) { index ->
                     val isActive = index == currentStep
-                    val width = if (isActive) 24.dp else 8.dp
-                    val color = if (isActive) Color.White else Color.White.copy(alpha = 0.5f)
-                    
                     Box(
                         modifier = Modifier
                             .padding(4.dp)
-                            .height(8.dp)
-                            .width(width)
-                            .background(color, IndicatorShape)
+                            .height(10.dp)
+                            .width(if (isActive) 30.dp else 10.dp)
+                            .neumorphic(
+                                shape = RoundedCornerShape(8.dp),
+                                backgroundColor = if (isActive) NeumorphicPrimary else NeumorphicSurface,
+                                elevation = if (isActive) 5.dp else 3.dp
+                            )
                     )
                 }
             }
-            
-            // Content
-            GlassCard(
+
+            // Content tile
+            NeumorphicCard(
                 modifier = Modifier.fillMaxWidth(),
-                elevation = 16.dp
+                elevation = 8.dp
             ) {
                 AnimatedContent(
                     targetState = currentStep,
@@ -91,11 +94,11 @@ fun OnboardingScreen(
                     }
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(32.dp))
-            
+
             if (currentStep == 0) {
-                GradientButton(
+                NeumorphicButton(
                     text = stringResource(R.string.onboarding_start_btn),
                     onClick = onNext,
                     icon = Icons.Default.ArrowForward,
@@ -109,28 +112,28 @@ fun OnboardingScreen(
 @Composable
 private fun IntroStep() {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(
-            imageVector = Icons.Default.Security,
-            contentDescription = null,
-            tint = Color.White,
-            modifier = Modifier.size(80.dp)
+        NeumorphicIconTile(
+            icon = Icons.Default.Security,
+            tint = NeumorphicPrimary,
+            size = 96.dp,
+            iconSize = 44.dp
         )
-        
+
         Spacer(modifier = Modifier.height(24.dp))
-        
+
         Text(
             text = stringResource(R.string.onboarding_intro_title),
             style = MaterialTheme.typography.headlineMedium,
-            color = Color.White,
+            color = NeumorphicOnSurface,
             textAlign = TextAlign.Center
         )
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
+
+        Spacer(modifier = Modifier.height(12.dp))
+
         Text(
             text = stringResource(R.string.onboarding_intro_desc),
             style = MaterialTheme.typography.bodyLarge,
-            color = Color.White.copy(alpha = 0.9f),
+            color = NeumorphicOnSurfaceMuted,
             textAlign = TextAlign.Center
         )
     }
@@ -140,39 +143,39 @@ private fun IntroStep() {
 private fun PermissionStep(
     title: String,
     description: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     buttonText: String,
     onAction: () -> Unit
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = Color.White,
-            modifier = Modifier.size(80.dp)
+        NeumorphicIconTile(
+            icon = icon,
+            tint = NeumorphicPrimary,
+            size = 96.dp,
+            iconSize = 44.dp
         )
-        
+
         Spacer(modifier = Modifier.height(24.dp))
-        
+
         Text(
             text = title,
             style = MaterialTheme.typography.headlineSmall,
-            color = Color.White,
+            color = NeumorphicOnSurface,
             textAlign = TextAlign.Center
         )
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
+
+        Spacer(modifier = Modifier.height(12.dp))
+
         Text(
             text = description,
             style = MaterialTheme.typography.bodyLarge,
-            color = Color.White.copy(alpha = 0.9f),
+            color = NeumorphicOnSurfaceMuted,
             textAlign = TextAlign.Center
         )
-        
-        Spacer(modifier = Modifier.height(32.dp))
-        
-        GradientButton(
+
+        Spacer(modifier = Modifier.height(28.dp))
+
+        NeumorphicButton(
             text = buttonText,
             onClick = onAction,
             icon = Icons.Default.Settings,
@@ -184,34 +187,34 @@ private fun PermissionStep(
 @Composable
 private fun DoneStep(onFinish: () -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(
-            imageVector = Icons.Default.CheckCircle,
-            contentDescription = null,
-            tint = Success,
-            modifier = Modifier.size(80.dp)
+        NeumorphicIconTile(
+            icon = Icons.Default.CheckCircle,
+            tint = NeumorphicSuccess,
+            size = 96.dp,
+            iconSize = 44.dp
         )
-        
+
         Spacer(modifier = Modifier.height(24.dp))
-        
+
         Text(
             text = stringResource(R.string.onboarding_done_title),
             style = MaterialTheme.typography.headlineMedium,
-            color = Color.White,
+            color = NeumorphicOnSurface,
             textAlign = TextAlign.Center
         )
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
+
+        Spacer(modifier = Modifier.height(12.dp))
+
         Text(
             text = stringResource(R.string.onboarding_done_desc),
             style = MaterialTheme.typography.bodyLarge,
-            color = Color.White.copy(alpha = 0.9f),
+            color = NeumorphicOnSurfaceMuted,
             textAlign = TextAlign.Center
         )
-        
-        Spacer(modifier = Modifier.height(32.dp))
-        
-        GradientButton(
+
+        Spacer(modifier = Modifier.height(28.dp))
+
+        NeumorphicButton(
             text = stringResource(R.string.onboarding_enter_btn),
             onClick = onFinish,
             icon = Icons.Default.Login,

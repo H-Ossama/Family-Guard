@@ -15,7 +15,11 @@ data class SavedDevice(
     val name: String,
     val ipAddress: String,
     val port: Int,
-    val customName: String
+    val customName: String,
+    val reportedName: String? = null,
+    val bluetoothName: String? = null,
+    val bluetoothMac: String? = null,
+    val pairToken: String? = null
 )
 
 class DeviceRepository(context: Context) {
@@ -42,7 +46,11 @@ class DeviceRepository(context: Context) {
                 name = device.name,
                 ipAddress = device.ip.hostAddress ?: "",
                 port = device.port,
-                customName = device.customName
+                    customName = device.customName,
+                    reportedName = device.reportedName,
+                bluetoothName = device.bluetoothName,
+                bluetoothMac = device.bluetoothMac,
+                pairToken = device.pairToken
             )
         }
         
@@ -64,7 +72,11 @@ class DeviceRepository(context: Context) {
                     name = saved.name,
                     ip = InetAddress.getByName(saved.ipAddress),
                     port = saved.port,
-                    customName = saved.customName
+                    customName = saved.customName,
+                    reportedName = saved.reportedName,
+                    bluetoothName = saved.bluetoothName,
+                    bluetoothMac = saved.bluetoothMac,
+                    pairToken = saved.pairToken
                 )
             }
         } catch (e: Exception) {

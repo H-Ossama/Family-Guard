@@ -23,11 +23,24 @@ data class ChildDevice(
     val name: String,          // Original device name
     var ip: InetAddress,       // Mutable to allow updating IP for same deviceId
     val port: Int,
-    var customName: String = name  // User-defined custom name
+    var customName: String = name,  // User-defined custom name
+    var reportedName: String? = null, // Latest name reported by the child
+    var bluetoothName: String? = null, // BT adapter name advertised by the child (PG_Child_<id>)
+    var bluetoothMac: String? = null,  // Remote BT device address, resolved via discovery
+    var pairToken: String? = null      // Pairing token from the child's QR (authenticates LAN commands)
+)
+
+/** A child device found via Bluetooth discovery, ready to be added to the circle. */
+data class BluetoothDeviceCandidate(
+    val deviceId: String,
+    val name: String,
+    val mac: String,
+    val alreadyPaired: Boolean = false
 )
 
 enum class ConnectionType {
     LOCAL,      // Direct WiFi connection
+    BLUETOOTH,  // Classic RFCOMM (SPP) connection
     CLOUD,      // Via cloud relay server  
     UNKNOWN     // Status not yet determined
 }
@@ -39,7 +52,8 @@ data class DeviceStatusSummary(
     val activeRulesCount: Int = 0,
     val todayScreenTimeMs: Long = 0,
     val lastUpdate: Long = 0,
-    val connectionType: ConnectionType = ConnectionType.UNKNOWN
+    val connectionType: ConnectionType = ConnectionType.UNKNOWN,
+    val reportedDeviceName: String? = null
 )
 
 class DiscoveryViewModel(application: Application) : AndroidViewModel(application) {
@@ -53,7 +67,17 @@ class DiscoveryViewModel(application: Application) : AndroidViewModel(applicatio
     private val _isScanning = MutableStateFlow(false)
     val isScanning: StateFlow<Boolean> = _isScanning.asStateFlow()
 
+    private val _isBluetoothScanning = MutableStateFlow(false)
+    val isBluetoothScanning: StateFlow<Boolean> = _isBluetoothScanning.asStateFlow()
+
+    private val _bluetoothCandidates = MutableStateFlow<List<BluetoothDeviceCandidate>>(emptyList())
+    val bluetoothCandidates: StateFlow<List<BluetoothDeviceCandidate>> = _bluetoothCandidates.asStateFlow()
+
+    private var bluetoothScanJob: Job? = null
+    private var autoBluetoothDiscoveryJob: Job? = null
+
     private val deviceClient = DeviceClient(application)
+    private val bluetoothClient = com.parentalguard.parent.network.BluetoothClient(application)
     private val observationJobs = ConcurrentHashMap<String, Job>()
     
     // Repositories for persistence
@@ -65,6 +89,8 @@ class DiscoveryViewModel(application: Application) : AndroidViewModel(applicatio
         loadSavedDevices()
         // Start network discovery automatically
         startDiscovery()
+        // Discover Bluetooth children to fill in their MACs for the BT fallback tier
+        autoBluetoothDiscoveryJob = startBluetoothDiscoveryInternal()
     }
 
     private fun loadSavedDevices() {
@@ -77,6 +103,12 @@ class DiscoveryViewModel(application: Application) : AndroidViewModel(applicatio
                 if (savedDevices.isNotEmpty()) {
                     _devices.value = savedDevices
                     Log.i("DiscoveryViewModel", "Loaded ${savedDevices.size} saved devices")
+                    
+                    // Restore pairing tokens so LAN commands remain authenticated after restart
+                    savedDevices.forEach { device ->
+                        device.pairToken?.let { deviceClient.registerPairToken(device.deviceId, it) }
+                        device.bluetoothMac?.let { deviceClient.registerBluetoothMac(device.deviceId, it) }
+                    }
                     
                     // Start monitoring all saved devices
                     savedDevices.forEach { device ->
@@ -111,11 +143,32 @@ class DiscoveryViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope.launch {
             try {
                 val parts = qrCode.split("|")
-                val (deviceId, hostPort, deviceName) = if (parts.size == 3) {
-                    Triple(parts[0], parts[1], parts[2])
-                } else {
-                    // Fallback for old IP-only QR codes
-                    Triple("legacy_${qrCode.replace(".", "_")}", qrCode, "Legacy Device")
+                val deviceId: String
+                val hostPort: String
+                val deviceName: String
+                val bluetoothName: String?
+                val pairToken: String?
+                when {
+                    parts.size >= 5 -> {
+                        deviceId = parts[0]; hostPort = parts[1]; deviceName = parts[2]
+                        bluetoothName = parts[3]; pairToken = parts[4]
+                    }
+                    parts.size == 4 -> {
+                        deviceId = parts[0]; hostPort = parts[1]; deviceName = parts[2]
+                        bluetoothName = parts[3]; pairToken = null
+                    }
+                    parts.size == 3 -> {
+                        deviceId = parts[0]; hostPort = parts[1]; deviceName = parts[2]
+                        bluetoothName = null; pairToken = null
+                    }
+                    else -> {
+                        // Fallback for old IP-only QR codes
+                        deviceId = "legacy_${qrCode.replace(".", "_")}"
+                        hostPort = qrCode
+                        deviceName = "Legacy Device"
+                        bluetoothName = null
+                        pairToken = null
+                    }
                 }
 
                 val hostParts = hostPort.split(":")
@@ -133,8 +186,13 @@ class DiscoveryViewModel(application: Application) : AndroidViewModel(applicatio
                     name = deviceName,
                     ip = host,
                     port = port,
-                    customName = existingCustomName ?: deviceName
+                    customName = existingCustomName ?: deviceName,
+                    reportedName = deviceName,
+                    bluetoothName = bluetoothName,
+                    pairToken = pairToken
                 )
+                
+                if (pairToken != null) deviceClient.registerPairToken(deviceId, pairToken)
                 
                 val currentList = _devices.value.toMutableList()
                 val existingIndex = currentList.indexOfFirst { it.deviceId == newDevice.deviceId }
@@ -172,6 +230,139 @@ class DiscoveryViewModel(application: Application) : AndroidViewModel(applicatio
     private fun observeDeviceEvents(device: ChildDevice) {
         // Delegate observation to Foreground Service to ensure it runs in background
         com.parentalguard.parent.service.NotificationService.startMonitoring(getApplication(), device)
+    }
+
+    /**
+     * Scans for child devices advertising the PG_Child_<deviceId> Bluetooth name
+     * and records their MAC address so DeviceClient can use BT as a fallback tier.
+     */
+    private fun startBluetoothDiscoveryInternal(): Job {
+        return viewModelScope.launch(Dispatchers.IO) {
+            bluetoothClient.discoverChildren().collect { (deviceId, btDevice) ->
+                val currentList = _devices.value.toMutableList()
+                val index = currentList.indexOfFirst { it.deviceId == deviceId }
+                val mac = runCatching { btDevice.address }.getOrNull() ?: return@collect
+
+                deviceClient.registerBluetoothMac(deviceId, mac)
+
+                if (index != -1) {
+                    val current = currentList[index]
+                    val updated = current.copy(bluetoothMac = mac)
+                    if (updated.bluetoothMac != current.bluetoothMac || updated.bluetoothName == null) {
+                        currentList[index] = updated.copy(
+                            bluetoothName = current.bluetoothName ?: runCatching { btDevice.name }.getOrNull()
+                                ?: BluetoothConfig.bluetoothNameFor(deviceId)
+                        )
+                        _devices.value = currentList
+                        saveDevices()
+                        Log.i("DiscoveryViewModel", "Linked BT ${mac} to ${current.customName}")
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Manual Bluetooth scan for the "Pair via Bluetooth" flow. Populates
+     * [bluetoothCandidates] with nearby children advertising PG_Child_<id>.
+     */
+    fun startBluetoothScan() {
+        if (bluetoothScanJob?.isActive == true) return
+        // Pause the auto-discovery while a manual scan owns the adapter, so the
+        // ACTION_FOUND results reach this collector (Android allows one discovery).
+        autoBluetoothDiscoveryJob?.cancel()
+        autoBluetoothDiscoveryJob = null
+        _isBluetoothScanning.value = true
+        _bluetoothCandidates.value = emptyList()
+        bluetoothScanJob = viewModelScope.launch(Dispatchers.IO) {
+            try {
+                bluetoothClient.discoverChildren().collect { (deviceId, btDevice) ->
+                    val mac = runCatching { btDevice.address }.getOrNull() ?: return@collect
+                    val name = runCatching { btDevice.name }.getOrNull()
+                        ?: BluetoothConfig.bluetoothNameFor(deviceId)
+                    val alreadyPaired = _devices.value.any { it.deviceId == deviceId }
+                    val candidates = _bluetoothCandidates.value.toMutableList()
+                    candidates.removeAll { it.deviceId == deviceId }
+                    candidates.add(BluetoothDeviceCandidate(deviceId, name, mac, alreadyPaired))
+                    _bluetoothCandidates.value = candidates
+                    Log.i("DiscoveryViewModel", "BT scan found ${name} (${mac})")
+                }
+            } catch (e: Exception) {
+                Log.e("DiscoveryViewModel", "Bluetooth scan error", e)
+            } finally {
+                _isBluetoothScanning.value = false
+            }
+        }
+    }
+
+    fun stopBluetoothScan() {
+        bluetoothScanJob?.cancel()
+        bluetoothScanJob = null
+        _isBluetoothScanning.value = false
+        // Resume the background auto-discovery that links MACs for known devices.
+        if (autoBluetoothDiscoveryJob?.isActive != true) {
+            autoBluetoothDiscoveryJob = startBluetoothDiscoveryInternal()
+        }
+    }
+
+    /**
+     * Adds a device found over Bluetooth to the circle. Fetches the child's
+     * friendly name over the RFCOMM link (falling back to the BT name), links
+     * the MAC so commands can tunnel over Bluetooth, and persists the device.
+     */
+    fun connectBluetoothDevice(candidate: BluetoothDeviceCandidate) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val mac = candidate.mac
+            deviceClient.registerBluetoothMac(candidate.deviceId, mac)
+
+            // Verify the link and grab the child's friendly device name.
+            var friendlyName = candidate.name
+            try {
+                val statsResponse = bluetoothClient.executeCommand(mac, Packet.Command(CommandType.GET_STATS))
+                statsResponse?.stats?.deviceName?.takeIf { it.isNotBlank() }?.let { friendlyName = it }
+            } catch (e: Exception) {
+                Log.w("DiscoveryViewModel", "BT handshake failed for ${candidate.deviceId}", e)
+            }
+            if (friendlyName.startsWith(BluetoothConfig.SERVICE_NAME_PREFIX)) {
+                friendlyName = friendlyName.removePrefix(BluetoothConfig.SERVICE_NAME_PREFIX)
+            }
+
+            val currentList = _devices.value.toMutableList()
+            val index = currentList.indexOfFirst { it.deviceId == candidate.deviceId }
+            if (index != -1) {
+                val current = currentList[index]
+                val updated = current.copy(
+                    bluetoothMac = mac,
+                    bluetoothName = current.bluetoothName ?: candidate.name
+                )
+                currentList[index] = updated
+                _devices.value = currentList
+                saveDevices()
+                observeDeviceEvents(updated)
+                Log.i("DiscoveryViewModel", "Linked Bluetooth ${mac} to existing ${updated.customName}")
+            } else {
+                val placeholderIp = runCatching { InetAddress.getByName("0.0.0.0") }.getOrNull() ?: return@launch
+                val newDevice = ChildDevice(
+                    deviceId = candidate.deviceId,
+                    name = candidate.name,
+                    ip = placeholderIp,
+                    port = 8080,
+                    customName = friendlyName,
+                    reportedName = friendlyName,
+                    bluetoothName = candidate.name,
+                    bluetoothMac = mac
+                )
+                currentList.add(newDevice)
+                _devices.value = currentList
+                saveDevices()
+                observeDeviceEvents(newDevice)
+                Log.i("DiscoveryViewModel", "Added Bluetooth device ${friendlyName} (${candidate.deviceId})")
+            }
+
+            _bluetoothCandidates.value = _bluetoothCandidates.value.map {
+                if (it.deviceId == candidate.deviceId) it.copy(alreadyPaired = true) else it
+            }
+        }
     }
 
     fun startDiscovery() {
@@ -247,14 +438,20 @@ class DiscoveryViewModel(application: Application) : AndroidViewModel(applicatio
         val currentList = _devices.value.toMutableList()
         currentList.removeAll { it.deviceId == device.deviceId }
         _devices.value = currentList
+        _deviceStatuses.value = _deviceStatuses.value - device.deviceId
         saveDevices() // Persist the removal
+        com.parentalguard.parent.service.NotificationService.stopMonitoring(getApplication(), device.deviceId)
         Log.i("DiscoveryViewModel", "Removed device: ${device.customName}")
     }
     
     fun resetAllDevices() {
+        val removed = _devices.value
         _devices.value = emptyList()
         _deviceStatuses.value = emptyMap()
         saveDevices()
+        removed.forEach { device ->
+            com.parentalguard.parent.service.NotificationService.stopMonitoring(getApplication(), device.deviceId)
+        }
         Log.i("DiscoveryViewModel", "Reset all devices")
     }
     
@@ -280,7 +477,8 @@ class DiscoveryViewModel(application: Application) : AndroidViewModel(applicatio
                 }
             }.awaitAll()
 
-            _deviceStatuses.value = results.toMap()
+                _deviceStatuses.value = results.toMap()
+                applyReportedNames(results.toMap())
         }
     }
 
@@ -313,7 +511,8 @@ class DiscoveryViewModel(application: Application) : AndroidViewModel(applicatio
                     activeRulesCount = stats?.activeRules?.size ?: 0,
                     todayScreenTimeMs = screenTime,
                     lastUpdate = System.currentTimeMillis(),
-                    connectionType = responseResult.connectionType
+                    connectionType = responseResult.connectionType,
+                    reportedDeviceName = stats?.deviceName
                 )
             } else {
                 if (!skipDirect && responseResult.connectionType == ConnectionType.UNKNOWN) {
@@ -322,6 +521,35 @@ class DiscoveryViewModel(application: Application) : AndroidViewModel(applicatio
                 }
                 DeviceStatusSummary(isOnline = false, connectionType = responseResult.connectionType)
             }
+        }
+    }
+
+    private fun applyReportedNames(statuses: Map<String, DeviceStatusSummary>) {
+        var changed = false
+        val updated = _devices.value.map { device ->
+            val reported = statuses[device.deviceId]?.reportedDeviceName
+                ?.trim()
+                ?.takeIf { it.isNotEmpty() && !it.startsWith(BluetoothConfig.SERVICE_NAME_PREFIX) }
+                ?: return@map device
+
+            val current = device.customName.trim()
+            val generatedName = current.isBlank() ||
+                current == device.name ||
+                current == device.deviceId ||
+                current.startsWith(BluetoothConfig.SERVICE_NAME_PREFIX) ||
+                current.startsWith("Legacy Device") ||
+                current == device.reportedName
+
+            val next = device.copy(
+                customName = if (generatedName) reported else device.customName,
+                reportedName = reported
+            )
+            if (next != device) changed = true
+            next
+        }
+        if (changed) {
+            _devices.value = updated
+            saveDevices()
         }
     }
     fun syncLanguage(languageCode: String) {

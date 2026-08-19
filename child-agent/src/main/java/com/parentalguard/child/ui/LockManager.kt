@@ -6,6 +6,8 @@ import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -15,7 +17,10 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.parentalguard.child.ui.screens.LockScreen
+import com.parentalguard.child.ui.screens.BlackoutLockScreen
+import com.parentalguard.child.ui.screens.QuietFocusLockScreen
 import com.parentalguard.child.ui.theme.ParentalGuardTheme
+import com.parentalguard.common.model.BlockingScreenStyle
 import android.widget.Toast
 
 class LockManager(private val context: Context) : LifecycleOwner, SavedStateRegistryOwner {
@@ -62,15 +67,19 @@ class LockManager(private val context: Context) : LifecycleOwner, SavedStateRegi
                 
                 setContent {
                     ParentalGuardTheme {
-                        LockScreen(
-                            onRequestUnlock = {
-                                com.parentalguard.child.utils.EventHelper.sendUnlockRequest(
-                                    context = context,
-                                    requestType = "DEVICE"
-                                )
-                                Toast.makeText(context, "Unlock Requested", Toast.LENGTH_SHORT).show()
-                            }
-                        )
+                        val style by com.parentalguard.child.data.RuleRepository.blockingScreenStyle.collectAsState()
+                        val requestUnlock = {
+                            com.parentalguard.child.utils.EventHelper.sendUnlockRequest(
+                                context = context,
+                                requestType = "DEVICE"
+                            )
+                            Toast.makeText(context, "Unlock Requested", Toast.LENGTH_SHORT).show()
+                        }
+                        when (style) {
+                            BlockingScreenStyle.CURRENT -> LockScreen(onRequestUnlock = requestUnlock)
+                            BlockingScreenStyle.BLACKOUT -> BlackoutLockScreen()
+                            BlockingScreenStyle.QUIET_FOCUS -> QuietFocusLockScreen(onRequestUnlock = requestUnlock)
+                        }
                     }
                 }
             }
@@ -78,10 +87,16 @@ class LockManager(private val context: Context) : LifecycleOwner, SavedStateRegi
             // Add to Window
             windowManager.addView(overlayView, params)
             
-            // Activate Lifecycle
-            _lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
-            _lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
-            _lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
+            // Activate or resume the reusable Compose lifecycle.
+            if (_lifecycleRegistry.currentState == Lifecycle.State.INITIALIZED) {
+                _lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+            }
+            if (_lifecycleRegistry.currentState < Lifecycle.State.STARTED) {
+                _lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
+            }
+            if (_lifecycleRegistry.currentState < Lifecycle.State.RESUMED) {
+                _lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
+            }
             
         } catch (e: Exception) {
             e.printStackTrace()
@@ -97,8 +112,6 @@ class LockManager(private val context: Context) : LifecycleOwner, SavedStateRegi
             // Deactivate Lifecycle
             _lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
             _lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
-            _lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-            
             windowManager.removeView(overlayView)
             overlayView = null
         } catch (e: Exception) {

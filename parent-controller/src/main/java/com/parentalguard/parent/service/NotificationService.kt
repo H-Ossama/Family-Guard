@@ -35,6 +35,7 @@ class NotificationService : Service() {
     companion object {
         private const val CHANNEL_ID = "parent_monitor_service"
         private const val ACTION_START_MONITORING = "com.parentalguard.parent.action.START_MONITORING"
+        private const val ACTION_STOP_MONITORING = "com.parentalguard.parent.action.STOP_MONITORING"
         private const val EXTRA_IP = "extra_ip"
         private const val EXTRA_PORT = "extra_port"
         private const val EXTRA_NAME = "extra_name"
@@ -53,6 +54,14 @@ class NotificationService : Service() {
             } else {
                 context.startService(intent)
             }
+        }
+
+        fun stopMonitoring(context: Context, deviceId: String) {
+            val intent = Intent(context, NotificationService::class.java).apply {
+                action = ACTION_STOP_MONITORING
+                putExtra(EXTRA_DEVICE_ID, deviceId)
+            }
+            context.startService(intent)
         }
     }
 
@@ -76,7 +85,10 @@ class NotificationService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent?.action == ACTION_START_MONITORING) {
+        if (intent?.action == ACTION_STOP_MONITORING) {
+            val deviceId = intent.getStringExtra(EXTRA_DEVICE_ID)
+            if (deviceId != null) stopObserving(deviceId)
+        } else if (intent?.action == ACTION_START_MONITORING) {
             val ip = intent.getStringExtra(EXTRA_IP)
             val port = intent.getIntExtra(EXTRA_PORT, 0)
             val name = intent.getStringExtra(EXTRA_NAME) ?: "Unknown"
@@ -93,6 +105,13 @@ class NotificationService : Service() {
             }
         }
         return START_STICKY
+    }
+
+    private fun stopObserving(deviceId: String) {
+        observationJobs.remove(deviceId)?.cancel()
+        activeJobIps.remove(deviceId)
+        knownDevices.remove(deviceId)
+        Log.i("NotificationService", "Stopped observation for $deviceId")
     }
 
     private fun observeDeviceEvents(device: ChildDevice) {
@@ -147,6 +166,12 @@ class NotificationService : Service() {
                 appPackageName = event.appPackageName,
                 appName = event.appName
             )
+        } else if (event.eventType == EventType.EXTENSION_REQUESTED) {
+            NotificationHelper.showExtensionRequestNotification(
+                context = this,
+                deviceId = deviceId,
+                deviceName = customName
+            )
         }
     }
 
@@ -164,7 +189,7 @@ class NotificationService : Service() {
 
     private fun createNotification(): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Family Guard Active")
+            .setContentTitle("Kid Guard Active")
             .setContentText("Listening for child device events...")
             .setSmallIcon(R.drawable.ic_parent_logo) // Ensure this exists, or use default
             .setPriority(NotificationCompat.PRIORITY_LOW)

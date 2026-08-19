@@ -14,7 +14,7 @@ android {
         minSdk = 26
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0"
+        versionName = "2.4.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -46,6 +46,9 @@ android {
         resources {
             excludes += "META-INF/INDEX.LIST"
             excludes += "META-INF/io.netty.versions.properties"
+            // Netty's BlockHound integration is a JVM-only dev tool; its service descriptor
+            // references a runtime-generated class that doesn't exist in the jar (breaks R8).
+            excludes += "META-INF/services/reactor.blockhound.integration.BlockHoundIntegration"
         }
     }
 }
@@ -81,14 +84,6 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
     implementation("io.ktor:ktor-client-websockets:2.3.7")
 
-    // Room
-    val roomVersion = "2.6.1"
-    implementation("androidx.room:room-runtime:$roomVersion")
-    implementation("androidx.room:room-ktx:$roomVersion")
-    // Note: kapt/ksp would be needed for annotation processing. Adding kapt plugin if we were using it, 
-    // but for now just runtime deps until we add the processor logic in a follow up if needed.
-    // Actually, Room REQUIRES annotation processing. I must add it.
-    
     // WorkManager for scheduled tasks
     implementation("androidx.work:work-runtime-ktx:2.9.0")
 
@@ -97,5 +92,8 @@ dependencies {
 
     // Logging
     implementation("org.slf4j:slf4j-simple:2.0.9")
+
+    // Unit tests
+    testImplementation("junit:junit:4.13.2")
 }
 

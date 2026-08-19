@@ -11,25 +11,66 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.geometry.Size as CmSize
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathFillType
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import com.parentalguard.parent.R
+import com.parentalguard.parent.ui.neumorphic.Nm
+import com.parentalguard.parent.ui.neumorphic.NeumorphicBackground
+import com.parentalguard.parent.ui.neumorphic.NeumorphicEmptyState
+import com.parentalguard.parent.ui.neumorphic.NeumorphicIconTile
+import com.parentalguard.parent.ui.neumorphic.neumorphic
 import java.util.concurrent.Executors
-import androidx.compose.ui.res.stringResource
-import androidx.compose.foundation.Canvas
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 
 @Composable
 fun QRScannerScreen(
@@ -40,10 +81,8 @@ fun QRScannerScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     var hasCamPermission by remember {
         mutableStateOf(
-            ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED
         )
     }
 
@@ -51,151 +90,199 @@ fun QRScannerScreen(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { granted ->
             hasCamPermission = granted
-            if (!granted) {
-                onBack() 
-            }
+            if (!granted) onBack()
         }
     )
 
-    LaunchedEffect(key1 = true) {
-        if (!hasCamPermission) {
-            launcher.launch(Manifest.permission.CAMERA)
-        }
+    LaunchedEffect(true) {
+        if (!hasCamPermission) launcher.launch(Manifest.permission.CAMERA)
     }
 
-    // State for detected QR
     var isScanned by remember { mutableStateOf(false) }
 
-    if (hasCamPermission) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            AndroidView(
-                factory = { ctx ->
-                    val previewView = PreviewView(ctx).apply {
-                        layoutParams = ViewGroup.LayoutParams(
-                            ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.MATCH_PARENT
-                        )
-                        scaleType = PreviewView.ScaleType.FILL_CENTER
-                    }
-                    
-                    val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
-                    cameraProviderFuture.addListener({
-                        val cameraProvider = cameraProviderFuture.get()
-                        val preview = Preview.Builder().build().apply {
-                            setSurfaceProvider(previewView.surfaceProvider)
-                        }
-
-                        @Suppress("DEPRECATION")
-                        val imageAnalysis = ImageAnalysis.Builder()
-                            .setTargetResolution(Size(1280, 720)) // 720p is good for QR
-                            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                            .build()
-
-                        imageAnalysis.setAnalyzer(
-                            Executors.newSingleThreadExecutor(),
-                            QrCodeAnalyzer { result ->
-                                // Update UI with detected points
-                                val points = result.resultPoints
-                                if (points != null && points.isNotEmpty() && !isScanned) {
-                                    isScanned = true
-                                    // Trigger callback on main thread
-                                    previewView.post {
-                                        onQrScanned(result.text)
-                                    }
-                                }
-                            }
-                        )
-
-                        val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-
-                        try {
-                            cameraProvider.unbindAll()
-                            cameraProvider.bindToLifecycle(
-                                lifecycleOwner,
-                                cameraSelector,
-                                preview,
-                                imageAnalysis
-                            )
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }, ContextCompat.getMainExecutor(ctx))
-
-                    previewView
-                },
-                modifier = Modifier.fillMaxSize()
-            )
-
-            // Overlay with Viewfinder and Back Button
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                // Back Button
-                androidx.compose.material3.IconButton(
-                    onClick = onBack,
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .align(Alignment.TopStart)
-                ) {
-                    androidx.compose.material3.Icon(
-                        imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = Color.White
-                    )
-                }
-                
-                val borderColor = if (isScanned) Color.Green else Color.White
-
-                // Viewfinder lines
-                Canvas(modifier = Modifier.fillMaxSize()) {
-                    val strokeWidth = (if (isScanned) 8.dp else 4.dp).toPx()
-                    val cornerLength = 40.dp.toPx()
-                    val width = size.width
-                    val height = size.height
-                    val boxSize = width * 0.7f // 70% width square
-                    val left = (width - boxSize) / 2
-                    val top = (height - boxSize) / 2
-                    val right = left + boxSize
-                    val bottom = top + boxSize
-                    
-                    // Top Left
-                    drawLine(borderColor, Offset(left, top), Offset(left + cornerLength, top), strokeWidth)
-                    drawLine(borderColor, Offset(left, top), Offset(left, top + cornerLength), strokeWidth)
-
-                    // Top Right
-                    drawLine(borderColor, Offset(right, top), Offset(right - cornerLength, top), strokeWidth)
-                    drawLine(borderColor, Offset(right, top), Offset(right, top + cornerLength), strokeWidth)
-
-                    // Bottom Left
-                    drawLine(borderColor, Offset(left, bottom), Offset(left + cornerLength, bottom), strokeWidth)
-                    drawLine(borderColor, Offset(left, bottom), Offset(left, bottom - cornerLength), strokeWidth)
-
-                    // Bottom Right
-                    drawLine(borderColor, Offset(right, bottom), Offset(right - cornerLength, bottom), strokeWidth)
-                    drawLine(borderColor, Offset(right, bottom), Offset(right, bottom - cornerLength), strokeWidth)
-                }
-
-                if (isScanned) {
-                     androidx.compose.material3.CircularProgressIndicator(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .padding(top = 150.dp), // Below the box
-                        color = Color.Green
-                    )
-                }
-
-                Text(
-                    text = stringResource(com.parentalguard.parent.R.string.scan_instruction),
-                    color = Color.White,
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 64.dp)
+    if (!hasCamPermission) {
+        NeumorphicBackground {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                NeumorphicEmptyState(
+                    icon = Icons.Default.QrCodeScanner,
+                    title = stringResource(R.string.camera_permission_required),
+                    description = ""
                 )
             }
         }
-    } else {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(stringResource(com.parentalguard.parent.R.string.camera_permission_required))
+        return
+    }
+
+    NeumorphicBackground {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding()
+                .padding(20.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                NeumorphicIconTile(
+                    icon = Icons.Default.ArrowBack,
+                    onClick = onBack,
+                    tint = Nm.onSurface,
+                    contentDescription = stringResource(R.string.back),
+                    size = 46.dp
+                )
+                Spacer(Modifier.width(14.dp))
+                Text(
+                    text = stringResource(R.string.scan_qr),
+                    color = Nm.onSurface,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(Modifier.height(20.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .neumorphic(
+                        shape = RoundedCornerShape(36.dp),
+                        backgroundColor = Color.Black,
+                        elevation = 10.dp
+                    )
+                    .clip(RoundedCornerShape(36.dp))
+            ) {
+                AndroidView(
+                    factory = { ctx ->
+                        val previewView = PreviewView(ctx).apply {
+                            layoutParams = ViewGroup.LayoutParams(
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.MATCH_PARENT
+                            )
+                            scaleType = PreviewView.ScaleType.FILL_CENTER
+                        }
+
+                        val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
+                        cameraProviderFuture.addListener({
+                            val cameraProvider = cameraProviderFuture.get()
+                            val preview = Preview.Builder().build().apply {
+                                setSurfaceProvider(previewView.surfaceProvider)
+                            }
+
+                            @Suppress("DEPRECATION")
+                            val imageAnalysis = ImageAnalysis.Builder()
+                                .setTargetResolution(Size(1280, 720))
+                                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                                .build()
+
+                            imageAnalysis.setAnalyzer(
+                                Executors.newSingleThreadExecutor(),
+                                QrCodeAnalyzer { result ->
+                                    val points = result.resultPoints
+                                    if (!points.isNullOrEmpty() && !isScanned) {
+                                        isScanned = true
+                                        previewView.post { onQrScanned(result.text) }
+                                    }
+                                }
+                            )
+
+                            try {
+                                cameraProvider.unbindAll()
+                                cameraProvider.bindToLifecycle(
+                                    lifecycleOwner,
+                                    CameraSelector.DEFAULT_BACK_CAMERA,
+                                    preview,
+                                    imageAnalysis
+                                )
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }, ContextCompat.getMainExecutor(ctx))
+
+                        previewView
+                    },
+                    modifier = Modifier.fillMaxSize()
+                )
+
+                ScannerOverlay(isScanned = isScanned)
+
+                if (isScanned) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center),
+                        color = Nm.success
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(20.dp))
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .neumorphic(shape = RoundedCornerShape(50), backgroundColor = Nm.surface, elevation = 5.dp)
+                    .clip(RoundedCornerShape(50))
+                    .padding(horizontal = 20.dp, vertical = 12.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.scan_instruction),
+                    color = Nm.onSurface,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ScannerOverlay(isScanned: Boolean) {
+    val laser by rememberInfiniteTransition(label = "laser").animateFloat(
+        initialValue = 0f, targetValue = 1f,
+        animationSpec = infiniteRepeatable(tween(2200, easing = LinearEasing), RepeatMode.Reverse),
+        label = "laser-y"
+    )
+    val accent = if (isScanned) Nm.success else Nm.primary
+
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        val boxSize = size.width * 0.68f
+        val left = (size.width - boxSize) / 2f
+        val top = (size.height - boxSize) / 2f
+        val radius = 32.dp.toPx()
+
+        // Dimmed scrim with a rounded window
+        val scrim = Path().apply {
+            addRect(Rect(0f, 0f, size.width, size.height))
+            addRoundRect(RoundRect(left, top, left + boxSize, top + boxSize, radius, radius))
+            fillType = PathFillType.EvenOdd
+        }
+        drawPath(scrim, Color.Black.copy(alpha = 0.5f))
+
+        // Recessed groove frame: dark inner shadow + light top edge
+        drawRoundRect(
+            color = Nm.darkShadow.copy(alpha = 0.6f),
+            topLeft = Offset(left + 2.dp.toPx(), top + 2.dp.toPx()),
+            size = CmSize(boxSize - 4.dp.toPx(), boxSize - 4.dp.toPx()),
+            cornerRadius = CornerRadius(radius - 2.dp.toPx()),
+            style = Stroke(width = 4.dp.toPx())
+        )
+        drawRoundRect(
+            color = Nm.lightShadow.copy(alpha = 0.85f),
+            topLeft = Offset(left - 2.dp.toPx(), top - 2.dp.toPx()),
+            size = CmSize(boxSize + 4.dp.toPx(), boxSize + 4.dp.toPx()),
+            cornerRadius = CornerRadius(radius + 2.dp.toPx()),
+            style = Stroke(width = 3.dp.toPx())
+        )
+
+        // Scan line
+        if (!isScanned) {
+            val laserY = top + 14.dp.toPx() + ((boxSize - 28.dp.toPx()) * laser)
+            drawLine(
+                brush = Brush.horizontalGradient(
+                    listOf(Color.Transparent, accent.copy(alpha = 0.9f), Color.Transparent)
+                ),
+                start = Offset(left + 16.dp.toPx(), laserY),
+                end = Offset(left + boxSize - 16.dp.toPx(), laserY),
+                strokeWidth = 2.5.dp.toPx(),
+                cap = StrokeCap.Round
+            )
         }
     }
 }

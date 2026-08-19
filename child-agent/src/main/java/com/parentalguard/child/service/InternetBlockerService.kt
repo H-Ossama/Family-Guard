@@ -15,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import com.parentalguard.child.data.RuleRepository
+import com.parentalguard.child.R
 import android.content.Context
 
 class InternetBlockerService : VpnService() {
@@ -173,8 +174,8 @@ class InternetBlockerService : VpnService() {
 
     private fun createNotification(): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Parental Guard Proxy")
-            .setContentText("Internet control active")
+            .setContentTitle(getString(R.string.internet_blocker_title))
+            .setContentText(getString(R.string.internet_control_active))
             .setSmallIcon(android.R.drawable.ic_lock_lock)
             .setOngoing(true)
             .build()

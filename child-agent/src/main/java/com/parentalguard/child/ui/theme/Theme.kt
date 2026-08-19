@@ -14,42 +14,42 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val LightColorScheme = lightColorScheme(
-    primary = Primary,
+    primary = NeumorphicPrimary,
     onPrimary = Color.White,
-    primaryContainer = PrimaryLight,
-    onPrimaryContainer = PrimaryDark,
+    primaryContainer = NeumorphicPrimarySoft,
+    onPrimaryContainer = NeumorphicPrimaryDeep,
     
-    secondary = Secondary,
+    secondary = NeumorphicPrimary,
     onSecondary = Color.White,
-    secondaryContainer = SecondaryLight,
-    onSecondaryContainer = SecondaryDark,
+    secondaryContainer = NeumorphicPrimarySoft,
+    onSecondaryContainer = NeumorphicPrimaryDeep,
     
-    tertiary = AccentPurple,
+    tertiary = NeumorphicPrimaryDeep,
     onTertiary = Color.White,
-    tertiaryContainer = Color(0xFFEDE7F6),
-    onTertiaryContainer = Color(0xFF4A148C),
+    tertiaryContainer = NeumorphicPrimarySoft,
+    onTertiaryContainer = NeumorphicPrimaryDeep,
     
-    error = Error,
+    error = NeumorphicError,
     onError = Color.White,
-    errorContainer = ErrorLight,
-    onErrorContainer = Error,
+    errorContainer = Color(0xFFFDEBEF),
+    onErrorContainer = NeumorphicError,
     
-    background = BackgroundLight,
-    onBackground = TextPrimaryLight,
+    background = NeumorphicBackgroundColor,
+    onBackground = NeumorphicOnSurface,
     
-    surface = SurfaceLight,
-    onSurface = TextPrimaryLight,
-    surfaceVariant = SurfaceVariantLight,
-    onSurfaceVariant = TextSecondaryLight,
+    surface = NeumorphicSurface,
+    onSurface = NeumorphicOnSurface,
+    surfaceVariant = NeumorphicSurfaceInset,
+    onSurfaceVariant = NeumorphicOnSurfaceMuted,
     
-    outline = TextTertiaryLight,
-    outlineVariant = Color(0xFFE0E0E0),
+    outline = NeumorphicDarkShadow,
+    outlineVariant = Color(0xFFD5DCEA),
     
-    inverseSurface = SurfaceDark,
-    inverseOnSurface = TextPrimaryDark,
-    inversePrimary = PrimaryLight,
+    inverseSurface = NeumorphicOnSurface,
+    inverseOnSurface = NeumorphicSurface,
+    inversePrimary = NeumorphicPrimary,
     
-    surfaceTint = Primary,
+    surfaceTint = NeumorphicPrimary,
     scrim = Color.Black
 )
 
@@ -122,8 +122,11 @@ fun ParentalGuardTheme(
             val context = view.context
             if (context is Activity) {
                 val window = context.window
-                window.statusBarColor = if (darkTheme) BackgroundDark.toArgb() else Primary.toArgb()
-                WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+                window.statusBarColor = colorScheme.background.toArgb()
+                window.navigationBarColor = colorScheme.background.toArgb()
+                val insetsController = WindowCompat.getInsetsController(window, view)
+                insetsController.isAppearanceLightStatusBars = !darkTheme
+                insetsController.isAppearanceLightNavigationBars = !darkTheme
             }
         }
     }
@@ -144,6 +147,7 @@ fun getCategoryColor(category: com.parentalguard.common.model.AppCategory): Colo
         com.parentalguard.common.model.AppCategory.EDUCATION -> CategoryEducation
         com.parentalguard.common.model.AppCategory.PRODUCTIVITY -> CategoryProductivity
         com.parentalguard.common.model.AppCategory.ENTERTAINMENT -> CategoryEntertainment
+        com.parentalguard.common.model.AppCategory.SYSTEM -> CategorySystem
         com.parentalguard.common.model.AppCategory.OTHER -> CategoryOther
     }
 }

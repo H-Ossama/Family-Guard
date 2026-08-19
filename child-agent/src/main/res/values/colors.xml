@@ -12,4 +12,15 @@
     <!-- Base Colors -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Neumorphism Palette - Soft Periwinkle -->
+    <color name="neu_background">#E4E9F5</color>
+    <color name="neu_surface">#EAEFFB</color>
+    <color name="neu_surface_inset">#DCE3F2</color>
+    <color name="neu_on_surface">#2C3752</color>
+    <color name="neu_on_surface_muted">#7A86A1</color>
+    <color name="neu_primary">#5B6BD6</color>
+    <color name="neu_primary_deep">#4555B8</color>
+    <color name="neu_light_shadow">#FFFFFF</color>
+    <color name="neu_dark_shadow">#A3AFCA</color>
 </resources>

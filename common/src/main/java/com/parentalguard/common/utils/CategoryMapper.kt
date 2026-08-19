@@ -81,8 +81,28 @@ object CategoryMapper {
      * Get the category for a given package name
      */
     fun getCategoryForPackage(packageName: String): AppCategory {
-        return categoryMap[packageName] ?: AppCategory.OTHER
+        return getCategoryForPackage(packageName, null)
     }
+
+    /**
+     * Classifies known apps first, then uses package/label keywords for apps
+     * that are not in the static catalog yet.
+     */
+    fun getCategoryForPackage(packageName: String, appLabel: String?): AppCategory {
+        categoryMap[packageName]?.let { return it }
+
+        val value = "$packageName ${appLabel.orEmpty()}".lowercase()
+        return when {
+            containsAny(value, "facebook", "instagram", "whatsapp", "messenger", "snapchat", "tiktok", "twitter", "telegram", "discord", "reddit", "linkedin", "pinterest", "social") -> AppCategory.SOCIAL
+            containsAny(value, "game", "games", "roblox", "minecraft", "clash", "brawl", "pubg", "freefire", "fortnite", "subway", "candy", "chess") -> AppCategory.GAMES
+            containsAny(value, "school", "education", "learning", "learn", "classroom", "duolingo", "khan", "quiz", "course", "udemy", "coursera", "wikipedia", "dictionary") -> AppCategory.EDUCATION
+            containsAny(value, "youtube", "netflix", "spotify", "music", "video", "twitch", "disney", "prime video", "hulu", "movie", "movies", "podcast", "stream") -> AppCategory.ENTERTAINMENT
+            containsAny(value, "office", "docs", "sheets", "word", "excel", "powerpoint", "drive", "notes", "calendar", "gmail", "mail", "outlook", "notion", "todo", "task", "slack", "teams", "zoom", "browser", "chrome", "firefox", "edge") -> AppCategory.PRODUCTIVITY
+            else -> AppCategory.OTHER
+        }
+    }
+
+    private fun containsAny(value: String, vararg terms: String): Boolean = terms.any(value::contains)
     
     /**
      * Check if a package should be whitelisted (never blocked)
@@ -96,13 +116,5 @@ object CategoryMapper {
      */
     fun getPackagesInCategory(category: AppCategory): List<String> {
         return categoryMap.filterValues { it == category }.keys.toList()
-    }
-    
-    /**
-     * Add a custom mapping (for future extensibility)
-     */
-    fun addCustomMapping(_packageName: String, _category: AppCategory) {
-        // This would require making categoryMap mutable or using a separate storage
-        // For now, this is a placeholder for future enhancement
     }
 }

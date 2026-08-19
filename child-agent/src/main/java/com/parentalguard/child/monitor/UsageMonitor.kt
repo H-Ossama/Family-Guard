@@ -7,7 +7,9 @@ import com.parentalguard.common.model.AppUsageLog
 import com.parentalguard.common.model.AppCategory
 import com.parentalguard.common.model.CategoryUsage
 import com.parentalguard.common.model.DailyUsageReport
+import com.parentalguard.common.model.mergedByPackage
 import com.parentalguard.common.utils.CategoryMapper
+import com.parentalguard.child.utils.DeviceUtils
 import java.util.Calendar
 
 class UsageMonitor(private val context: Context) {
@@ -36,20 +38,35 @@ class UsageMonitor(private val context: Context) {
         if (stats != null) {
             for (usageStat in stats) {
                 if (usageStat.totalTimeInForeground > 0) {
-                    val category = com.parentalguard.child.data.RuleRepository.getCategory(usageStat.packageName)
+                    val appInfo = runCatching {
+                        context.packageManager.getApplicationInfo(usageStat.packageName, 0)
+                    }.getOrNull()
+                    val appLabel = appInfo?.loadLabel(context.packageManager)?.toString()
+                    val isSystem = appInfo?.let {
+                        (it.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
+                    } == true
+                    val category = if (isSystem) {
+                        AppCategory.SYSTEM
+                    } else {
+                        com.parentalguard.child.data.RuleRepository.getCategory(
+                            usageStat.packageName,
+                            appLabel
+                        )
+                    }
                     usageLogs.add(
                         AppUsageLog(
                             packageName = usageStat.packageName,
                             totalTimeInForeground = usageStat.totalTimeInForeground,
                             lastTimeUsed = usageStat.lastTimeUsed,
                             date = android.text.format.DateFormat.format("yyyy-MM-dd", System.currentTimeMillis()).toString(),
-                            category = category
+                            category = category,
+                            appLabel = appLabel
                         )
                     )
                 }
             }
         }
-        return usageLogs
+        return usageLogs.mergedByPackage()
     }
     
     /**
@@ -124,7 +141,7 @@ class UsageMonitor(private val context: Context) {
         
         return DailyUsageReport(
             date = android.text.format.DateFormat.format("yyyy-MM-dd", System.currentTimeMillis()).toString(),
-            deviceName = android.os.Build.MODEL,
+            deviceName = DeviceUtils.getDeviceName(context),
             totalScreenTimeMs = totalScreenTime,
             appUsages = usageLogs,
             categoryUsages = categoryUsages,
@@ -153,22 +170,16 @@ class UsageMonitor(private val context: Context) {
         while (events.hasNextEvent()) {
             events.getNextEvent(event)
             val packageName = event.packageName
-            val eventTime = event.timeStamp
             val eventType = event.eventType
             
-            val calendar = Calendar.getInstance()
-            calendar.timeInMillis = eventTime
-            val hour = calendar.get(Calendar.HOUR_OF_DAY)
-            
             if (eventType == android.app.usage.UsageEvents.Event.MOVE_TO_FOREGROUND) {
-                lastEventTime[packageName] = eventTime
+                lastEventTime[packageName] = event.timeStamp
             } else if (eventType == android.app.usage.UsageEvents.Event.MOVE_TO_BACKGROUND) {
                 val start = lastEventTime[packageName]
                 if (start != null) {
-                    val duration = eventTime - start
-                    if (hour in 0..23) {
-                        hourlyUsage[hour] += duration
-                    }
+                    // Credit each minute to the hour it actually occurred in,
+                    // so a 22:50-23:10 session lands partly in hour 22 and partly in 23.
+                    addSessionToHourlyUsage(hourlyUsage, start, event.timeStamp)
                     lastEventTime.remove(packageName)
                 }
             }
@@ -176,6 +187,24 @@ class UsageMonitor(private val context: Context) {
         
         return hourlyUsage.mapIndexed { index, timeMs ->
             com.parentalguard.common.model.HourlyUsage(index, timeMs)
+        }
+    }
+
+    private fun addSessionToHourlyUsage(hourlyUsage: LongArray, startMs: Long, endMs: Long) {
+        var cursor = startMs
+        val calendar = Calendar.getInstance()
+        while (cursor < endMs) {
+            calendar.timeInMillis = cursor
+            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+            calendar.set(Calendar.MINUTE, 0)
+            calendar.set(Calendar.SECOND, 0)
+            calendar.set(Calendar.MILLISECOND, 0)
+            val hourEnd = calendar.timeInMillis + 3600_000L
+            val chunkEnd = minOf(hourEnd, endMs)
+            if (hour in 0..23) {
+                hourlyUsage[hour] += (chunkEnd - cursor)
+            }
+            cursor = chunkEnd
         }
     }
 }
